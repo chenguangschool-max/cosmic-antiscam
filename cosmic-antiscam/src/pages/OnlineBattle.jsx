@@ -4,7 +4,8 @@ import { socket } from '../socket'
 const COLORS = ['#5b8dee', '#a78bfa', '#34d399', '#fb923c', '#ff6b6b']
 
 export default function OnlineBattle({ room, navigate }) {
-  const [phase, setPhase] = useState('generating') // generating | question | result | gameover
+  const [phase, setPhase] = useState('generating') // generating | question | result | gameover | error
+  const [genError, setGenError] = useState('')
   const [q, setQ] = useState(null)
   const [qIndex, setQIndex] = useState(0)
   const [total, setTotal] = useState(10)
@@ -39,6 +40,8 @@ export default function OnlineBattle({ room, navigate }) {
       setPhase('result')
     })
 
+    socket.on('gen-error', (msg) => { setGenError(msg); setPhase('error') })
+
     socket.on('game-over', ({ results }) => {
       clearTimer()
       setFinalResults(results)
@@ -53,6 +56,7 @@ export default function OnlineBattle({ room, navigate }) {
     })
 
     return () => {
+      socket.off('gen-error')
       socket.off('game-start')
       socket.off('new-question')
       socket.off('question-result')
@@ -89,7 +93,7 @@ export default function OnlineBattle({ room, navigate }) {
       <div style={{ ...page, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 18 }}>🤖</div>
         <div style={titleStyle}>AI 正在生成題目</div>
-        <div style={{ color: 'rgba(180,200,255,.4)', fontSize: 12, marginTop: 8 }}>宇宙情報收集中，請稍候…</div>
+        <div style={{ color: 'rgba(180,200,255,.4)', fontSize: 12, marginTop: 8 }}>宇宙情報收集中，約需 30 秒…</div>
         <div style={{ marginTop: 24, display: 'flex', gap: 6 }}>
           {[0, 1, 2].map(i => (
             <div key={i} style={{
@@ -98,6 +102,17 @@ export default function OnlineBattle({ room, navigate }) {
             }} />
           ))}
         </div>
+      </div>
+    )
+  }
+
+  if (phase === 'error') {
+    return (
+      <div style={{ ...page, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: 40, marginBottom: 18 }}>⚠️</div>
+        <div style={titleStyle}>生成失敗</div>
+        <div style={{ color: 'rgba(255,150,150,.7)', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{genError}</div>
+        <button onClick={() => { socket.disconnect(); navigate('menu') }} style={{ ...actionBtn, marginTop: 24 }}>返回主選單</button>
       </div>
     )
   }

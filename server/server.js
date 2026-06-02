@@ -66,14 +66,18 @@ function shuffle(arr) {
 }
 
 async function genRoomQuestions() {
-  // 7 詐騙 + 3 正常，各取不重複主題
+  // 7 詐騙 + 3 正常，各取不重複主題，依序生成避免 rate limit
   const scamTopics = shuffle(SCAM_TOPICS).slice(0, 7)
   const normalTopics = shuffle(NORMAL_TOPICS).slice(0, 3)
   const assignments = shuffle([
     ...scamTopics.map(t => ({ isScam: true, topic: t })),
     ...normalTopics.map(t => ({ isScam: false, topic: t })),
   ])
-  return Promise.all(assignments.map(({ isScam, topic }) => genQuestion(isScam, topic)))
+  const questions = []
+  for (const { isScam, topic } of assignments) {
+    questions.push(await genQuestion(isScam, topic))
+  }
+  return questions
 }
 
 // ── 房間管理 ───────────────────────────────────────────────────────────────────
