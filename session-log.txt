@@ -1,0 +1,1 @@
+﻿[2026-05-31 21:15:52] cosmic-antiscam 多人模式實作完成：新增 MultiQuiz.jsx（交接畫面+輪流答題+計時器），更新 App.jsx 串接 multiSetup/multiQuiz/multiResult 三頁流程，MainMenu 多人按鈕改為真實導航，STATIC_QUESTIONS 和 generateQuestion 移至 data.js 共用。下一步：可加入 localStorage 存檔、音效、或更多題目。

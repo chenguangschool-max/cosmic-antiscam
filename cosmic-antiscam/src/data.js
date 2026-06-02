@@ -1,0 +1,114 @@
+export const MONSTERS = [
+  { id:'m01', code:'α-01', emoji:'👾', name:'仿冒銀行使者',   type:'fraud',  tl:'假冒詐騙', stars:2, desc:'偽裝銀行客服，要求點連結輸入帳密。',                           defeat:'正規銀行不用訊息叫你輸入密碼。',             reward:50,  lv:1,  cr:0,    unlocked:true  },
+  { id:'m02', code:'α-02', emoji:'🕷️', name:'快遞補費蜘蛛',   type:'fraud',  tl:'假冒詐騙', stars:2, desc:'偽裝快遞要求先上網補繳郵資。',                               defeat:'正規快遞不要求先上網補費。',                 reward:50,  lv:1,  cr:80,   unlocked:true  },
+  { id:'m03', code:'α-03', emoji:'🎰', name:'彩券大獎幻象',   type:'fraud',  tl:'假冒詐騙', stars:2, desc:'中獎通知要先繳手續費才能領獎。',                             defeat:'先繳費才能領獎永遠是詐騙。',                 reward:50,  lv:2,  cr:100,  unlocked:false },
+  { id:'m04', code:'α-04', emoji:'📱', name:'假客服分期魔',   type:'fraud',  tl:'假冒詐騙', stars:3, desc:'假冒電商客服說誤設分期，要求提供銀行密碼。',                 defeat:'客服永遠不需要你的轉帳密碼。',               reward:80,  lv:3,  cr:150,  unlocked:false },
+  { id:'m05', code:'α-05', emoji:'🏛️', name:'安全帳戶幽靈',   type:'fraud',  tl:'假冒詐騙', stars:4, desc:'偽裝政府要求轉入安全帳戶。',                                 defeat:'安全帳戶不存在，撥165。',                    reward:120, lv:5,  cr:250,  unlocked:false },
+  { id:'m06', code:'α-06', emoji:'🏦', name:'假冒電信使者',   type:'fraud',  tl:'假冒詐騙', stars:3, desc:'偽裝電信說欠費即將停話，要求立即線上繳費。',               defeat:'電信不會突然要求立即線上繳費。',             reward:80,  lv:4,  cr:180,  unlocked:false },
+  { id:'m07', code:'α-07', emoji:'🚔', name:'假警察幽靈船',   type:'fraud',  tl:'假冒詐騙', stars:4, desc:'偽裝警察說你帳戶涉及犯罪，要求配合轉帳。',                 defeat:'警察不會電話要求轉帳，直接撥110。',          reward:120, lv:6,  cr:280,  unlocked:false },
+  { id:'m08', code:'α-08', emoji:'🏥', name:'假健保催費蟲',   type:'fraud',  tl:'假冒詐騙', stars:2, desc:'假冒健保局說欠繳保費，要求即刻轉帳否則停保。',             defeat:'健保局不會電話催繳，親洽確認。',             reward:50,  lv:2,  cr:100,  unlocked:false },
+  { id:'m09', code:'β-01', emoji:'💘', name:'假愛情星球人',   type:'social', tl:'社交陷阱', stars:3, desc:'網路交友快速升溫後，以緊急狀況借錢。',                       defeat:'不轉帳給未曾見面的網友。',                   reward:80,  lv:2,  cr:120,  unlocked:true  },
+  { id:'m10', code:'β-02', emoji:'💼', name:'高薪保證金怪',   type:'social', tl:'社交陷阱', stars:2, desc:'高薪居家工作廣告，要先繳保證金才能上工。',                   defeat:'正規公司不要員工先付費。',                   reward:50,  lv:2,  cr:100,  unlocked:false },
+  { id:'m11', code:'β-03', emoji:'👥', name:'假冒親友使者',   type:'social', tl:'社交陷阱', stars:3, desc:'入侵帳號假冒親友緊急借錢。',                                 defeat:'借錢前另外致電確認。',                       reward:80,  lv:4,  cr:180,  unlocked:false },
+  { id:'m12', code:'β-04', emoji:'🎭', name:'身份偽裝魔人',   type:'social', tl:'社交陷阱', stars:3, desc:'假冒網紅邀請加入私密群組投資。',                             defeat:'名人不會主動邀請陌生人私下投資。',           reward:80,  lv:5,  cr:200,  unlocked:false },
+  { id:'m13', code:'β-05', emoji:'🤝', name:'假公益騙局師',   type:'social', tl:'社交陷阱', stars:2, desc:'假冒慈善機構募款，騙取捐款後消失。',                         defeat:'捐款前查證機構是否在官方名冊。',             reward:50,  lv:3,  cr:130,  unlocked:false },
+  { id:'m14', code:'β-06', emoji:'🎓', name:'假學歷掮客',     type:'social', tl:'社交陷阱', stars:3, desc:'販售假文憑，聲稱可幫助求職加薪。',                           defeat:'文憑只從合法機構取得。',                     reward:80,  lv:5,  cr:200,  unlocked:false },
+  { id:'m15', code:'β-07', emoji:'🧧', name:'假紅包陷阱獸',   type:'social', tl:'社交陷阱', stars:2, desc:'以免費紅包誘導加入群組，要繳費才能領取。',                   defeat:'真正免費的紅包不需先繳任何費用。',           reward:50,  lv:3,  cr:130,  unlocked:false },
+  { id:'m16', code:'γ-01', emoji:'📈', name:'虛假報酬惡魔',   type:'invest', tl:'投資詐騙', stars:4, desc:'保證高報酬，初期讓你小賺，最後捲款消失。',                   defeat:'投資必有風險，保證獲利都是詐騙。',           reward:120, lv:6,  cr:280,  unlocked:false },
+  { id:'m17', code:'γ-02', emoji:'💹', name:'加密貨幣騙士',   type:'invest', tl:'投資詐騙', stars:5, desc:'假加密平台顯示帳面獲利，出金時拒絕。',                       defeat:'帳面獲利不等於真實獲利，無法出金就是詐騙。', reward:200, lv:9,  cr:500,  unlocked:false },
+  { id:'m18', code:'γ-03', emoji:'🏠', name:'假房產投資蟲',   type:'invest', tl:'投資詐騙', stars:4, desc:'聲稱有低價好屋，需先繳訂金才能看屋。',                       defeat:'正規房屋交易不需先繳訂金才能看屋。',         reward:120, lv:7,  cr:320,  unlocked:false },
+  { id:'m19', code:'γ-04', emoji:'🌾', name:'農業基金幻靈',   type:'invest', tl:'投資詐騙', stars:3, desc:'投資農業可獲每月固定配息，遠超市場水準。',                   defeat:'任何超過市場水準的固定配息都要高度懷疑。',   reward:80,  lv:6,  cr:260,  unlocked:false },
+  { id:'m20', code:'γ-05', emoji:'💎', name:'假鑽石傳銷怪',   type:'invest', tl:'投資詐騙', stars:4, desc:'購買珠寶並拉人頭返利的多層次傳銷詐騙。',                     defeat:'拉人頭才能獲利的模型是龐氏騙局。',           reward:120, lv:8,  cr:380,  unlocked:false },
+  { id:'m21', code:'δ-01', emoji:'🔗', name:'釣魚連結病毒',   type:'cyber',  tl:'網路攻擊', stars:3, desc:'仿造官網騙取帳密與信用卡資料。',                             defeat:'查網址正確性，不點來路不明的連結。',         reward:80,  lv:4,  cr:180,  unlocked:false },
+  { id:'m22', code:'δ-02', emoji:'💻', name:'惡意程式幽靈',   type:'cyber',  tl:'網路攻擊', stars:4, desc:'偽裝軟體更新安裝後竊取裝置中的個資。',                       defeat:'只從官方管道下載軟體。',                     reward:120, lv:6,  cr:280,  unlocked:false },
+  { id:'m23', code:'δ-03', emoji:'📧', name:'假帳單轟炸獸',   type:'cyber',  tl:'網路攻擊', stars:3, desc:'偽造帳單要求點連結確認，竊取個資。',                         defeat:'收到帳單直接到官方網站登入確認。',           reward:80,  lv:5,  cr:220,  unlocked:false },
+  { id:'m24', code:'δ-04', emoji:'📲', name:'簡訊炸彈蟲',     type:'cyber',  tl:'網路攻擊', stars:2, desc:'大量發送含惡意連結的簡訊，謊稱包裹通知。',                   defeat:'不點簡訊中的不明連結。',                     reward:50,  lv:3,  cr:130,  unlocked:false },
+  { id:'m25', code:'δ-05', emoji:'🖥️', name:'遠端控制魔王',   type:'cyber',  tl:'網路攻擊', stars:5, desc:'謊稱技術支援，引導安裝遠端軟體後轉帳。',                     defeat:'任何人都不應遠端控制你的裝置進行金融操作。', reward:200, lv:10, cr:600,  unlocked:false },
+  { id:'m26', code:'Ω-01', emoji:'🧠', name:'心理操控大師',   type:'mixed',  tl:'複合詐騙', stars:4, desc:'結合情感操控與投資誘惑，長期培養信任後詐騙。',               defeat:'任何需長期維繫才能獲利的方案都要高度警戒。', reward:150, lv:8,  cr:400,  unlocked:false },
+  { id:'m27', code:'Ω-02', emoji:'🌐', name:'假冒官網怪獸',   type:'mixed',  tl:'複合詐騙', stars:4, desc:'建立幾乎完全相同的假官網誘導付款。',                         defeat:'確認網址是否正確，使用書籤或搜尋官方網站。', reward:150, lv:8,  cr:400,  unlocked:false },
+  { id:'m28', code:'Ω-03', emoji:'🎪', name:'多重身份變形蟲', type:'mixed',  tl:'複合詐騙', stars:4, desc:'同時偽裝銀行、政府、親友進行組合攻擊。',                     defeat:'遇多方同時聯繫要求轉帳，一定是詐騙，撥165。',reward:150, lv:9,  cr:450,  unlocked:false },
+  { id:'m29', code:'Ω-04', emoji:'🌌', name:'星際詐騙領主',   type:'mixed',  tl:'複合詐騙', stars:5, desc:'使用AI偽造聲音影像，冒充名人或親友詐騙。',                   defeat:'要求對方做出不尋常動作確認真人身份。',       reward:300, lv:11, cr:700,  unlocked:false },
+  { id:'m30', code:'Ω-99', emoji:'👑', name:'宇宙詐騙皇帝',   type:'mixed',  tl:'複合詐騙', stars:5, desc:'集所有詐騙手法的最終Boss，三重攻勢同時發動。',               defeat:'冷靜判斷、多方查證、撥165，不衝動不轉帳不點連結。', reward:500, lv:13, cr:1000, unlocked:false },
+]
+
+export const ITEMS = [
+  { id:'turtle',      emoji:'🐢', name:'冷靜龜',     cat:'time',    price:80,  desc:'答題時間延長10秒。',     effect:'+10秒',      hot:true    },
+  { id:'shield',      emoji:'🛡️', name:'防護盾',     cat:'shield',  price:120, desc:'答錯一次不扣分。',       effect:'免疫一次'                },
+  { id:'owl',         emoji:'🦉', name:'觀察鴞',     cat:'hint',    price:100, desc:'顯示額外提示。',         effect:'揭示線索'                },
+  { id:'radar',       emoji:'📡', name:'宇宙雷達',   cat:'hint',    price:150, desc:'排除一個錯誤選項。',     effect:'刪去錯誤'                },
+  { id:'crystal',     emoji:'🔮', name:'預知水晶',   cat:'special', price:200, desc:'預先看到答案類型。',     effect:'預知類型'                },
+  { id:'magnet',      emoji:'🧲', name:'金幣磁鐵',   cat:'special', price:180, desc:'答對額外+5金幣。',       effect:'答對+5金幣'              },
+  { id:'clock',       emoji:'⏰', name:'時間停止器', cat:'time',    price:250, desc:'暫停計時15秒。',         effect:'暫停15秒'                },
+  { id:'pass',        emoji:'🎫', name:'跳題卡',     cat:'special', price:90,  desc:'略過當前題目。',         effect:'跳過一題',  isNew:true   },
+  { id:'doublecoins', emoji:'💰', name:'雙倍金幣',   cat:'special', price:220, desc:'本回合金幣翻倍。',       effect:'金幣x2'                  },
+]
+
+export const MODES = [
+  { id:'beginner', emoji:'🧑', name:'新手模式', desc:'提示較多，時間充裕。',       tags:['提示','30秒','新手'],   time:30 },
+  { id:'expert',   emoji:'⭐', name:'高手模式', desc:'無提示，時間緊迫。',         tags:['無提示','15秒','挑戰'], time:15 },
+  { id:'edu',      emoji:'📚', name:'教育模式', desc:'每題後提供詳細說明。',       tags:['題後說明','25秒','學習'],time:25 },
+  { id:'holiday',  emoji:'🌴', name:'假日模式', desc:'輕鬆休閒娛樂玩法。',         tags:['輕鬆','35秒','娛樂'],   time:35 },
+]
+
+export const SCAM_TOPICS = [
+  '假冒銀行客服要求點連結','假冒政府說涉及洗錢','假冒快遞補繳郵資',
+  '網路交友後借錢','假冒電商客服誤設分期','中獎先繳手續費',
+  '高薪工作先繳保證金','假冒親友借錢','投資詐騙保證報酬','假冒電信說欠費停話',
+  'AI換臉視訊投資詐騙','LINE群組假投資','假網拍訂金消失','假借貸先繳保證金',
+  '假冒檢察官要求轉帳','求職先繳設備費','加密貨幣無法出金','假冒名人推薦投資',
+  '二次詐騙聲稱追回損失','解除分期要求轉帳','假公益捐款詐騙','假冒LINE客服凍結帳號',
+]
+
+export const NORMAL_TOPICS = [
+  '電商正常出貨通知','銀行正常對帳單','醫院健檢預約確認',
+  '學校招生報名通知','宅配改地址通知','政府正常稅務繳費',
+  '銀行信用卡消費通知','健保卡補發正常通知','銀行定存到期通知','政府退稅通知',
+]
+
+export const XP_TABLE = [0,100,250,450,700,1000,1400,1900,2500,3200,4000,5000,6500,8000]
+
+export const STATIC_QUESTIONS = [
+  // ── 詐騙題 ──
+  { signal:'星際銀行通訊', text:'【星際銀行緊急通報】您的帳戶疑似遭到異常登入，請立即點擊以下星際連結驗證身份，否則帳戶將於24小時內凍結。請速行動！', answer:1, explanation:'正規銀行不會以訊息要求點連結輸入帳密，這是典型釣魚詐騙手法。', topic:'假冒銀行客服要求點連結' },
+  { signal:'銀河法務署', text:'【銀河星際法務署通知】偵測到您的星際帳號涉及跨星系洗錢犯罪，需立即配合調查並將資產轉入指定安全帳戶，否則將遭到星際通緝。', answer:1, explanation:'政府機關不會要求轉帳至「安全帳戶」，遇到此情況請撥打165反詐騙專線。', topic:'假冒政府說涉及洗錢' },
+  { signal:'宇宙快遞中心', text:'【宇宙快遞通知】您的包裹因星際郵資不足無法配送，請點此連結補繳18星幣郵資，否則包裹將退回發件星球。', answer:1, explanation:'正規快遞不會要求先線上補繳費用，此為常見包裹補費詐騙。', topic:'假冒快遞補繳郵資' },
+  { signal:'星際交友平台', text:'【來自Stella的訊息】我們認識才兩週，但我對你的感情非常真實。我現在在外星出任務遇到緊急狀況，能否先借我5000星幣？等我回來一定還你。', answer:1, explanation:'網路交友快速升溫後借錢是常見詐騙手法，不要轉帳給未曾見面的網友。', topic:'網路交友後借錢' },
+  { signal:'星際電商客服', text:'【星際電商客服】您好，系統偵測到您的帳戶誤設了36期分期，需立即取消否則將扣款。請提供您的銀行帳號與密碼讓我們協助處理。', answer:1, explanation:'任何客服都不應要求提供銀行密碼，這是詐騙集團慣用話術。', topic:'假冒電商客服誤設分期' },
+  { signal:'星際彩券中心', text:'【恭喜！星際彩券中獎通知】您已中得頭獎1000萬星幣！請先匯入2000星幣手續費至指定帳戶，即可領取獎金。', answer:1, explanation:'需先繳費才能領獎永遠是詐騙，合法抽獎不會要求得獎者先付錢。', topic:'中獎先繳手續費' },
+  { signal:'星際人力銀行', text:'【高薪居家機會】日薪3000星幣，無需經驗！正式上工前需繳交2000星幣保證金，錄取後立即退還。名額有限請速回覆。', answer:1, explanation:'正規公司絕對不會要求員工先繳保證金，凡是要先付費的工作機會都是詐騙。', topic:'高薪工作先繳保證金' },
+  { signal:'來自：媽媽', text:'【媽媽】寶貝，我手機壞了換號碼了，這是我的新號。你現在方便嗎？我急需轉10000星幣，之後再跟你解釋，先別問了。', answer:1, explanation:'收到親友換號後緊急借錢的訊息，務必用原來的號碼致電確認，這是假冒親友詐騙。', topic:'假冒親友借錢' },
+  { signal:'星際投資顧問', text:'【獨家投資機會】加入我們的星際基金，保證每月8%固定報酬，已有數千名星際居民獲利！名額即將截止，立即轉帳加入。', answer:1, explanation:'任何「保證報酬」的投資都是詐騙，投資必有風險，高報酬必伴隨高風險。', topic:'投資詐騙保證報酬' },
+  { signal:'銀河電信公司', text:'【銀河電信緊急通知】您的星際通訊費用已逾期，帳戶將於今日18:00停話。請立即掃描以下QR碼線上繳費以維持服務。', answer:1, explanation:'電信公司不會突然要求立即掃碼繳費，請直接至官方網站或門市查詢帳單狀態。', topic:'假冒電信說欠費停話' },
+
+  { signal:'星際視訊通話', text:'【視訊來電：投資大師 Nova Chen】對方開啟視訊，臉孔與聲音和知名財經名人一模一樣，邀請你加入「宇宙套利密室」，聲稱本週獲利已達 120%，要求立即轉入 5 萬星幣搶佔席位。', answer:1, explanation:'詐騙集團使用 AI 換臉與變聲技術偽裝名人，視訊逼真不代表真實身份，任何要求轉帳的投資邀約都應拒絕。', topic:'AI換臉視訊投資詐騙' },
+  { signal:'星際通訊 - 陌生群組', text:'【宇宙財富交流群】你被拉進一個500人大群，群內「老師」每天分享精準選股，許多成員曬出獲利截圖。老師私訊說你被選為VIP，只需轉帳3萬星幣即可進入內部跟單系統。', answer:1, explanation:'被拉進投資群組、曬獲利截圖吸引你繳費是「養套殺」詐騙標準流程，截圖均為偽造。', topic:'LINE群組假投資' },
+  { signal:'宇宙二手交易所', text:'【交易成立通知】賣家 Orion 已確認您的訂單，請先匯款 8,800 星幣訂金至指定帳戶，匯款後截圖傳給賣家即可安排出貨。', answer:1, explanation:'正規交易平台有第三方保管機制，若賣家要求直接匯款至私人帳戶，收款後消失的風險極高。', topic:'假網拍訂金消失' },
+  { signal:'銀河貸款中心', text:'【免審核急速貸款】星幣缺口？我們提供最高50萬免擔保貸款！核准後2小時入帳，需先繳 5,000 星幣「信用啟動費」以完成系統開通，費用核貸後從本金扣除。', answer:1, explanation:'正規金融機構不會要求借款前先繳任何費用，先繳費才能借到錢是詐騙的標準話術。', topic:'假借貸先繳保證金' },
+  { signal:'銀河星際檢察署', text:'【緊急：刑事偵查通知】您的帳戶被列為跨星系毒品案共犯帳戶，本署檢察官 K-7 要求您配合調查，請勿告知任何人，並將名下存款轉至指定帳戶「監管」，案結後全數返還。', answer:1, explanation:'檢察官絕對不會電話要求轉帳或保密，這是「假冒公務員+安全帳戶」雙重詐騙，請立即掛斷撥 165。', topic:'假冒檢察官要求轉帳' },
+  { signal:'宇宙徵才平台', text:'【工作錄取通知】恭喜您通過面試！職位：星際資料輸入員，月薪 8 萬星幣，居家上班。入職前需自行購買指定設備一套，費用 12,000 星幣，公司將於首月薪資補貼。', answer:1, explanation:'合法雇主不會要求員工自費購買設備，「薪資補貼」承諾多為空頭，費用交出後雇主消失。', topic:'求職先繳設備費' },
+  { signal:'星際加密交易所 NovaCoin', text:'【提款申請待處理】您的帳戶餘額為 380,000 星幣，申請提款時系統提示：帳戶未完成「星際合規認證」，需繳交餘額 20% 作為認證保證金，認證後全額提款。', answer:1, explanation:'帳面有獲利卻以各種理由無法出金，是加密貨幣投資詐騙的典型收尾手法，保證金繳出後平台即消失。', topic:'加密貨幣無法出金' },
+  { signal:'來自：Nova Chen 官方頻道', text:'【Nova Chen 限時推薦】我親自驗證的宇宙量子基金今日開放認購，過去12個月年化報酬率 340%，限前100名，私訊我取得專屬認購連結。', answer:1, explanation:'名人不會主動私訊陌生人推薦投資，社群帳號易被仿冒，凡是透過私訊推薦的投資連結都應拒絕。', topic:'假冒名人推薦投資' },
+  { signal:'星際資產追回中心', text:'【您的損失可追回】我們偵測到您曾遭受詐騙，本中心專業凍結詐騙集團帳戶，成功率 95%。僅需預付 3,000 星幣手續費，7 個工作天內為您追回全額損失。', answer:1, explanation:'聲稱能追回詐騙損失並要求先繳費的，本身就是第二次詐騙（二次詐騙），請直接向警方報案。', topic:'二次詐騙聲稱追回損失' },
+  { signal:'星際電商 - 客服專線', text:'【客服緊急通知】您好，系統偵測您於本平台誤開通「月扣型 VIP」，每月自動扣除 3,200 星幣，需配合操作解除。請至 ATM 依指示操作，或提供網銀帳密讓我們遠端協助取消。', answer:1, explanation:'「解除分期/取消扣款」需要操作 ATM 或提供帳密是詐騙集團最慣用的話術，正規解除只需在官網登入操作。', topic:'解除分期要求轉帳' },
+  { signal:'宇宙愛心聯盟', text:'【緊急募款】木星難民星球遭流星撞擊，數萬居民急需糧食與醫療，請立即掃描 QR 碼捐款，今日捐款將加倍抵達災區，帳戶資訊如下：私人帳戶 0912-XXXX。', answer:1, explanation:'真正的公益機構捐款不會指定私人帳戶，捐款前請至公益勸募平台查驗機構是否合法登記。', topic:'假公益捐款詐騙' },
+  { signal:'LINE 官方客服', text:'【帳號安全警示】您的 LINE 帳號疑似在異常裝置登入，為保護您的資料安全，請立即點擊此連結輸入手機號碼與驗證碼，否則帳號將於 30 分鐘內暫停使用。', answer:1, explanation:'LINE 官方不會以連結要求輸入驗證碼，這是釣魚手法，輸入驗證碼等同把帳號拱手讓出。', topic:'假冒LINE客服凍結帳號' },
+
+  // ── 正常題 ──
+  { signal:'星際電商平台', text:'【訂單出貨通知】您於2026/05/30訂購的星際商品（訂單編號：SC20260530）已於今日出貨，預計3-5個工作天到達，可至官網輸入訂單編號追蹤。', answer:0, explanation:'這是正常的電商出貨通知，包含完整訂單資訊且僅提供追蹤方式，無要求點擊連結或付款。', topic:'電商正常出貨通知' },
+  { signal:'星際中央銀行', text:'【帳戶對帳單】您好，5月份對帳單已產生。本月消費3筆，共計2,450星幣。如有疑問請至官網登入查詢，或撥打背面客服電話。', answer:0, explanation:'這是正常的銀行對帳單通知，僅告知有對帳單可查詢，未要求任何動作或點擊連結。', topic:'銀行正常對帳單' },
+  { signal:'星際醫療中心', text:'【健檢預約確認】您已成功預約6月15日上午9點的年度健康檢查。請當天攜帶健保卡並空腹8小時，如需更改請於3天前來電。', answer:0, explanation:'這是正常的醫院預約確認，提供清楚的時間地點說明，未要求轉帳或點擊可疑連結。', topic:'醫院健檢預約確認' },
+  { signal:'星際大學招生組', text:'【招生通知】2026學年度碩士班招生報名系統已開放，報名期限為6月1日至6月30日。請至學校官網下載簡章並依步驟完成線上報名。', answer:0, explanation:'這是正常的學校招生通知，引導至官網報名，沒有要求私下轉帳或提供個人敏感資料。', topic:'學校招生報名通知' },
+  { signal:'宇宙快遞配送', text:'【宅配通知】您有一件包裹因無人在家無法投遞，配送員將於明日10:00-12:00再次嘗試配送，如需更改請至官方APP調整配送時間。', answer:0, explanation:'這是正常的宅配再配送通知，引導至官方APP操作，未要求補繳費用或點擊不明連結。', topic:'宅配改地址通知' },
+  { signal:'星際財政部', text:'【2025年度稅務繳費通知】您的綜合所得稅應繳金額為12,500星幣，繳費期限為6月30日。請至財政部官方網站或便利超商繳納。', answer:0, explanation:'這是正常的稅務繳費通知，提供官方繳費管道，未要求立即匯款至私人帳戶。', topic:'政府正常稅務繳費' },
+  { signal:'星際中央銀行', text:'【信用卡消費通知】您的信用卡於今日 14:32 在「星際超市」消費 320 星幣，若非本人消費請於24小時內致電背面客服電話掛失。', answer:0, explanation:'這是正常的信用卡即時消費通知，僅告知交易資訊並提供官方客服電話，未要求點連結或提供密碼。', topic:'銀行信用卡消費通知' },
+  { signal:'銀河全民健保署', text:'【健保卡換發通知】您的健保卡有效期限將於本月底到期，新卡已寄送至戶籍地址，如三週內未收到請持身分證至任一健保署辦事處補領。', answer:0, explanation:'這是正常的健保卡換發通知，指引至實體辦事處補領，未要求線上輸入個資或繳任何費用。', topic:'健保卡補發正常通知' },
+  { signal:'星際銀行 - 定存通知', text:'【定存到期提醒】您有一筆定存將於2026/06/20到期，到期後系統將依您設定的指示自動轉存。如需調整，請於到期前登入網銀或親洽分行。', answer:0, explanation:'這是正常的定存到期提醒，引導至官方管道操作，未要求提供帳密或轉帳至其他帳戶。', topic:'銀行定存到期通知' },
+  { signal:'星際財政部 - 退稅中心', text:'【退稅入帳通知】您2025年度所得稅申報結果已核定，退稅金額 2,300 星幣已於今日直接匯入您申報時填寫的退稅帳戶，請自行查詢帳戶餘額確認。', answer:0, explanation:'這是正常的退稅入帳通知，款項直接退回原帳戶，未要求任何操作、點連結或提供帳號密碼。', topic:'政府退稅通知' },
+]
+
+export function generateQuestion(isScam, usedTopics) {
+  const pool = STATIC_QUESTIONS.filter(q => (q.answer === (isScam ? 1 : 0)) && !usedTopics.includes(q.topic))
+  const fallback = STATIC_QUESTIONS.filter(q => q.answer === (isScam ? 1 : 0))
+  const src = pool.length ? pool : fallback
+  return Promise.resolve({ ...src[Math.floor(Math.random() * src.length)] })
+}
