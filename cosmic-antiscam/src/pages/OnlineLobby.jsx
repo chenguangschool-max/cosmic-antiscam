@@ -61,7 +61,6 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
   const [view, setView] = useState('home')
   const [name, setName] = useState('')
   const [joinChars, setJoinChars] = useState(['', '', '', ''])
-  const [customChars, setCustomChars] = useState(['', '', '', ''])
   const [roomCode, setRoomCode] = useState('')
   const [players, setPlayers] = useState([])
   const [isHost, setIsHost] = useState(false)
@@ -105,10 +104,8 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
 
   const handleCreate = () => {
     if (!name.trim()) return setError('請輸入你的名稱')
-    const cc = customChars.join('')
-    if (cc && cc.length !== 4) return setError('請填滿 4 格或全部留空')
     setError('')
-    socket.emit('create-room', { name: name.trim(), customCode: cc || null })
+    socket.emit('create-room', { name: name.trim() })
   }
 
   const handleJoin = () => {
@@ -224,7 +221,6 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
         </div>
       </div>
 
-      {/* 名稱 */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 13, color: 'rgba(140,180,255,.55)', letterSpacing: 1, marginBottom: 7 }}>你的名稱</div>
         <input
@@ -236,20 +232,6 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
         />
       </div>
 
-      {/* 建立房間：自訂代碼 */}
-      {view === 'creating' && (
-        <div style={{ marginBottom: 22 }}>
-          <div style={{ fontSize: 13, color: 'rgba(140,180,255,.55)', letterSpacing: 1, marginBottom: 12 }}>
-            自訂房間代碼（選填，留空自動產生）
-          </div>
-          <CodeBoxes chars={customChars} onChange={setCustomChars} />
-          <div style={{ fontSize: 13, color: 'rgba(140,180,255,.38)', marginTop: 10, textAlign: 'center' }}>
-            可輸入英文字母或數字，方便朋友記住
-          </div>
-        </div>
-      )}
-
-      {/* 加入房間：輸入代碼 */}
       {view === 'joining' && (
         <div style={{ marginBottom: 22 }}>
           <div style={{ fontSize: 13, color: 'rgba(140,180,255,.55)', letterSpacing: 1, marginBottom: 12 }}>
@@ -263,14 +245,8 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
 
       {view === 'home' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <button onClick={() => { setView('creating'); setError('') }} style={primaryBtn}>🏠 建立房間</button>
+          <button onClick={handleCreate} style={primaryBtn}>🏠 建立房間</button>
           <button onClick={() => { setView('joining'); setError('') }} style={secondaryBtn}>🔗 加入房間</button>
-        </div>
-      )}
-      {view === 'creating' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <button onClick={handleCreate} style={primaryBtn}>🏠 建立</button>
-          <button onClick={() => { setView('home'); setCustomChars(['','','','']); setError('') }} style={secondaryBtn}>← 返回</button>
         </div>
       )}
       {view === 'joining' && (
@@ -289,5 +265,4 @@ const backBtn = { background: 'none', border: 'none', color: 'rgba(180,200,255,.
 const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 9, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(91,141,238,.22)', color: '#e0eaff', fontSize: 16, fontFamily: 'Noto Sans TC,sans-serif', outline: 'none', boxSizing: 'border-box' }
 const primaryBtn = { width: '100%', padding: 15, borderRadius: 12, background: 'rgba(91,141,238,.22)', border: '1px solid rgba(91,141,238,.6)', color: '#c8dbff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif', letterSpacing: 1 }
 const secondaryBtn = { width: '100%', padding: 15, borderRadius: 12, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.12)', color: 'rgba(180,200,255,.6)', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }
-const smallBtn = { padding: '6px 14px', borderRadius: 8, background: 'rgba(91,141,238,.18)', border: '1px solid rgba(91,141,238,.4)', color: '#c8dbff', fontSize: 13, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }
 const errBox = { background: 'rgba(255,80,80,.1)', border: '1px solid rgba(255,80,80,.28)', borderRadius: 8, padding: '10px 14px', color: '#ffaaaa', fontSize: 14, marginBottom: 12 }

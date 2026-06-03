@@ -189,16 +189,8 @@ function roomView(room) {
 
 io.on('connection', (socket) => {
 
-  socket.on('create-room', ({ name, customCode }) => {
-    let code
-    if (customCode) {
-      const cc = customCode.toUpperCase().trim()
-      if (!/^[A-Z0-9]{4}$/.test(cc)) return socket.emit('join-error', '自訂代碼必須是 4 個英數字')
-      if (rooms.has(cc)) return socket.emit('join-error', '此代碼已被使用，請換一個')
-      code = cc
-    } else {
-      code = makeCode()
-    }
+  socket.on('create-room', ({ name }) => {
+    const code = makeCode()
     const room = {
       code, host: socket.id,
       players: [{ id: socket.id, name, score: 0 }],
