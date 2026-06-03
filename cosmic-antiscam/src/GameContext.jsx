@@ -12,30 +12,26 @@ function loadSave() {
 
 export function GameProvider({ children }) {
   const save = loadSave()
-  const savedLevel = save?.level ?? 1
-  const savedCoinUnlocked = save?.coinUnlocked ?? {}
+  const savedUnlockedIds = new Set(save?.unlockedIds ?? [])
 
   const [coins, setCoins] = useState(save?.coins ?? 0)
   const [xp, setXp] = useState(save?.xp ?? 0)
-  const [level, setLevel] = useState(savedLevel)
+  const [level, setLevel] = useState(save?.level ?? 1)
   const [bag, setBag] = useState(save?.bag ?? {})
-  const [coinUnlocked, setCoinUnlocked] = useState(savedCoinUnlocked)
 
-  // 怪物解鎖狀態從等級 + 金幣購買推導，不信任舊的 monsters map
+  // 怪物解鎖狀態只依賴已儲存的 unlockedIds，全新存檔 = 全部鎖定
   const [monsters, setMonsters] = useState(() =>
-    MONSTERS.map(m => ({
-      ...m,
-      unlocked: m.unlocked || savedLevel >= m.lv || !!savedCoinUnlocked[m.id],
-    }))
+    MONSTERS.map(m => ({ ...m, unlocked: savedUnlockedIds.has(m.id) }))
   )
   const [justUnlocked, setJustUnlocked] = useState([])
   const ulQueue = useRef([])
 
   useEffect(() => {
+    const unlockedIds = monsters.filter(m => m.unlocked).map(m => m.id)
     localStorage.setItem('cosmicSave_v4', JSON.stringify({
-      coins, xp, level, bag, coinUnlocked,
+      coins, xp, level, bag, unlockedIds,
     }))
-  }, [coins, xp, level, bag, coinUnlocked])
+  }, [coins, xp, level, bag, monsters])
 
   const xpForLv = (lv) => XP_TABLE[lv] ?? lv * 600
 
@@ -70,12 +66,9 @@ export function GameProvider({ children }) {
     })
   }
 
-  const unlockMonster = (id, isCoin) => {
+  const unlockMonster = (id) => {
     setMonsters(prev => prev.map(m => m.id === id ? { ...m, unlocked: true } : m))
     setJustUnlocked(prev => [...prev, id])
-    if (isCoin) {
-      setCoinUnlocked(prev => ({ ...prev, [id]: true }))
-    }
   }
 
   const buyItem = (item) => {
