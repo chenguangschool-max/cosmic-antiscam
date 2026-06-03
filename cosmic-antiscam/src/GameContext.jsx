@@ -5,7 +5,7 @@ const GameCtx = createContext(null)
 
 function loadSave() {
   try {
-    const raw = localStorage.getItem('cosmicSave_v3')
+    const raw = localStorage.getItem('cosmicSave_v4')
     return raw ? JSON.parse(raw) : null
   } catch { return null }
 }
@@ -32,7 +32,7 @@ export function GameProvider({ children }) {
   const ulQueue = useRef([])
 
   useEffect(() => {
-    localStorage.setItem('cosmicSave_v3', JSON.stringify({
+    localStorage.setItem('cosmicSave_v4', JSON.stringify({
       coins, xp, level, bag, coinUnlocked,
     }))
   }, [coins, xp, level, bag, coinUnlocked])
