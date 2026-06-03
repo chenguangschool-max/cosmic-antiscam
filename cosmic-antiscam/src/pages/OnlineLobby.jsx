@@ -15,7 +15,7 @@ function CodeBoxes({ chars, onChange }) {
       return
     }
     const ch = e.key.toUpperCase()
-    if (!/^[A-Z0-9]$/.test(ch)) return
+    if (!/^[A-Z0-9]$/.test(ch) || 'OQDIO01'.includes(ch)) return
     const next = chars.map((c, idx) => idx === i ? ch : c)
     onChange(next)
     if (i < 3) refs[i + 1].current?.focus()
