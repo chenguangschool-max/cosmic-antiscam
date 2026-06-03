@@ -127,7 +127,7 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
           <div style={title}>等待玩家加入</div>
           <div style={{ marginTop: 16 }}>
             <div style={{ fontSize: 12, color: 'rgba(140,180,255,.5)', letterSpacing: 2, marginBottom: 10 }}>房間代碼</div>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', cursor: 'pointer' }} onClick={copyCode} title="點擊複製">
               {roomCode.split('').map((char, i) => (
                 <div key={i} style={{
                   width: 62, height: 72, borderRadius: 12,
@@ -139,8 +139,18 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
                 }}>{char}</div>
               ))}
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-              <button onClick={copyCode} style={smallBtn}>{copied ? '✅ 已複製' : '複製代碼'}</button>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+              <button onClick={copyCode} style={{
+                padding: '10px 28px', borderRadius: 10,
+                background: copied ? 'rgba(50,200,150,.22)' : 'rgba(91,141,238,.22)',
+                border: `1px solid ${copied ? 'rgba(50,200,150,.6)' : 'rgba(91,141,238,.6)'}`,
+                color: copied ? '#7ee8c5' : '#c8dbff',
+                fontSize: 15, fontWeight: 600, cursor: 'pointer',
+                fontFamily: 'Noto Sans TC,sans-serif', letterSpacing: 1,
+                transition: 'all .2s',
+              }}>
+                {copied ? '✅ 已複製！' : '📋 複製代碼'}
+              </button>
             </div>
           </div>
           <div style={{ fontSize: 13, color: 'rgba(180,200,255,.4)', marginTop: 8 }}>
