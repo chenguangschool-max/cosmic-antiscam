@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useGame } from '../GameContext'
-import { useToast } from '../components/Toast'
 import { CODEX_EXTRA } from '../data'
 
 const starsH = n => '★'.repeat(n) + '☆'.repeat(5-n)
@@ -19,22 +18,12 @@ const FILTERS = [
 ]
 
 export default function Codex({ navigate }) {
-  const { monsters, coins, level, spendCoins, unlockMonster, justUnlocked } = useGame()
-  const showToast = useToast()
+  const { monsters, justUnlocked } = useGame()
   const [filter, setFilter] = useState('all')
   const [selected, setSelected] = useState(null)
-  const [lockSelected, setLockSelected] = useState(null)
 
   const list = filter === 'all' ? monsters : monsters.filter(m => m.type === filter)
   const unlocked = monsters.filter(m => m.unlocked).length
-
-  const handleCoinUnlock = () => {
-    if (!lockSelected || coins < lockSelected.cr) return
-    spendCoins(lockSelected.cr)
-    unlockMonster(lockSelected.id, true)
-    showToast(`✅ 解鎖 ${lockSelected.emoji} ${lockSelected.name}！`)
-    setLockSelected(null)
-  }
 
   const ts = (t) => typeStyle[tcls(t)] || typeStyle.tf
 
@@ -65,25 +54,36 @@ export default function Codex({ navigate }) {
           const isJust = justUnlocked.includes(m.id)
           const s = ts(m.type)
           return (
-            <div key={m.id} onClick={() => m.unlocked ? setSelected(m) : setLockSelected(m)} style={{
-              borderRadius:12, border: isJust ? '1px solid rgba(255,210,50,.5)' : '1px solid rgba(91,141,238,.16)',
-              background: isJust ? 'rgba(255,210,50,.04)':'rgba(255,255,255,.04)',
-              padding:'13px 10px', textAlign:'center', cursor:'pointer', position:'relative', overflow:'hidden',
-              boxShadow: m.stars===5 ? '0 0 9px rgba(255,210,50,.18)' : m.stars===4 ? '0 0 7px rgba(150,100,255,.13)':'',
-              animation: isJust ? 'pop .5s ease':'',
-            }}>
+            <div key={m.id}
+              onClick={() => m.unlocked ? setSelected(m) : undefined}
+              style={{
+                borderRadius:12,
+                border: isJust ? '1px solid rgba(255,210,50,.5)' : '1px solid rgba(91,141,238,.16)',
+                background: m.unlocked
+                  ? (isJust ? 'rgba(255,210,50,.04)' : 'rgba(255,255,255,.04)')
+                  : 'rgba(3,8,18,.6)',
+                padding:'13px 10px', textAlign:'center',
+                cursor: m.unlocked ? 'pointer' : 'default',
+                position:'relative', overflow:'hidden',
+                boxShadow: m.unlocked && m.stars===5 ? '0 0 9px rgba(255,210,50,.18)'
+                  : m.unlocked && m.stars===4 ? '0 0 7px rgba(150,100,255,.13)' : '',
+                animation: isJust ? 'pop .5s ease' : '',
+                opacity: m.unlocked ? 1 : 0.55,
+              }}>
               {isJust && <div style={{ position:'absolute', top:5, left:5, background:'rgba(50,200,150,.14)', border:'1px solid rgba(50,200,150,.32)', color:'#7ee8c0', fontSize:8, padding:'1px 5px', borderRadius:20 }}>NEW</div>}
-              {!m.unlocked && <div style={{ position:'absolute', top:5, right:5, fontSize:12, opacity:.45 }}>🔒</div>}
               <div style={{ fontSize:28, marginBottom:5 }}>{m.unlocked ? m.emoji : '❓'}</div>
-              <div style={{ fontSize:10, fontWeight:500, color:'#e0eaff', marginBottom:2, lineHeight:1.4 }}>
-                {m.unlocked ? m.name : m.code}
+              <div style={{ fontSize:10, fontWeight:500, color: m.unlocked ? '#e0eaff' : 'rgba(140,160,200,.4)', marginBottom:2, lineHeight:1.4 }}>
+                {m.unlocked ? m.name : '???'}
               </div>
-              <div style={{ fontSize:9, padding:'1px 6px', borderRadius:20, display:'inline-block', marginBottom:3, background:s.bg, border:`1px solid ${s.bc}`, color:s.col }}>{m.tl}</div>
-              {m.unlocked && <div style={{ fontSize:9, color:'var(--gold)' }}>{starsH(m.stars)}</div>}
+              {m.unlocked && (
+                <>
+                  <div style={{ fontSize:9, padding:'1px 6px', borderRadius:20, display:'inline-block', marginBottom:3, background:s.bg, border:`1px solid ${s.bc}`, color:s.col }}>{m.tl}</div>
+                  <div style={{ fontSize:9, color:'var(--gold)' }}>{starsH(m.stars)}</div>
+                </>
+              )}
               {!m.unlocked && (
-                <div style={{ position:'absolute', inset:0, background:'rgba(3,8,18,.52)', borderRadius:12, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:3 }}>
-                  <div style={{ fontSize:14, opacity:.5 }}>🔒</div>
-                  <div style={{ fontSize:8, color:'rgba(140,180,255,.48)', textAlign:'center', padding:'0 3px', lineHeight:1.4 }}>Lv.{m.lv} 或 🪙{m.cr}</div>
+                <div style={{ position:'absolute', inset:0, borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <div style={{ fontSize:20, opacity:.3 }}>🔒</div>
                 </div>
               )}
             </div>
@@ -91,7 +91,7 @@ export default function Codex({ navigate }) {
         })}
       </div>
 
-      {/* Detail overlay */}
+      {/* Detail overlay — 已解鎖才會出現 */}
       {selected && (() => {
         const extra = CODEX_EXTRA[selected.id]
         return (
@@ -144,38 +144,6 @@ export default function Codex({ navigate }) {
           </div>
         )
       })()}
-
-      {/* Lock detail overlay */}
-      {lockSelected && (
-        <div style={overlayBg} onClick={() => setLockSelected(null)}>
-          <div style={overlayCard} onClick={e => e.stopPropagation()}>
-            <button style={closeBtn} onClick={() => setLockSelected(null)}>✕</button>
-            <div style={{ fontSize:44, marginBottom:8 }}>❓</div>
-            <div style={{ fontSize:12, color:'rgba(140,180,255,.55)', fontFamily:'Orbitron,monospace', marginBottom:5 }}>神秘訊號 {lockSelected.code}</div>
-            <div style={{ fontSize:13, color:'rgba(180,200,255,.5)', marginBottom:12 }}>神秘訊號尚未解碼</div>
-            <div style={{ textAlign:'left', marginBottom:10 }}>
-              <div style={secLabel}>解鎖條件</div>
-              <div style={{ ...secVal, marginBottom:5 }}>⭐ 等級解鎖（免費）：達到 <strong>Lv.{lockSelected.lv}</strong>　目前 Lv.{level}</div>
-              <div style={secVal}>🪙 金幣解鎖：花費 <strong>{lockSelected.cr} 金幣</strong>　目前 {coins} 金幣</div>
-            </div>
-            <div style={{ background:'rgba(91,141,238,.07)', border:'1px solid rgba(91,141,238,.2)', borderRadius:9, padding:'9px 12px' }}>
-              <div style={{ fontSize:10, color:'rgba(140,180,255,.5)', marginBottom:6 }}>提前花金幣解鎖？</div>
-              <div style={{ display:'flex', gap:7 }}>
-                <button onClick={handleCoinUnlock} disabled={coins < lockSelected.cr} style={{
-                  flex:1, padding:7, borderRadius:8, fontSize:11, cursor: coins>=lockSelected.cr?'pointer':'default',
-                  background: coins>=lockSelected.cr ? 'rgba(91,141,238,.18)':'rgba(255,255,255,.03)',
-                  border: `1px solid ${coins>=lockSelected.cr ? 'rgba(91,141,238,.42)':'rgba(255,255,255,.09)'}`,
-                  color: coins>=lockSelected.cr ? '#c8dbff':'rgba(140,160,200,.35)',
-                  fontFamily:'Noto Sans TC,sans-serif',
-                }}>
-                  {coins >= lockSelected.cr ? `🪙 花 ${lockSelected.cr} 金幣解鎖` : `金幣不足（差${lockSelected.cr-coins}枚）`}
-                </button>
-                <button onClick={() => setLockSelected(null)} style={{ flex:.55, padding:7, borderRadius:8, fontSize:11, background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.1)', color:'rgba(180,200,255,.5)', cursor:'pointer', fontFamily:'Noto Sans TC,sans-serif' }}>取消</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
