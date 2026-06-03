@@ -3,6 +3,12 @@ import { socket } from '../socket'
 
 function CodeBoxes({ chars, onChange }) {
   const refs = [useRef(), useRef(), useRef(), useRef()]
+  const [shake, setShake] = useState(null)
+
+  const flash = (i) => {
+    setShake(i)
+    setTimeout(() => setShake(null), 400)
+  }
 
   const handleKey = (i, e) => {
     if (e.key === 'Backspace') {
@@ -15,7 +21,8 @@ function CodeBoxes({ chars, onChange }) {
       return
     }
     const ch = e.key.toUpperCase()
-    if (!/^[A-Z0-9]$/.test(ch) || 'IO01'.includes(ch)) return
+    if (!/^[A-Z0-9]$/.test(ch)) return
+    if ('IO01'.includes(ch)) { flash(i); return }
     const next = chars.map((c, idx) => idx === i ? ch : c)
     onChange(next)
     if (i < 3) refs[i + 1].current?.focus()
@@ -24,23 +31,27 @@ function CodeBoxes({ chars, onChange }) {
   return (
     <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
       {[0, 1, 2, 3].map(i => (
-        <input
-          key={i}
-          ref={refs[i]}
-          value={chars[i]}
-          onChange={() => {}}
-          onKeyDown={e => handleKey(i, e)}
-          maxLength={1}
-          style={{
-            width: 62, height: 72, borderRadius: 12, textAlign: 'center',
-            background: chars[i] ? 'rgba(91,141,238,.18)' : 'rgba(255,255,255,.05)',
-            border: `2px solid ${chars[i] ? 'rgba(91,141,238,.7)' : 'rgba(91,141,238,.25)'}`,
-            fontFamily: "'Courier New', Courier, monospace", fontSize: 34, fontWeight: 700,
-            color: '#7eb8ff', outline: 'none', cursor: 'text',
-            caretColor: 'transparent', boxSizing: 'border-box',
-            transition: 'border-color .15s, background .15s',
-          }}
-        />
+        <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <input
+            ref={refs[i]}
+            value={chars[i]}
+            onChange={() => {}}
+            onKeyDown={e => handleKey(i, e)}
+            maxLength={1}
+            style={{
+              width: 62, height: 72, borderRadius: 12, textAlign: 'center',
+              background: shake === i ? 'rgba(255,80,80,.18)' : chars[i] ? 'rgba(91,141,238,.18)' : 'rgba(255,255,255,.05)',
+              border: `2px solid ${shake === i ? 'rgba(255,80,80,.7)' : chars[i] ? 'rgba(91,141,238,.7)' : 'rgba(91,141,238,.25)'}`,
+              fontFamily: "'Courier New', Courier, monospace", fontSize: 34, fontWeight: 700,
+              color: shake === i ? '#ff9999' : '#7eb8ff', outline: 'none', cursor: 'text',
+              caretColor: 'transparent', boxSizing: 'border-box',
+              transition: 'border-color .15s, background .15s, color .15s',
+            }}
+          />
+          {shake === i && (
+            <div style={{ fontSize: 11, color: '#ff9999', whiteSpace: 'nowrap' }}>不可用</div>
+          )}
+        </div>
       ))}
     </div>
   )
