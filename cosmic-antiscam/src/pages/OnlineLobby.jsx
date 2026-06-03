@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import { socket } from '../socket'
 
 export default function OnlineLobby({ navigate, onRoomReady }) {
-  const [view, setView] = useState('home')   // 'home' | 'waiting' | 'joining'
+  const [view, setView] = useState('home')   // 'home' | 'waiting' | 'joining' | 'creating'
   const [name, setName] = useState('')
   const [joinCode, setJoinCode] = useState('')
+  const [customCode, setCustomCode] = useState('')
   const [roomCode, setRoomCode] = useState('')
   const [players, setPlayers] = useState([])
   const [isHost, setIsHost] = useState(false)
@@ -56,8 +57,11 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
 
   const handleCreate = () => {
     if (!name.trim()) return setError('請輸入你的名稱')
+    const cc = customCode.trim().toUpperCase()
+    if (cc && cc.length !== 4) return setError('自訂代碼必須是 4 個字元')
+    if (cc && !/^[A-Z0-9]+$/.test(cc)) return setError('代碼只能使用英文字母或數字')
     setError('')
-    socket.emit('create-room', { name: name.trim() })
+    socket.emit('create-room', { name: name.trim(), customCode: cc || null })
   }
 
   const handleJoin = () => {
@@ -183,6 +187,22 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
         />
       </div>
 
+      {view === 'creating' && (
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ fontSize: 11, color: 'rgba(140,180,255,.55)', letterSpacing: 1, marginBottom: 7 }}>自訂房間代碼（選填）</div>
+          <input
+            value={customCode}
+            onChange={e => setCustomCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+            placeholder='留空則自動產生'
+            maxLength={4}
+            style={{ ...inputStyle, fontFamily: 'Orbitron,monospace', fontSize: 22, textAlign: 'center', letterSpacing: 6 }}
+          />
+          <div style={{ fontSize: 12, color: 'rgba(140,180,255,.4)', marginTop: 6 }}>
+            可輸入 4 個英數字，方便朋友記住
+          </div>
+        </div>
+      )}
+
       {view === 'joining' && (
         <div style={{ marginBottom: 18 }}>
           <div style={{ fontSize: 11, color: 'rgba(140,180,255,.55)', letterSpacing: 1, marginBottom: 7 }}>房間代碼</div>
@@ -198,12 +218,19 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
 
       {error && <div style={errBox}>{error}</div>}
 
-      {view === 'home' ? (
+      {view === 'home' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <button onClick={handleCreate} style={primaryBtn}>🏠 建立房間</button>
+          <button onClick={() => { setView('creating'); setError('') }} style={primaryBtn}>🏠 建立房間</button>
           <button onClick={() => { setView('joining'); setError('') }} style={secondaryBtn}>🔗 加入房間</button>
         </div>
-      ) : (
+      )}
+      {view === 'creating' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button onClick={handleCreate} style={primaryBtn}>🏠 建立</button>
+          <button onClick={() => { setView('home'); setCustomCode(''); setError('') }} style={secondaryBtn}>← 返回</button>
+        </div>
+      )}
+      {view === 'joining' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button onClick={handleJoin} style={primaryBtn}>🚀 加入</button>
           <button onClick={() => { setView('home'); setError('') }} style={secondaryBtn}>← 返回</button>
