@@ -12,8 +12,8 @@ export default function MainMenu({ navigate }) {
         <div style={chip('#5b8dee')}>Lv.<strong>{level}</strong></div>
         <div style={coinBadge}>🪙 {coins}</div>
         <div style={{ marginLeft:'auto', display:'flex', gap:6 }}>
-          <button style={iconBtn} onClick={() => navigate('instructions')}>📋</button>
-          <button style={iconBtn} onClick={() => navigate('shop')}>🛒</button>
+          <button style={iconBtn} onClick={() => navigate('instructions')}>📋 使用說明</button>
+          <button style={iconBtn} onClick={() => navigate('shop')}>🛒 商店</button>
         </div>
       </div>
 
@@ -32,13 +32,13 @@ export default function MainMenu({ navigate }) {
             top:'50%', left:'50%', transform:'translate(-50%,-50%) rotateX(72deg)',
           }} />
         </div>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:17, fontWeight:900, color:'#fff', letterSpacing:2, textShadow:'0 0 18px rgba(91,141,238,.7)' }}>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:20, fontWeight:900, color:'#fff', letterSpacing:2, textShadow:'0 0 18px rgba(91,141,238,.7)' }}>
           宇宙防詐任務
         </div>
-        <div style={{ fontSize:11, color:'rgba(180,200,255,.45)', marginTop:3 }}>COSMIC ANTI-SCAM MISSION</div>
+        <div style={{ fontSize:14, color:'rgba(180,200,255,.45)', marginTop:3 }}>COSMIC ANTI-SCAM MISSION</div>
         {/* XP bar */}
         <div style={{ maxWidth:300, margin:'10px auto 0' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', fontSize:10, color:'rgba(140,180,255,.45)', marginBottom:3 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', fontSize:13, color:'rgba(140,180,255,.45)', marginBottom:3 }}>
             <span>XP {cur}</span><span>Lv.{level+1} 需 {next}</span>
           </div>
           <div style={{ height:4, background:'rgba(255,255,255,.07)', borderRadius:4, overflow:'hidden' }}>
@@ -50,24 +50,24 @@ export default function MainMenu({ navigate }) {
       {/* Menu grid */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, maxWidth:440, margin:'0 auto' }}>
         <button style={{ ...menuBtn, ...btnStart, gridColumn:'1/-1' }} onClick={() => navigate('modeSelect')}>
-          <span style={{ fontSize:19 }}>🚀</span>
-          <span style={{ fontSize:14, letterSpacing:1 }}>▶ 開始遊戲</span>
+          <span style={{ fontSize:22 }}>🚀</span>
+          <span style={{ fontSize:18, letterSpacing:1 }}>▶ 開始遊戲</span>
         </button>
         <button style={{ ...menuBtn, background:'rgba(80,200,240,.07)', borderColor:'rgba(80,200,240,.28)', color:'#94e8ff' }} onClick={() => navigate('codex')}>
-          <span style={{ fontSize:19 }}>📖</span>
-          <div><div style={{ fontSize:13, fontWeight:500 }}>圖鑑</div><div style={{ fontSize:10, opacity:.6 }}>收集 {unlocked}/30</div></div>
+          <span style={{ fontSize:22 }}>📖</span>
+          <div><div style={{ fontSize:16, fontWeight:500 }}>圖鑑</div><div style={{ fontSize:13, opacity:.6 }}>收集 {unlocked}/30</div></div>
         </button>
         <button style={{ ...menuBtn, background:'rgba(255,180,50,.09)', borderColor:'rgba(255,180,50,.28)', color:'#ffd27a' }} onClick={() => navigate('shop')}>
-          <span style={{ fontSize:19 }}>🛒</span>
-          <div><div style={{ fontSize:13, fontWeight:500 }}>商店</div><div style={{ fontSize:10, opacity:.6 }}>購買道具</div></div>
+          <span style={{ fontSize:22 }}>🛒</span>
+          <div><div style={{ fontSize:16, fontWeight:500 }}>商店</div><div style={{ fontSize:13, opacity:.6 }}>購買道具</div></div>
         </button>
         <button style={{ ...menuBtn, background:'rgba(255,80,120,.09)', borderColor:'rgba(255,80,120,.32)', color:'#ffaac0' }} onClick={() => navigate('multiSetup')}>
-          <span style={{ fontSize:19 }}>👥</span>
-          <div><div style={{ fontSize:13, fontWeight:500 }}>多人對戰</div><div style={{ fontSize:10, opacity:.6 }}>輪流答題</div></div>
+          <span style={{ fontSize:22 }}>👥</span>
+          <div><div style={{ fontSize:16, fontWeight:500 }}>多人對戰</div><div style={{ fontSize:13, opacity:.6 }}>輪流答題</div></div>
         </button>
         <button style={{ ...menuBtn, background:'rgba(80,200,120,.09)', borderColor:'rgba(80,200,120,.32)', color:'#7ee8a0' }} onClick={() => navigate('onlineLobby')}>
-          <span style={{ fontSize:19 }}>🌐</span>
-          <div><div style={{ fontSize:13, fontWeight:500 }}>連線對戰</div><div style={{ fontSize:10, opacity:.6 }}>即時同步</div></div>
+          <span style={{ fontSize:22 }}>🌐</span>
+          <div><div style={{ fontSize:16, fontWeight:500 }}>連線對戰</div><div style={{ fontSize:13, opacity:.6 }}>即時同步</div></div>
         </button>
       </div>
 
@@ -75,7 +75,7 @@ export default function MainMenu({ navigate }) {
       <div style={{ textAlign:'center', marginTop:20 }}>
         <button onClick={() => { if(window.confirm('確定要歸零所有存檔嗎？')) resetGame() }} style={{
           background:'none', border:'none', color:'rgba(180,200,255,.2)',
-          fontSize:11, cursor:'pointer', fontFamily:'Noto Sans TC,sans-serif',
+          fontSize:14, cursor:'pointer', fontFamily:'Noto Sans TC,sans-serif',
         }}>重置存檔</button>
       </div>
     </div>
@@ -85,10 +85,10 @@ export default function MainMenu({ navigate }) {
 const chip = (color) => ({
   background:`rgba(${color === '#5b8dee' ? '91,141,238' : '255,210,50'},.2)`,
   border:`1px solid rgba(${color === '#5b8dee' ? '91,141,238' : '255,210,50'},.42)`,
-  borderRadius:20, padding:'4px 11px',
-  fontFamily:'Orbitron,monospace', fontSize:11, color:'#c8dbff',
+  borderRadius:20, padding:'5px 13px',
+  fontFamily:'Orbitron,monospace', fontSize:13, color:'#c8dbff',
 })
-const coinBadge = { display:'flex', alignItems:'center', gap:5, background:'rgba(255,210,50,.1)', border:'1px solid rgba(255,210,50,.32)', borderRadius:20, padding:'4px 12px', color:'var(--gold)', fontSize:13, fontWeight:500 }
-const iconBtn = { background:'rgba(255,255,255,.07)', border:'1px solid rgba(255,255,255,.14)', borderRadius:20, padding:'5px 13px', color:'rgba(180,200,255,.7)', fontSize:12, cursor:'pointer' }
-const menuBtn = { display:'flex', alignItems:'center', gap:8, padding:'12px 13px', borderRadius:12, border:'1px solid', cursor:'pointer', textAlign:'left', fontFamily:'Noto Sans TC,sans-serif' }
-const btnStart = { background:'rgba(91,141,238,.17)', borderColor:'rgba(91,141,238,.52)', color:'#c8dbff', justifyContent:'center', padding:'15px' }
+const coinBadge = { display:'flex', alignItems:'center', gap:5, background:'rgba(255,210,50,.1)', border:'1px solid rgba(255,210,50,.32)', borderRadius:20, padding:'5px 14px', color:'var(--gold)', fontSize:15, fontWeight:500 }
+const iconBtn = { background:'rgba(255,255,255,.07)', border:'1px solid rgba(255,255,255,.14)', borderRadius:20, padding:'7px 15px', color:'rgba(180,200,255,.85)', fontSize:14, cursor:'pointer', fontFamily:'Noto Sans TC,sans-serif' }
+const menuBtn = { display:'flex', alignItems:'center', gap:10, padding:'14px 15px', borderRadius:12, border:'1px solid', cursor:'pointer', textAlign:'left', fontFamily:'Noto Sans TC,sans-serif' }
+const btnStart = { background:'rgba(91,141,238,.17)', borderColor:'rgba(91,141,238,.52)', color:'#c8dbff', justifyContent:'center', padding:'17px' }
