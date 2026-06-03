@@ -1,4 +1,4 @@
-export default function Instructions({ onDone }) {
+export default function Instructions({ onDone, isRevisit }) {
   return (
     <div style={{ padding:'20px 18px 0', position:'relative', zIndex:2, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
 
@@ -44,7 +44,7 @@ export default function Instructions({ onDone }) {
           color:'#e0eaff', fontSize:14, fontWeight:700,
           cursor:'pointer', fontFamily:'Noto Sans TC,sans-serif', letterSpacing:1,
         }}>
-          我閱讀完了，開始任務 🚀
+          {isRevisit ? '← 返回主選單' : '我閱讀完了，開始任務 🚀'}
         </button>
       </div>
     </div>

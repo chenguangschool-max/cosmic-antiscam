@@ -40,6 +40,7 @@ export default function App() {
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 520, margin: '0 auto' }}>
         {showInstructions && <Instructions onDone={handleInstructionsDone} />}
         {!showInstructions && page === 'menu' && <MainMenu navigate={navigate} />}
+        {!showInstructions && page === 'instructions'  && <Instructions onDone={() => navigate('menu')} isRevisit />}
         {!showInstructions && page === 'modeSelect'   && <ModeSelect navigate={navigate} onModeSelect={setCurrentMode} />}
         {page === 'quiz'         && <Quiz mode={currentMode} navigate={navigate} onResult={setQuizResult} />}
         {page === 'result'       && <Result result={quizResult} navigate={navigate} />}
