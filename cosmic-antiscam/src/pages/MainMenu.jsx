@@ -1,8 +1,23 @@
 import { useGame } from '../GameContext'
 
+const TIPS = [
+  { icon:'🏦', text:'銀行不會用簡訊叫你點連結輸入密碼，收到就直接刪除。' },
+  { icon:'👮', text:'警察和檢察官絕對不會電話要求你轉帳，掛斷後撥 110 確認。' },
+  { icon:'🎁', text:'沒參加的抽獎卻中獎，又要先繳費才能領，100% 是詐騙。' },
+  { icon:'💸', text:'任何「保證獲利」的投資都是詐騙，投資一定有風險。' },
+  { icon:'👴', text:'孫子或家人緊急借錢，先掛斷用原本的號碼打回去確認。' },
+  { icon:'🔗', text:'不要點簡訊或 LINE 裡來路不明的連結，直接到官方網站查詢。' },
+  { icon:'🏥', text:'醫院急診不會要求家屬先匯押金到私人帳戶才能開刀。' },
+  { icon:'📞', text:'不確定真假，就撥 165 反詐騙專線，24 小時都有人接聽。' },
+  { icon:'🔐', text:'驗證碼就是鑰匙，任何人要求驗證碼都不能給，包括自稱官方的人。' },
+  { icon:'💡', text:'被催促「馬上決定」「不然來不及」，就是詐騙在逼你，先停下來。' },
+]
+
+const tip = TIPS[Math.floor(Math.random() * TIPS.length)]
+
 export default function MainMenu({ navigate }) {
   const { coins, level, getXpProgress, monsters, resetGame } = useGame()
-  const { cur, range, pct, next } = getXpProgress()
+  const { cur, pct, next } = getXpProgress()
   const unlocked = monsters.filter(m => m.unlocked).length
 
   return (
@@ -18,7 +33,7 @@ export default function MainMenu({ navigate }) {
       </div>
 
       {/* Hero */}
-      <div style={{ textAlign:'center', margin:'6px 0 18px', position:'relative', zIndex:2 }}>
+      <div style={{ textAlign:'center', margin:'6px 0 14px', position:'relative', zIndex:2 }}>
         <div style={{
           width:76, height:76,
           background:'radial-gradient(circle at 35% 35%,#5b8dee,#1a2f6e)',
@@ -44,6 +59,21 @@ export default function MainMenu({ navigate }) {
           <div style={{ height:4, background:'rgba(255,255,255,.07)', borderRadius:4, overflow:'hidden' }}>
             <div style={{ height:'100%', width:`${pct}%`, background:'linear-gradient(90deg,#a78bfa,#5b8dee)', borderRadius:4, transition:'width .6s' }} />
           </div>
+        </div>
+      </div>
+
+      {/* 每日防詐提示卡 */}
+      <div style={{
+        maxWidth:440, margin:'0 auto 14px',
+        padding:'13px 16px', borderRadius:14,
+        background:'rgba(255,220,80,.07)',
+        border:'1px solid rgba(255,220,80,.28)',
+        display:'flex', alignItems:'flex-start', gap:12,
+      }}>
+        <span style={{ fontSize:26, flexShrink:0, lineHeight:1.3 }}>{tip.icon}</span>
+        <div>
+          <div style={{ fontSize:12, color:'rgba(255,220,80,.6)', fontWeight:700, letterSpacing:1, marginBottom:5 }}>💡 防詐小提醒</div>
+          <div style={{ fontSize:16, color:'rgba(255,240,180,.92)', lineHeight:1.75 }}>{tip.text}</div>
         </div>
       </div>
 
