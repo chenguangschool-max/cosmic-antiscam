@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { GameProvider } from './GameContext'
 import Stars from './components/Stars'
 import Toast from './components/Toast'
+import Instructions from './pages/Instructions'
 import MainMenu from './pages/MainMenu'
 import ModeSelect from './pages/ModeSelect'
 import Quiz from './pages/Quiz'
@@ -15,6 +16,9 @@ import OnlineLobby from './pages/OnlineLobby'
 import OnlineBattle from './pages/OnlineBattle'
 
 export default function App() {
+  const [showInstructions, setShowInstructions] = useState(
+    () => !localStorage.getItem('hasReadInstructions')
+  )
   const [page, setPage] = useState('menu')
   const [currentMode, setCurrentMode] = useState(null)
   const [quizResult, setQuizResult] = useState(null)
@@ -24,13 +28,19 @@ export default function App() {
 
   const navigate = (p) => setPage(p)
 
+  const handleInstructionsDone = () => {
+    localStorage.setItem('hasReadInstructions', '1')
+    setShowInstructions(false)
+  }
+
   return (
     <GameProvider>
       <Stars />
       <Toast />
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 520, margin: '0 auto' }}>
-        {page === 'menu'         && <MainMenu navigate={navigate} />}
-        {page === 'modeSelect'   && <ModeSelect navigate={navigate} onModeSelect={setCurrentMode} />}
+        {showInstructions && <Instructions onDone={handleInstructionsDone} />}
+        {!showInstructions && page === 'menu' && <MainMenu navigate={navigate} />}
+        {!showInstructions && page === 'modeSelect'   && <ModeSelect navigate={navigate} onModeSelect={setCurrentMode} />}
         {page === 'quiz'         && <Quiz mode={currentMode} navigate={navigate} onResult={setQuizResult} />}
         {page === 'result'       && <Result result={quizResult} navigate={navigate} />}
         {page === 'codex'        && <Codex navigate={navigate} />}
