@@ -59,8 +59,8 @@ export default function Quiz({ mode, navigate, onResult }) {
     const cur = questions[currentQ]
     if (!cur || answered) return
     window.speechSynthesis?.cancel()
-    const u = new SpeechSynthesisUtterance(`發件人：${cur.signal}。${cur.text}`)
-    u.lang = 'zh-TW'; u.rate = 0.88
+    const u = new SpeechSynthesisUtterance(cur.text)
+    u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 0.9
     u.onstart = () => setSpeaking(true)
     u.onend = () => setSpeaking(false)
     u.onerror = () => setSpeaking(false)
@@ -112,8 +112,8 @@ export default function Quiz({ mode, navigate, onResult }) {
     if (!window.speechSynthesis || !q) return
     if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return }
     window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(`發件人：${q.signal}。${q.text}`)
-    u.lang = 'zh-TW'
+    const u = new SpeechSynthesisUtterance(q.text)
+    u.lang = 'zh-TW'; u.pitch = 0.9
     u.rate = 0.88
     u.onstart = () => setSpeaking(true)
     u.onend = () => setSpeaking(false)

@@ -71,8 +71,8 @@ export default function OnlineBattle({ room, navigate }) {
   useEffect(() => {
     if (!q || phase !== 'question') return
     window.speechSynthesis?.cancel()
-    const u = new SpeechSynthesisUtterance(`發件人：${q.signal}。${q.text}`)
-    u.lang = 'zh-TW'; u.rate = 0.88
+    const u = new SpeechSynthesisUtterance(q.text)
+    u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 0.9
     u.onstart = () => setSpeaking(true)
     u.onend = () => setSpeaking(false)
     u.onerror = () => setSpeaking(false)
