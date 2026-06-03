@@ -240,7 +240,7 @@ export default function MultiQuiz({ players, navigate, onDone }) {
       <div style={{ background: 'rgba(255,255,255,.04)', border: `1px solid ${color}33`, borderRadius: 12, padding: 16, marginBottom: 12, minHeight: 95 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
           <div style={{ fontSize: 10, color: 'rgba(140,180,255,.6)', letterSpacing: 1 }}>
-            {q ? `📡 發件人：${q.signal}` : '📡 宇宙訊號偵測中'}
+            📡 宇宙訊號偵測中
           </div>
           {q && (
             <button onClick={speakQuestion} style={{

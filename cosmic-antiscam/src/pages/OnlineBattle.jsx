@@ -210,7 +210,7 @@ export default function OnlineBattle({ room, navigate }) {
         <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(91,141,238,.22)', borderRadius: 12, padding: 16, marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
             <div style={{ fontSize: 10, color: 'rgba(140,180,255,.55)', letterSpacing: 1 }}>
-              📡 {q.signal}
+              📡 宇宙訊號偵測中
             </div>
             <button onClick={speakQuestion} style={{
               display: 'flex', alignItems: 'center', gap: 4,
