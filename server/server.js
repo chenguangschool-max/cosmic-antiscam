@@ -30,6 +30,81 @@ const NORMAL_TOPICS = [
   '銀行信用卡消費通知', '健保卡補發正常通知', '銀行定存到期通知', '政府退稅通知',
 ]
 
+// ── 備用靜態題庫（API 失敗時使用）────────────────────────────────────────────
+
+const FALLBACK_QUESTIONS = [
+  {
+    signal: '銀河聯邦安全局',
+    text: '【緊急通知】您的星際帳戶編號 GX-2024-77812 疑似遭非法入侵，資產已被強制凍結。為保護您的 8,500 星幣安全並完成解凍手續，請立即點擊安全驗證連結，並轉帳 2,000 星幣作為身份擔保金。2 小時內未處理帳戶將永久停用，請立即行動！',
+    answer: 1,
+    explanation: '這是詐騙，因為官方機構不會要求轉帳「擔保金」才能解凍帳戶。',
+    topic: '假冒政府說涉及洗錢',
+  },
+  {
+    signal: '宇宙快遞星際服務',
+    text: '您有一件跨星系包裹（編號 GX-88731）因未繳星際關稅，暫存於木星轉運站。請於 24 小時內點擊連結補繳關稅 350 星幣，逾期包裹將退回原發件方且不退還費用。此為系統自動通知，請勿回覆，立即處理以免損失！',
+    answer: 1,
+    explanation: '這是詐騙，因為正規快遞不會要求點陌生連結付關稅。',
+    topic: '假冒快遞補繳郵資',
+  },
+  {
+    signal: '宇宙中獎通知中心',
+    text: '恭喜！您的星際帳號已被系統抽中榮獲本月特等獎「銀河豪華飛船一艘」，市值 500,000 星幣！請於 48 小時內聯繫客服領獎，並預先繳納 3,000 星幣行政手續費以啟動領獎程序。機會難得，立即回覆確認！',
+    answer: 1,
+    explanation: '這是詐騙，因為中獎不需要先繳手續費，這是典型的詐騙手法。',
+    topic: '中獎先繳手續費',
+  },
+  {
+    signal: '宇宙電信星際帳務',
+    text: '【停話警告】您的星際通訊門號帳單金額 2,890 星幣逾期未繳，將於今日 18:00 強制停話。為避免影響通訊及信用記錄，請立即轉帳至帳號 9999-2024-1234 完成繳費，繳費後回傳收據，客服將於 30 分鐘內恢復您的通訊服務。',
+    answer: 1,
+    explanation: '這是詐騙，因為電信公司不會要求直接轉帳至個人帳號繳費。',
+    topic: '假冒電信說欠費停話',
+  },
+  {
+    signal: '星際理財顧問王銀河',
+    text: '朋友您好！我是持牌星際理財顧問，目前有一個保證月收益 25% 的礦星投資計劃，已有 3,200 位投資者每月穩定獲利。最低門檻僅需 10,000 星幣，早鳥加入還有額外紅利 500 星幣。機會難得，今天就把錢轉給我開始賺錢！',
+    answer: 1,
+    explanation: '這是詐騙，因為保證高報酬的投資不存在，私人轉帳投資風險極高。',
+    topic: '投資詐騙保證報酬',
+  },
+  {
+    signal: '星際獵才HR銀河人才',
+    text: '恭喜您通過「星際數據分析師」初試！月薪 180,000 星幣含交通補助。正式上班前需繳交 5,000 星幣設備保證金，保證到職後第一個月薪資退還。請於 3 天內完成繳款以保留職缺，逾期視同放棄，請聯繫 HR 確認繳款方式。',
+    answer: 1,
+    explanation: '這是詐騙，因為正規企業不會要求求職者先繳設備保證金。',
+    topic: '求職先繳設備費',
+  },
+  {
+    signal: '銀河星際銀行客服',
+    text: '親愛的客戶，系統偵測您的星際帳戶有異常登入紀錄，為保護資產安全已暫時鎖定網路銀行功能。請立即點擊以下安全連結，輸入帳號密碼及動態密碼完成身份驗證以解除鎖定。請在 1 小時內完成，否則帳戶將暫停使用！',
+    answer: 1,
+    explanation: '這是詐騙，因為銀行不會透過簡訊連結要求輸入密碼及動態密碼。',
+    topic: '假冒銀行客服要求點連結',
+  },
+  {
+    signal: '銀河商業銀行',
+    text: '親愛的客戶您好，您的星際信用卡於今日 14:32 在火星購物中心消費 1,280 星幣（交易序號 MC-78821）。如有疑問或非本人消費，請撥打背面客服專線 0800-888-777 或登入官方網站 galaxybank.space 查詢及申報，本訊息由系統自動發送，請勿直接回覆。',
+    answer: 0,
+    explanation: '這是正常訊息，因為消費通知提供官方查詢管道，不要求立即付款。',
+    topic: '銀行信用卡消費通知',
+  },
+  {
+    signal: '宇宙星際醫院健檢中心',
+    text: '您好，您預約的星際健康檢查時間為 2026-06-15 上午 09:30，地點：宇宙大道 100 號星際醫院 3 樓健檢中心。請提前 15 分鐘報到，攜帶星際健保卡及身分證。如需更改或取消，請提前 3 個工作天致電 02-2345-6789，謝謝您的配合。',
+    answer: 0,
+    explanation: '這是正常訊息，因為預約確認提供具體資訊和官方電話，未要求付款。',
+    topic: '醫院健檢預約確認',
+  },
+  {
+    signal: '銀河國稅局',
+    text: '納稅義務人您好，依據 2025 年度星際所得稅結算，您應退稅金額為 4,231 星幣，將於 2026-07-01 自動匯入您申報時填寫之帳戶。若帳戶有變更，請至官網 tax.galaxy.gov 申請修改，或攜帶身分證至各地稅務服務中心辦理，請勿輕信非官方管道。',
+    answer: 0,
+    explanation: '這是正常訊息，因為退稅通知提供官方管道變更資料，未要求立即操作。',
+    topic: '政府退稅通知',
+  },
+]
+
 // ── AI 題目生成 ────────────────────────────────────────────────────────────────
 
 function parseJson(raw) {
@@ -47,13 +122,19 @@ async function genQuestion(isScam, topic) {
     ? `你是防詐騙教育遊戲設計師。請生成一道「${topic}」的詐騙情境題。${base}\n格式：${schema}`
     : `你是防詐騙教育遊戲設計師。請生成一道「${topic}」的正常通知題。${base}\n格式：${schema}`
 
-  const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 512,
-    messages: [{ role: 'user', content: prompt }],
-  })
-
-  return parseJson(msg.content[0].text)
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const msg = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 512,
+        messages: [{ role: 'user', content: prompt }],
+      })
+      return parseJson(msg.content[0].text)
+    } catch (e) {
+      if (attempt === 1) throw e
+      await new Promise(r => setTimeout(r, 1500))
+    }
+  }
 }
 
 function shuffle(arr) {
@@ -66,18 +147,22 @@ function shuffle(arr) {
 }
 
 async function genRoomQuestions() {
-  // 7 詐騙 + 3 正常，各取不重複主題，依序生成避免 rate limit
-  const scamTopics = shuffle(SCAM_TOPICS).slice(0, 7)
-  const normalTopics = shuffle(NORMAL_TOPICS).slice(0, 3)
-  const assignments = shuffle([
-    ...scamTopics.map(t => ({ isScam: true, topic: t })),
-    ...normalTopics.map(t => ({ isScam: false, topic: t })),
-  ])
-  const questions = []
-  for (const { isScam, topic } of assignments) {
-    questions.push(await genQuestion(isScam, topic))
+  try {
+    const scamTopics = shuffle(SCAM_TOPICS).slice(0, 7)
+    const normalTopics = shuffle(NORMAL_TOPICS).slice(0, 3)
+    const assignments = shuffle([
+      ...scamTopics.map(t => ({ isScam: true, topic: t })),
+      ...normalTopics.map(t => ({ isScam: false, topic: t })),
+    ])
+    const questions = []
+    for (const { isScam, topic } of assignments) {
+      questions.push(await genQuestion(isScam, topic))
+    }
+    return questions
+  } catch (e) {
+    console.error('AI generation failed, using fallback questions:', e.message)
+    return shuffle(FALLBACK_QUESTIONS)
   }
-  return questions
 }
 
 // ── 房間管理 ───────────────────────────────────────────────────────────────────

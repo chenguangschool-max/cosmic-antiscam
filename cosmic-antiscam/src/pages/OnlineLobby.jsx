@@ -87,15 +87,29 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ fontSize: 36, marginBottom: 8 }}>🛸</div>
           <div style={title}>等待玩家加入</div>
-          <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-            <div style={{ fontFamily: 'Orbitron,monospace', fontSize: 28, fontWeight: 900, color: '#5b8dee', letterSpacing: 4 }}>
-              {roomCode}
+          <div style={{ marginTop: 16 }}>
+            <div style={{ fontSize: 10, color: 'rgba(140,180,255,.5)', letterSpacing: 2, marginBottom: 10, textAlign: 'center' }}>
+              房間代碼
             </div>
-            <button onClick={copyCode} style={smallBtn}>
-              {copied ? '✅' : '複製'}
-            </button>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              {roomCode.split('').map((char, i) => (
+                <div key={i} style={{
+                  width: 56, height: 64, borderRadius: 10,
+                  background: 'rgba(91,141,238,.1)',
+                  border: '2px solid rgba(91,141,238,.55)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'Orbitron,monospace', fontSize: 28, fontWeight: 900,
+                  color: '#5b8dee',
+                }}>{char}</div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
+              <button onClick={copyCode} style={smallBtn}>
+                {copied ? '✅ 已複製' : '複製代碼'}
+              </button>
+            </div>
           </div>
-          <div style={{ fontSize: 11, color: 'rgba(180,200,255,.4)', marginTop: 5 }}>
+          <div style={{ fontSize: 11, color: 'rgba(180,200,255,.4)', marginTop: 8 }}>
             把代碼分享給朋友，他們輸入後就能加入
           </div>
         </div>
