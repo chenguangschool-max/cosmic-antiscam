@@ -23,6 +23,7 @@ export default function Quiz({ mode, navigate, onResult }) {
   const [extraCoins] = useState((bag['magnet'] || 0) > 0 ? 5 : 0)
   const [justUnlockedMonster, setJustUnlockedMonster] = useState(null)
   const [ulQueue, setUlQueue] = useState([])
+  const [speaking, setSpeaking] = useState(false)
   const usedTopics = useRef([])
   const planRef = useRef([])
   const timerRef = useRef(null)
@@ -95,7 +96,22 @@ export default function Quiz({ mode, navigate, onResult }) {
     if (currentQ + 2 < 10 && !questions[currentQ+2]) loadQuestion(currentQ+2)
   }
 
+  const speakQuestion = () => {
+    if (!window.speechSynthesis || !q) return
+    if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return }
+    window.speechSynthesis.cancel()
+    const u = new SpeechSynthesisUtterance(`發件人：${q.signal}。${q.text}`)
+    u.lang = 'zh-TW'
+    u.rate = 0.88
+    u.onstart = () => setSpeaking(true)
+    u.onend = () => setSpeaking(false)
+    u.onerror = () => setSpeaking(false)
+    window.speechSynthesis.speak(u)
+  }
+
   const handleNext = () => {
+    window.speechSynthesis?.cancel()
+    setSpeaking(false)
     const next = currentQ + 1
     if (next >= 10) {
       const bonusXp = score * 20
@@ -182,8 +198,22 @@ export default function Quiz({ mode, navigate, onResult }) {
 
       {/* question card */}
       <div style={{ background:'rgba(255,255,255,.04)', border:`1px solid ${isEdu ? 'rgba(91,141,238,.32)' : 'rgba(91,141,238,.2)'}`, borderRadius:12, padding:16, marginBottom:12, minHeight:95 }}>
-        <div style={{ fontSize:10, color:'rgba(140,180,255,.6)', letterSpacing:1, marginBottom:5 }}>
-          {isEdu && q ? `📡 發件人：${q.signal}` : '📡 宇宙訊號偵測中'}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:5 }}>
+          <div style={{ fontSize:10, color:'rgba(140,180,255,.6)', letterSpacing:1 }}>
+            {isEdu && q ? `📡 發件人：${q.signal}` : '📡 宇宙訊號偵測中'}
+          </div>
+          {q && (
+            <button onClick={speakQuestion} style={{
+              display:'flex', alignItems:'center', gap:4,
+              background: speaking ? 'rgba(91,141,238,.22)' : 'rgba(255,255,255,.05)',
+              border: `1px solid ${speaking ? 'rgba(91,141,238,.55)' : 'rgba(91,141,238,.2)'}`,
+              borderRadius:20, padding:'3px 10px', fontSize:10, cursor:'pointer',
+              color: speaking ? '#a8c4ff' : 'rgba(180,200,255,.45)',
+              fontFamily:'Noto Sans TC,sans-serif', transition:'all .2s',
+            }}>
+              {speaking ? '⏹ 停止' : '🔊 朗讀'}
+            </button>
+          )}
         </div>
         {!q ? (
           <div style={{ display:'flex', alignItems:'center', gap:8, color:'rgba(180,200,255,.5)', fontSize:12 }}>

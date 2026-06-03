@@ -14,6 +14,7 @@ export default function OnlineBattle({ room, navigate }) {
   const [questionResult, setQuestionResult] = useState(null)
   const [scores, setScores] = useState([])
   const [finalResults, setFinalResults] = useState(null)
+  const [speaking, setSpeaking] = useState(false)
 
   const timerRef = useRef(null)
 
@@ -24,6 +25,8 @@ export default function OnlineBattle({ room, navigate }) {
     })
 
     socket.on('new-question', ({ index, total: t, signal, text, timeLimit }) => {
+      window.speechSynthesis?.cancel()
+      setSpeaking(false)
       setQ({ signal, text })
       setQIndex(index)
       setTotal(t)
@@ -79,6 +82,19 @@ export default function OnlineBattle({ room, navigate }) {
   const clearTimer = () => {
     clearInterval(timerRef.current)
     timerRef.current = null
+  }
+
+  const speakQuestion = () => {
+    if (!window.speechSynthesis || !q) return
+    if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return }
+    window.speechSynthesis.cancel()
+    const u = new SpeechSynthesisUtterance(`發件人：${q.signal}。${q.text}`)
+    u.lang = 'zh-TW'
+    u.rate = 0.88
+    u.onstart = () => setSpeaking(true)
+    u.onend = () => setSpeaking(false)
+    u.onerror = () => setSpeaking(false)
+    window.speechSynthesis.speak(u)
   }
 
   const handleAnswer = (val) => {
@@ -181,8 +197,20 @@ export default function OnlineBattle({ room, navigate }) {
       {/* 題目卡 */}
       {q && (
         <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(91,141,238,.22)', borderRadius: 12, padding: 16, marginBottom: 12 }}>
-          <div style={{ fontSize: 10, color: 'rgba(140,180,255,.55)', letterSpacing: 1, marginBottom: 5 }}>
-            📡 {q.signal}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+            <div style={{ fontSize: 10, color: 'rgba(140,180,255,.55)', letterSpacing: 1 }}>
+              📡 {q.signal}
+            </div>
+            <button onClick={speakQuestion} style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              background: speaking ? 'rgba(91,141,238,.22)' : 'rgba(255,255,255,.05)',
+              border: `1px solid ${speaking ? 'rgba(91,141,238,.55)' : 'rgba(91,141,238,.2)'}`,
+              borderRadius: 20, padding: '3px 10px', fontSize: 10, cursor: 'pointer',
+              color: speaking ? '#a8c4ff' : 'rgba(180,200,255,.45)',
+              fontFamily: 'Noto Sans TC,sans-serif', transition: 'all .2s',
+            }}>
+              {speaking ? '⏹ 停止' : '🔊 朗讀'}
+            </button>
           </div>
           <div style={{ fontSize: 13, lineHeight: 1.8, color: '#e0eaff' }}>{q.text}</div>
         </div>
