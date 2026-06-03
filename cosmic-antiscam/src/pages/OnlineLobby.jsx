@@ -15,7 +15,7 @@ function CodeBoxes({ chars, onChange }) {
       return
     }
     const ch = e.key.toUpperCase()
-    if (!/^[A-Z0-9]$/.test(ch) || 'OQDIO01'.includes(ch)) return
+    if (!/^[A-Z0-9]$/.test(ch) || 'IO01'.includes(ch)) return
     const next = chars.map((c, idx) => idx === i ? ch : c)
     onChange(next)
     if (i < 3) refs[i + 1].current?.focus()
@@ -35,7 +35,7 @@ function CodeBoxes({ chars, onChange }) {
             width: 62, height: 72, borderRadius: 12, textAlign: 'center',
             background: chars[i] ? 'rgba(91,141,238,.18)' : 'rgba(255,255,255,.05)',
             border: `2px solid ${chars[i] ? 'rgba(91,141,238,.7)' : 'rgba(91,141,238,.25)'}`,
-            fontFamily: 'Orbitron,monospace', fontSize: 32, fontWeight: 900,
+            fontFamily: "'Courier New', Courier, monospace", fontSize: 34, fontWeight: 700,
             color: '#7eb8ff', outline: 'none', cursor: 'text',
             caretColor: 'transparent', boxSizing: 'border-box',
             transition: 'border-color .15s, background .15s',
@@ -134,7 +134,7 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
                   background: 'rgba(91,141,238,.1)',
                   border: '2px solid rgba(91,141,238,.55)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontFamily: 'Orbitron,monospace', fontSize: 32, fontWeight: 900,
+                  fontFamily: "'Courier New', Courier, monospace", fontSize: 34, fontWeight: 700,
                   color: '#5b8dee',
                 }}>{char}</div>
               ))}
