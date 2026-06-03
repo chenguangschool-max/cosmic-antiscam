@@ -148,9 +148,6 @@ export default function Codex({ navigate }) {
                   難度 <span style={{ color:'var(--gold)' }}>{starsH(selected.stars)}</span>
                 </div>
               </div>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, background:'rgba(255,210,50,.06)', border:'1px solid rgba(255,210,50,.2)', borderRadius:8, padding:'6px 12px', color:'var(--gold)', fontSize:11 }}>
-                🪙 首次解鎖：+{selected.reward} 金幣
-              </div>
             </div>
           </div>
         )
