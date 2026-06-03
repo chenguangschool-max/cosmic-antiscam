@@ -5,7 +5,7 @@ const GameCtx = createContext(null)
 
 function loadSave() {
   try {
-    const raw = localStorage.getItem('cosmicSave_v5')
+    const raw = localStorage.getItem('cosmicSave_v6')
     return raw ? JSON.parse(raw) : null
   } catch { return null }
 }
@@ -28,7 +28,7 @@ export function GameProvider({ children }) {
 
   useEffect(() => {
     const unlockedIds = monsters.filter(m => m.unlocked).map(m => m.id)
-    localStorage.setItem('cosmicSave_v5', JSON.stringify({
+    localStorage.setItem('cosmicSave_v6', JSON.stringify({
       coins, xp, level, bag, unlockedIds,
     }))
   }, [coins, xp, level, bag, monsters])

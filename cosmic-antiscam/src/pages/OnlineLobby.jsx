@@ -59,7 +59,7 @@ function CodeBoxes({ chars, onChange }) {
 
 export default function OnlineLobby({ navigate, onRoomReady }) {
   const [view, setView] = useState('home')
-  const [name, setName] = useState('')
+  const [name, setName] = useState(() => localStorage.getItem('playerName') || '')
   const [joinChars, setJoinChars] = useState(['', '', '', ''])
   const [roomCode, setRoomCode] = useState('')
   const [players, setPlayers] = useState([])
@@ -104,6 +104,7 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
 
   const handleCreate = () => {
     if (!name.trim()) return setError('請輸入你的名稱')
+    localStorage.setItem('playerName', name.trim())
     setError('')
     socket.emit('create-room', { name: name.trim() })
   }
@@ -112,6 +113,7 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
     if (!name.trim()) return setError('請輸入你的名稱')
     const code = joinChars.join('')
     if (code.length !== 4) return setError('請填滿 4 格代碼')
+    localStorage.setItem('playerName', name.trim())
     setError('')
     socket.emit('join-room', { code, name: name.trim() })
   }
