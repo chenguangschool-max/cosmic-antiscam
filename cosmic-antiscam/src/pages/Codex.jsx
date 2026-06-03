@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useGame } from '../GameContext'
 import { useToast } from '../components/Toast'
+import { CODEX_EXTRA } from '../data'
 
 const starsH = n => '★'.repeat(n) + '☆'.repeat(5-n)
 const tcls = t => ({ fraud:'tf', social:'ts', invest:'ti', cyber:'tc', mixed:'tx' }[t]||'tf')
@@ -91,29 +92,58 @@ export default function Codex({ navigate }) {
       </div>
 
       {/* Detail overlay */}
-      {selected && (
-        <div style={overlayBg} onClick={() => setSelected(null)}>
-          <div style={overlayCard} onClick={e => e.stopPropagation()}>
-            <button style={closeBtn} onClick={() => setSelected(null)}>✕</button>
-            <div style={{ fontSize:48, marginBottom:5 }}>{selected.emoji}</div>
-            <div style={{ fontSize:13, color:'var(--gold)', marginBottom:5, letterSpacing:2 }}>{starsH(selected.stars)}</div>
-            <div style={{ fontSize:16, fontWeight:700, color:'#e0eaff', marginBottom:2 }}>{selected.name}</div>
-            <div style={{ fontSize:9, color:'rgba(140,180,255,.38)', fontFamily:'Orbitron,monospace', marginBottom:5 }}>{selected.code}</div>
-            <div style={{ ...typeTag(ts(selected.type)), marginBottom:11 }}>{selected.tl}</div>
-            <div style={{ textAlign:'left', marginBottom:9 }}>
-              <div style={secLabel}>怪物介紹</div>
-              <div style={secVal}>{selected.desc}</div>
-            </div>
-            <div style={{ textAlign:'left', marginBottom:9 }}>
-              <div style={secLabel}>識破方式</div>
-              <div style={secVal}>{selected.defeat}</div>
-            </div>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, background:'rgba(255,210,50,.06)', border:'1px solid rgba(255,210,50,.2)', borderRadius:8, padding:'6px 12px', color:'var(--gold)', fontSize:11 }}>
-              🪙 首次解鎖：+{selected.reward} 金幣
+      {selected && (() => {
+        const extra = CODEX_EXTRA[selected.id]
+        return (
+          <div style={overlayBg} onClick={() => setSelected(null)}>
+            <div style={{ ...overlayCard, maxHeight:'88vh', overflowY:'auto' }} onClick={e => e.stopPropagation()}>
+              <button style={closeBtn} onClick={() => setSelected(null)}>✕</button>
+              <div style={{ fontSize:48, marginBottom:4 }}>{selected.emoji}</div>
+              <div style={{ fontSize:13, color:'var(--gold)', marginBottom:4, letterSpacing:2 }}>{starsH(selected.stars)}</div>
+              <div style={{ fontSize:16, fontWeight:700, color:'#e0eaff', marginBottom:2 }}>{selected.name}</div>
+              <div style={{ fontSize:9, color:'rgba(140,180,255,.38)', fontFamily:'Orbitron,monospace', marginBottom:6 }}>{selected.code}</div>
+              <div style={{ ...typeTag(ts(selected.type)), marginBottom:12 }}>{selected.tl}</div>
+
+              {/* 介紹 */}
+              <div style={{ textAlign:'left', marginBottom:9, background:'rgba(255,255,255,.03)', border:'1px solid rgba(91,141,238,.15)', borderRadius:8, padding:'9px 12px' }}>
+                <div style={secLabel}>👾 怪物介紹</div>
+                <div style={{ ...secVal, lineHeight:1.75 }}>{extra?.detail || selected.desc}</div>
+              </div>
+
+              {/* 詐騙警示 */}
+              {extra?.flags?.length > 0 && (
+                <div style={{ textAlign:'left', marginBottom:9, background:'rgba(255,90,70,.06)', border:'1px solid rgba(255,90,70,.2)', borderRadius:8, padding:'9px 12px' }}>
+                  <div style={{ ...secLabel, color:'rgba(255,150,120,.7)', marginBottom:6 }}>🚩 辨識此怪物的關鍵</div>
+                  {extra.flags.map((f, i) => (
+                    <div key={i} style={{ display:'flex', gap:6, fontSize:11, color:'rgba(255,185,165,.85)', lineHeight:1.65, marginBottom:3 }}>
+                      <span style={{ color:'rgba(255,120,90,.6)', flexShrink:0 }}>•</span>{f}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* 識破方式 */}
+              <div style={{ textAlign:'left', marginBottom:9, background:'rgba(50,200,150,.06)', border:'1px solid rgba(50,200,150,.2)', borderRadius:8, padding:'9px 12px' }}>
+                <div style={{ ...secLabel, color:'rgba(100,220,170,.65)', marginBottom:5 }}>✅ 識破方式</div>
+                <div style={{ fontSize:11, color:'rgba(165,235,200,.85)', lineHeight:1.75 }}>{extra?.action || selected.defeat}</div>
+              </div>
+
+              {/* 底部資訊 */}
+              <div style={{ display:'flex', gap:8, marginBottom:8 }}>
+                <div style={{ flex:1, textAlign:'center', background:'rgba(91,141,238,.06)', border:'1px solid rgba(91,141,238,.15)', borderRadius:8, padding:'6px 0', fontSize:10, color:'rgba(140,180,255,.6)' }}>
+                  解鎖等級 <strong style={{ color:'#c8dbff' }}>Lv.{selected.lv}</strong>
+                </div>
+                <div style={{ flex:1, textAlign:'center', background:'rgba(91,141,238,.06)', border:'1px solid rgba(91,141,238,.15)', borderRadius:8, padding:'6px 0', fontSize:10, color:'rgba(140,180,255,.6)' }}>
+                  難度 <span style={{ color:'var(--gold)' }}>{starsH(selected.stars)}</span>
+                </div>
+              </div>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, background:'rgba(255,210,50,.06)', border:'1px solid rgba(255,210,50,.2)', borderRadius:8, padding:'6px 12px', color:'var(--gold)', fontSize:11 }}>
+                🪙 首次解鎖：+{selected.reward} 金幣
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Lock detail overlay */}
       {lockSelected && (
