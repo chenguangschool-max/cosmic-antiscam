@@ -8,7 +8,6 @@ import Quiz from './pages/Quiz'
 import Result from './pages/Result'
 import Codex from './pages/Codex'
 import Shop from './pages/Shop'
-import Login from './pages/Login'
 import MultiSetup from './pages/MultiSetup'
 import MultiQuiz from './pages/MultiQuiz'
 import MultiResult from './pages/MultiResult'
@@ -36,7 +35,6 @@ export default function App() {
         {page === 'result'       && <Result result={quizResult} navigate={navigate} />}
         {page === 'codex'        && <Codex navigate={navigate} />}
         {page === 'shop'         && <Shop navigate={navigate} />}
-        {page === 'login'        && <Login navigate={navigate} />}
         {page === 'multiSetup'   && (
           <MultiSetup navigate={navigate} onStart={(players) => { setMultiPlayers(players); navigate('multiQuiz') }} />
         )}

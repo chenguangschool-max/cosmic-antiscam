@@ -1,17 +1,32 @@
-import { createContext, useContext, useState, useRef } from 'react'
+import { createContext, useContext, useState, useRef, useEffect } from 'react'
 import { MONSTERS, XP_TABLE } from './data'
 
 const GameCtx = createContext(null)
 
+function loadSave() {
+  try {
+    const raw = localStorage.getItem('cosmicSave_v2')
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
+}
+
 export function GameProvider({ children }) {
-  const [coins, setCoins] = useState(500)
-  const [xp, setXp] = useState(0)
-  const [level, setLevel] = useState(1)
-  const [bag, setBag] = useState({})
-  const [monsters, setMonsters] = useState(() => MONSTERS.map(m => ({ ...m })))
+  const save = loadSave()
+  const [coins, setCoins] = useState(save?.coins ?? 0)
+  const [xp, setXp] = useState(save?.xp ?? 0)
+  const [level, setLevel] = useState(save?.level ?? 1)
+  const [bag, setBag] = useState(save?.bag ?? {})
+  const [monsters, setMonsters] = useState(() => {
+    const saved = save?.monsters
+    return MONSTERS.map(m => saved ? { ...m, unlocked: saved[m.id] ?? m.unlocked } : { ...m })
+  })
   const [justUnlocked, setJustUnlocked] = useState([])
-  const [currentUser, setCurrentUser] = useState(null)
   const ulQueue = useRef([])
+
+  useEffect(() => {
+    const monsterMap = Object.fromEntries(monsters.map(m => [m.id, m.unlocked]))
+    localStorage.setItem('cosmicSave_v2', JSON.stringify({ coins, xp, level, bag, monsters: monsterMap }))
+  }, [coins, xp, level, bag, monsters])
 
   const xpForLv = (lv) => XP_TABLE[lv] ?? lv * 600
 
@@ -76,9 +91,9 @@ export function GameProvider({ children }) {
 
   return (
     <GameCtx.Provider value={{
-      coins, xp, level, bag, monsters, justUnlocked, currentUser,
+      coins, xp, level, bag, monsters, justUnlocked,
       addCoins, spendCoins, addXp, unlockMonster, buyItem, useItem,
-      clearJustUnlocked, getXpProgress, setCurrentUser, setMonsters, xpForLv,
+      clearJustUnlocked, getXpProgress, setMonsters, xpForLv,
     }}>
       {children}
     </GameCtx.Provider>

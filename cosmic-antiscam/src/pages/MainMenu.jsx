@@ -11,8 +11,7 @@ export default function MainMenu({ navigate }) {
       <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
         <div style={chip('#5b8dee')}>Lv.<strong>{level}</strong></div>
         <div style={coinBadge}>🪙 {coins}</div>
-        <div style={{ marginLeft:'auto', display:'flex', gap:6 }}>
-          <button style={iconBtn} onClick={() => navigate('login')}>👤 登入</button>
+        <div style={{ marginLeft:'auto' }}>
           <button style={iconBtn} onClick={() => navigate('shop')}>🛒</button>
         </div>
       </div>
