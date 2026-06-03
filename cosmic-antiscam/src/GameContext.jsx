@@ -12,7 +12,7 @@ function loadSave() {
 
 export function GameProvider({ children }) {
   const save = loadSave()
-  const [coins, setCoins] = useState(save?.coins ?? 0)
+  const [coins, setCoins] = useState(0)
   const [xp, setXp] = useState(save?.xp ?? 0)
   const [level, setLevel] = useState(save?.level ?? 1)
   const [bag, setBag] = useState(save?.bag ?? {})
@@ -25,8 +25,8 @@ export function GameProvider({ children }) {
 
   useEffect(() => {
     const monsterMap = Object.fromEntries(monsters.map(m => [m.id, m.unlocked]))
-    localStorage.setItem('cosmicSave_v2', JSON.stringify({ coins, xp, level, bag, monsters: monsterMap }))
-  }, [coins, xp, level, bag, monsters])
+    localStorage.setItem('cosmicSave_v2', JSON.stringify({ xp, level, bag, monsters: monsterMap }))
+  }, [xp, level, bag, monsters])
 
   const xpForLv = (lv) => XP_TABLE[lv] ?? lv * 600
 
