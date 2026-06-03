@@ -33,6 +33,17 @@ export default function MultiQuiz({ players, navigate, onDone }) {
     return () => clearInterval(timerRef.current)
   }, [currentQ, questions[currentQ], phase])
 
+  useEffect(() => {
+    if (!q || answered || phase !== 'playing') return
+    window.speechSynthesis?.cancel()
+    const u = new SpeechSynthesisUtterance(`發件人：${q.signal}。${q.text}`)
+    u.lang = 'zh-TW'; u.rate = 0.88
+    u.onstart = () => setSpeaking(true)
+    u.onend = () => setSpeaking(false)
+    u.onerror = () => setSpeaking(false)
+    window.speechSynthesis?.speak(u)
+  }, [q, phase])
+
   const startTimer = () => {
     clearInterval(timerRef.current)
     setTimerVal(MODE_TIME)

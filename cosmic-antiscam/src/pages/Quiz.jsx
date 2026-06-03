@@ -55,6 +55,17 @@ export default function Quiz({ mode, navigate, onResult }) {
     return () => clearInterval(timerRef.current)
   }, [currentQ, questions[currentQ]])
 
+  useEffect(() => {
+    if (!q || answered) return
+    window.speechSynthesis?.cancel()
+    const u = new SpeechSynthesisUtterance(`發件人：${q.signal}。${q.text}`)
+    u.lang = 'zh-TW'; u.rate = 0.88
+    u.onstart = () => setSpeaking(true)
+    u.onend = () => setSpeaking(false)
+    u.onerror = () => setSpeaking(false)
+    window.speechSynthesis?.speak(u)
+  }, [q])
+
   const startTimer = () => {
     clearInterval(timerRef.current)
     setTimerVal(mode?.time || 20)
