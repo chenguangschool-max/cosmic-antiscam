@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useGame } from '../GameContext'
-import { ITEMS, generateQuestion } from '../data'
+import { ITEMS, generateQuestion, EDU_TIPS } from '../data'
 import UnlockOverlay from '../components/UnlockOverlay'
 
 const starsH = n => '★'.repeat(n) + '☆'.repeat(5-n)
@@ -133,11 +133,21 @@ export default function Quiz({ mode, navigate, onResult }) {
 
   const q = questions[currentQ]
   const pct = ((currentQ+1)/10*100)
-  const warn = timerVal <= 5
+  const isEdu = mode?.id === 'edu'
+  const tips = isEdu && q ? (EDU_TIPS[q.topic] || null) : null
+  const warn = !isEdu && timerVal <= 5
+  const notAnswered = answered && selected === null
 
   return (
     <div style={{ padding:18, position:'relative', zIndex:2 }}>
       {/* top */}
+      {isEdu && (
+        <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:10, padding:'6px 12px', background:'rgba(91,141,238,.1)', border:'1px solid rgba(91,141,238,.25)', borderRadius:20 }}>
+          <span style={{ fontSize:13 }}>📚</span>
+          <span style={{ fontSize:10, color:'#a8c4ff', letterSpacing:1.5, fontWeight:600 }}>教育模式</span>
+          <span style={{ fontSize:9, color:'rgba(140,180,255,.5)', marginLeft:4 }}>每題後有詳細解說</span>
+        </div>
+      )}
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
         <div style={coinBadge}>🪙 {coins}</div>
         <div style={{ flex:1, margin:'0 12px' }}>
@@ -146,7 +156,7 @@ export default function Quiz({ mode, navigate, onResult }) {
             <div style={{ height:'100%', width:`${pct}%`, background:'linear-gradient(90deg,#5b8dee,#a78bfa)', transition:'width .4s', borderRadius:4 }} />
           </div>
         </div>
-        <div style={{ fontFamily:'Orbitron,monospace', fontSize:16, fontWeight:700, color: warn ? '#ff6b6b':'#fff', animation: warn ? 'pulse .5s infinite':'' }}>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:16, fontWeight:700, color: warn ? '#ff6b6b':'rgba(180,200,255,.7)', animation: warn ? 'pulse .5s infinite':'' }}>
           {timerVal}
         </div>
       </div>
@@ -171,8 +181,10 @@ export default function Quiz({ mode, navigate, onResult }) {
       </div>
 
       {/* question card */}
-      <div style={{ background:'rgba(255,255,255,.04)', border:'1px solid rgba(91,141,238,.2)', borderRadius:12, padding:16, marginBottom:12, minHeight:95 }}>
-        <div style={{ fontSize:10, color:'rgba(140,180,255,.6)', letterSpacing:1, marginBottom:5 }}>📡 宇宙訊號偵測中</div>
+      <div style={{ background:'rgba(255,255,255,.04)', border:`1px solid ${isEdu ? 'rgba(91,141,238,.32)' : 'rgba(91,141,238,.2)'}`, borderRadius:12, padding:16, marginBottom:12, minHeight:95 }}>
+        <div style={{ fontSize:10, color:'rgba(140,180,255,.6)', letterSpacing:1, marginBottom:5 }}>
+          {isEdu && q ? `📡 發件人：${q.signal}` : '📡 宇宙訊號偵測中'}
+        </div>
         {!q ? (
           <div style={{ display:'flex', alignItems:'center', gap:8, color:'rgba(180,200,255,.5)', fontSize:12 }}>
             <div style={{ width:14, height:14, border:'2px solid rgba(91,141,238,.22)', borderTopColor:'#5b8dee', borderRadius:'50%', animation:'spin .8s linear infinite', flexShrink:0 }} />
@@ -210,7 +222,7 @@ export default function Quiz({ mode, navigate, onResult }) {
       )}
 
       {/* feedback */}
-      {feedback && (
+      {feedback && !isEdu && (
         <div style={{
           marginTop:11, padding:'10px 14px', borderRadius:9, fontSize:12, lineHeight:1.6,
           background: feedback.correct ? 'rgba(50,200,150,.11)':'rgba(255,100,80,.09)',
@@ -219,6 +231,65 @@ export default function Quiz({ mode, navigate, onResult }) {
           animation:'slideUp .2s ease', whiteSpace:'pre-line',
         }}>
           {feedback.text}
+        </div>
+      )}
+
+      {/* 教育模式詳細解說卡 */}
+      {feedback && isEdu && q && (
+        <div style={{ marginTop:11, animation:'slideUp .2s ease' }}>
+          {/* 判決 + 類別 */}
+          <div style={{
+            display:'flex', alignItems:'center', gap:10,
+            padding:'12px 14px', borderRadius:10, marginBottom:8,
+            background: q.answer === 1 ? 'rgba(255,100,80,.1)' : 'rgba(50,200,150,.1)',
+            border: `1px solid ${q.answer === 1 ? 'rgba(255,100,80,.3)' : 'rgba(50,200,150,.3)'}`,
+          }}>
+            <span style={{ fontSize:24, flexShrink:0 }}>{q.answer === 1 ? '🚨' : '✅'}</span>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:13, fontWeight:700, color: q.answer === 1 ? '#ffa58e' : '#8ee8c5' }}>
+                {q.answer === 1 ? '這是詐騙訊息' : '這是正常通知'}
+              </div>
+              <div style={{ fontSize:11, color: feedback.correct ? 'rgba(140,220,180,.7)' : notAnswered ? 'rgba(255,210,80,.7)' : 'rgba(255,150,130,.7)', marginTop:2 }}>
+                {notAnswered ? '⏰ 時間到，未作答' : feedback.correct ? '答對了！繼續保持' : '答錯了，記住這個特徵'}
+              </div>
+            </div>
+            {tips && (
+              <span style={{
+                fontSize:9, padding:'3px 9px', borderRadius:20, flexShrink:0,
+                background:`${tips.catColor}22`, border:`1px solid ${tips.catColor}44`,
+                color: tips.catColor, letterSpacing:0.5,
+              }}>{tips.cat}</span>
+            )}
+          </div>
+
+          {/* 說明 */}
+          <div style={{ background:'rgba(255,255,255,.03)', border:'1px solid rgba(91,141,238,.18)', borderRadius:9, padding:'10px 13px', marginBottom:7 }}>
+            <div style={{ fontSize:9, color:'rgba(140,180,255,.55)', letterSpacing:1.5, marginBottom:5 }}>📋 說明</div>
+            <div style={{ fontSize:12, color:'#c8dbff', lineHeight:1.75 }}>{q.explanation}</div>
+          </div>
+
+          {/* 詐騙警示 */}
+          {tips?.flags?.length > 0 && (
+            <div style={{ background:'rgba(255,90,70,.06)', border:'1px solid rgba(255,90,70,.2)', borderRadius:9, padding:'10px 13px', marginBottom:7 }}>
+              <div style={{ fontSize:9, color:'rgba(255,150,120,.7)', letterSpacing:1.5, marginBottom:7 }}>🚩 辨識此類詐騙的關鍵</div>
+              {tips.flags.map((flag, i) => (
+                <div key={i} style={{ display:'flex', gap:6, fontSize:11, color:'rgba(255,185,165,.85)', lineHeight:1.6, marginBottom:3 }}>
+                  <span style={{ color:'rgba(255,120,90,.6)', flexShrink:0 }}>•</span>
+                  {flag}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 正確做法 */}
+          {tips?.action && (
+            <div style={{ background:'rgba(50,200,150,.06)', border:'1px solid rgba(50,200,150,.22)', borderRadius:9, padding:'10px 13px' }}>
+              <div style={{ fontSize:9, color:'rgba(100,220,170,.65)', letterSpacing:1.5, marginBottom:5 }}>
+                {tips.isNormal ? '💡 正常通知的特徵' : '✅ 遇到這種情況應該'}
+              </div>
+              <div style={{ fontSize:12, color:'rgba(165,235,200,.85)', lineHeight:1.75 }}>{tips.action}</div>
+            </div>
+          )}
         </div>
       )}
 
