@@ -34,15 +34,16 @@ export default function MultiQuiz({ players, navigate, onDone }) {
   }, [currentQ, questions[currentQ], phase])
 
   useEffect(() => {
-    if (!q || answered || phase !== 'playing') return
+    const cur = questions[currentQ]
+    if (!cur || answered || phase !== 'playing') return
     window.speechSynthesis?.cancel()
-    const u = new SpeechSynthesisUtterance(`發件人：${q.signal}。${q.text}`)
+    const u = new SpeechSynthesisUtterance(`發件人：${cur.signal}。${cur.text}`)
     u.lang = 'zh-TW'; u.rate = 0.88
     u.onstart = () => setSpeaking(true)
     u.onend = () => setSpeaking(false)
     u.onerror = () => setSpeaking(false)
     window.speechSynthesis?.speak(u)
-  }, [q, phase])
+  }, [questions[currentQ], phase])
 
   const startTimer = () => {
     clearInterval(timerRef.current)
