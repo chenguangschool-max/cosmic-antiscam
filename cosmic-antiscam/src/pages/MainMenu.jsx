@@ -1,7 +1,7 @@
 import { useGame } from '../GameContext'
 
 export default function MainMenu({ navigate }) {
-  const { coins, level, getXpProgress, monsters } = useGame()
+  const { coins, level, getXpProgress, monsters, resetGame } = useGame()
   const { cur, range, pct, next } = getXpProgress()
   const unlocked = monsters.filter(m => m.unlocked).length
 
@@ -68,6 +68,14 @@ export default function MainMenu({ navigate }) {
           <span style={{ fontSize:19 }}>🌐</span>
           <div><div style={{ fontSize:13, fontWeight:500 }}>連線對戰</div><div style={{ fontSize:10, opacity:.6 }}>即時同步</div></div>
         </button>
+      </div>
+
+      {/* 重置存檔 */}
+      <div style={{ textAlign:'center', marginTop:20 }}>
+        <button onClick={() => { if(window.confirm('確定要歸零所有存檔嗎？')) resetGame() }} style={{
+          background:'none', border:'none', color:'rgba(180,200,255,.2)',
+          fontSize:11, cursor:'pointer', fontFamily:'Noto Sans TC,sans-serif',
+        }}>重置存檔</button>
       </div>
     </div>
   )

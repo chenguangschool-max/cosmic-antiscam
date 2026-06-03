@@ -84,6 +84,15 @@ export function GameProvider({ children }) {
     return true
   }
 
+  const resetGame = () => {
+    setCoins(0)
+    setXp(0)
+    setLevel(1)
+    setBag({})
+    setMonsters(MONSTERS.map(m => ({ ...m, unlocked: false })))
+    setJustUnlocked([])
+  }
+
   const clearJustUnlocked = () => setJustUnlocked([])
 
   const getXpProgress = () => {
@@ -98,7 +107,7 @@ export function GameProvider({ children }) {
     <GameCtx.Provider value={{
       coins, xp, level, bag, monsters, justUnlocked,
       addCoins, spendCoins, addXp, unlockMonster, buyItem, useItem,
-      clearJustUnlocked, getXpProgress, setMonsters, xpForLv,
+      clearJustUnlocked, getXpProgress, setMonsters, xpForLv, resetGame,
     }}>
       {children}
     </GameCtx.Provider>
