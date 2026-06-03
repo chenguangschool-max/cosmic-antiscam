@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useGame } from '../GameContext'
+import { useToast } from '../components/Toast'
 import { CODEX_EXTRA } from '../data'
 
 const starsH = n => '★'.repeat(n) + '☆'.repeat(5-n)
@@ -18,12 +19,22 @@ const FILTERS = [
 ]
 
 export default function Codex({ navigate }) {
-  const { monsters, justUnlocked } = useGame()
+  const { monsters, coins, level, spendCoins, unlockMonster, justUnlocked } = useGame()
+  const showToast = useToast()
   const [filter, setFilter] = useState('all')
   const [selected, setSelected] = useState(null)
+  const [lockSelected, setLockSelected] = useState(null)
 
   const list = filter === 'all' ? monsters : monsters.filter(m => m.type === filter)
   const unlocked = monsters.filter(m => m.unlocked).length
+
+  const handleCoinUnlock = () => {
+    if (!lockSelected || coins < lockSelected.cr) return
+    spendCoins(lockSelected.cr)
+    unlockMonster(lockSelected.id, true)
+    showToast(`✅ 解鎖 ${lockSelected.name}！`)
+    setLockSelected(null)
+  }
 
   const ts = (t) => typeStyle[tcls(t)] || typeStyle.tf
 
@@ -55,7 +66,7 @@ export default function Codex({ navigate }) {
           const s = ts(m.type)
           return (
             <div key={m.id}
-              onClick={() => m.unlocked ? setSelected(m) : undefined}
+              onClick={() => m.unlocked ? setSelected(m) : setLockSelected(m)}
               style={{
                 borderRadius:12,
                 border: isJust ? '1px solid rgba(255,210,50,.5)' : '1px solid rgba(91,141,238,.16)',
@@ -63,7 +74,7 @@ export default function Codex({ navigate }) {
                   ? (isJust ? 'rgba(255,210,50,.04)' : 'rgba(255,255,255,.04)')
                   : 'rgba(3,8,18,.6)',
                 padding:'13px 10px', textAlign:'center',
-                cursor: m.unlocked ? 'pointer' : 'default',
+                cursor: 'pointer',
                 position:'relative', overflow:'hidden',
                 boxShadow: m.unlocked && m.stars===5 ? '0 0 9px rgba(255,210,50,.18)'
                   : m.unlocked && m.stars===4 ? '0 0 7px rgba(150,100,255,.13)' : '',
@@ -144,6 +155,52 @@ export default function Codex({ navigate }) {
           </div>
         )
       })()}
+      {/* 鎖定彈窗 */}
+      {lockSelected && (
+        <div style={overlayBg} onClick={() => setLockSelected(null)}>
+          <div style={overlayCard} onClick={e => e.stopPropagation()}>
+            <button style={closeBtn} onClick={() => setLockSelected(null)}>✕</button>
+            <div style={{ fontSize:44, marginBottom:8 }}>🔒</div>
+            <div style={{ fontSize:12, color:'rgba(140,180,255,.45)', fontFamily:'Orbitron,monospace', marginBottom:4 }}>{lockSelected.code}</div>
+            <div style={{ fontSize:14, color:'rgba(180,200,255,.6)', marginBottom:16 }}>此訊號尚未解碼</div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:14 }}>
+              <div style={{ background:'rgba(91,141,238,.07)', border:'1px solid rgba(91,141,238,.2)', borderRadius:9, padding:'10px 14px', textAlign:'left' }}>
+                <div style={{ fontSize:9, color:'rgba(140,180,255,.5)', letterSpacing:1, marginBottom:4 }}>⭐ 等級解鎖（免費）</div>
+                <div style={{ fontSize:12, color:'#c8dbff' }}>
+                  達到 <strong>Lv.{lockSelected.lv}</strong> 自動解鎖
+                  <span style={{ fontSize:10, color:'rgba(140,180,255,.5)', marginLeft:6 }}>（目前 Lv.{level}）</span>
+                </div>
+              </div>
+              <div style={{ background:'rgba(255,210,50,.06)', border:'1px solid rgba(255,210,50,.2)', borderRadius:9, padding:'10px 14px', textAlign:'left' }}>
+                <div style={{ fontSize:9, color:'rgba(255,210,80,.55)', letterSpacing:1, marginBottom:4 }}>🪙 金幣立即解鎖</div>
+                <div style={{ fontSize:12, color:'#ffd27a' }}>
+                  花費 <strong>{lockSelected.cr} 金幣</strong>
+                  <span style={{ fontSize:10, color:'rgba(255,210,80,.5)', marginLeft:6 }}>（目前 {coins} 枚）</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={handleCoinUnlock} disabled={coins < lockSelected.cr} style={{
+                flex:1, padding:'10px 0', borderRadius:9, fontSize:12, fontWeight:600,
+                cursor: coins >= lockSelected.cr ? 'pointer' : 'not-allowed',
+                background: coins >= lockSelected.cr ? 'rgba(255,210,50,.18)' : 'rgba(255,255,255,.04)',
+                border: `1px solid ${coins >= lockSelected.cr ? 'rgba(255,210,50,.5)' : 'rgba(255,255,255,.1)'}`,
+                color: coins >= lockSelected.cr ? '#ffd27a' : 'rgba(140,160,200,.35)',
+                fontFamily:'Noto Sans TC,sans-serif',
+              }}>
+                {coins >= lockSelected.cr ? '🪙 立即解鎖' : `差 ${lockSelected.cr - coins} 枚`}
+              </button>
+              <button onClick={() => setLockSelected(null)} style={{
+                flex:0.6, padding:'10px 0', borderRadius:9, fontSize:12,
+                background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.1)',
+                color:'rgba(180,200,255,.5)', cursor:'pointer', fontFamily:'Noto Sans TC,sans-serif',
+              }}>取消</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
