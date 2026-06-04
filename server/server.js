@@ -11,7 +11,21 @@ const http = createServer(app)
 const io = new Server(http, { cors: { origin: '*' } })
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
+app.use(express.json())
 app.get('/health', (_, res) => res.json({ ok: true }))
+
+// ── 遊戲開關 ───────────────────────────────────────────────────────────────────
+const ADMIN_SECRET = 'cosmic888'
+let gameOpen = false
+
+app.get('/api/status', (_, res) => res.json({ open: gameOpen }))
+
+app.post('/api/admin/toggle', (req, res) => {
+  if (req.body?.secret !== ADMIN_SECRET) return res.status(403).json({ error: 'forbidden' })
+  gameOpen = !gameOpen
+  io.emit('game-status', { open: gameOpen })
+  res.json({ open: gameOpen })
+})
 
 // ── 題庫主題 ───────────────────────────────────────────────────────────────────
 
