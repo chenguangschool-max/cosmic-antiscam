@@ -4,7 +4,7 @@ import Stars from './components/Stars'
 import Toast from './components/Toast'
 import Instructions from './pages/Instructions'
 import ProfileSetup from './pages/ProfileSetup'
-import WaitingRoom from './pages/WaitingRoom'
+
 import MainMenu from './pages/MainMenu'
 import ModeSelect from './pages/ModeSelect'
 import Quiz from './pages/Quiz'
@@ -28,7 +28,6 @@ function getStep(serverVersion) {
 
 export default function App() {
   const [step, setStep] = useState('instructions')
-  const [gameOpen, setGameOpen] = useState(false)
   const [serverVersion, setServerVersion] = useState(null)
   const [dailyTip, setDailyTip] = useState(null)
   const [broadcastBanner, setBroadcastBanner] = useState('')
@@ -46,7 +45,6 @@ export default function App() {
     try {
       const res = await fetch(`${SERVER}/api/status`)
       const data = await res.json()
-      setGameOpen(data.open)
       if (data.dailyTip !== undefined) setDailyTip(data.dailyTip)
       if (data.broadcast !== undefined) {
         const incoming = data.broadcast
@@ -120,11 +118,7 @@ export default function App() {
           <ProfileSetup onDone={markReady} />
         )}
 
-        {step === 'ready' && !gameOpen && (
-          <WaitingRoom />
-        )}
-
-        {step === 'ready' && gameOpen && (
+        {step === 'ready' && (
           <>
             {page === 'menu'         && <MainMenu navigate={navigate} dailyTip={dailyTip} />}
             {page === 'instructions' && <Instructions onDone={() => navigate('menu')} isRevisit />}
