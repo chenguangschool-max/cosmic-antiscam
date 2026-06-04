@@ -82,8 +82,7 @@ export default function App() {
           localStorage.removeItem('cosmicReady_v8')
           localStorage.removeItem('playerName')
           localStorage.setItem('cosmicVersion', String(data.version))
-          setStep('instructions')
-          setPage('menu')
+          if (!isAdmin) { setStep('instructions'); setPage('menu') }
         }
         setServerVersion(data.version)
         if (local === null) {
@@ -95,7 +94,7 @@ export default function App() {
 
   useEffect(() => {
     fetchStatus().then(() => {
-      setStep(getStep(localStorage.getItem('cosmicVersion')))
+      setStep(isAdmin ? 'ready' : getStep(localStorage.getItem('cosmicVersion')))
     })
     const interval = setInterval(fetchStatus, 5000)
     return () => clearInterval(interval)
