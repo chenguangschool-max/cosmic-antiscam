@@ -45,6 +45,9 @@ export default function App() {
   const [toggling, setToggling] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [playerCount, setPlayerCount] = useState(0)
+  const [dailyTip, setDailyTip] = useState(null)
+  const [remainingTips, setRemainingTips] = useState(null)
+  const [totalTips, setTotalTips] = useState(30)
   const [broadcastBanner, setBroadcastBanner] = useState('')
   const lastBroadcastRef = useRef('')
   const [page, setPage] = useState('menu')
@@ -62,6 +65,9 @@ export default function App() {
       const data = await res.json()
       setGameOpen(data.open)
       if (data.playerCount !== undefined) setPlayerCount(data.playerCount)
+      if (data.dailyTip !== undefined) setDailyTip(data.dailyTip)
+      if (data.remainingTips !== undefined) setRemainingTips(data.remainingTips)
+      if (data.totalTips !== undefined) setTotalTips(data.totalTips)
       if (data.broadcast !== undefined) {
         const incoming = data.broadcast
         if (incoming !== lastBroadcastRef.current) {
@@ -142,6 +148,14 @@ export default function App() {
           toggling={toggling}
           resetting={resetting}
           playerCount={playerCount}
+          dailyTip={dailyTip}
+          remainingTips={remainingTips}
+          totalTips={totalTips}
+          onDailyTipChange={(d) => {
+            if (d.dailyTip !== undefined) setDailyTip(d.dailyTip)
+            if (d.remaining !== undefined) setRemainingTips(d.remaining)
+            if (d.total !== undefined) setTotalTips(d.total)
+          }}
         />
       )}
 
@@ -181,7 +195,7 @@ export default function App() {
 
         {step === 'ready' && (gameOpen || isAdmin) && (
           <>
-            {page === 'menu'         && <MainMenu navigate={navigate} />}
+            {page === 'menu'         && <MainMenu navigate={navigate} dailyTip={dailyTip} />}
             {page === 'instructions' && <Instructions onDone={() => navigate('menu')} isRevisit />}
             {page === 'modeSelect'   && <ModeSelect navigate={navigate} onModeSelect={setCurrentMode} />}
             {page === 'quiz'         && <Quiz mode={currentMode} navigate={navigate} onResult={setQuizResult} />}

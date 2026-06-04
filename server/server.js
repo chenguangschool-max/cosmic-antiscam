@@ -21,7 +21,10 @@ let gameVersion = 1
 let broadcastMsg = ''
 let onlineCount = 0
 
-app.get('/api/status', (_, res) => res.json({ open: gameOpen, version: gameVersion, playerCount: onlineCount, broadcast: broadcastMsg }))
+app.get('/api/status', (_, res) => {
+  pickDailyTip()
+  res.json({ open: gameOpen, version: gameVersion, playerCount: onlineCount, broadcast: broadcastMsg, dailyTip: currentDailyTip, remainingTips: TIP_TOPICS.length - usedTipTopics.length, totalTips: TIP_TOPICS.length })
+})
 
 app.post('/api/admin/toggle', (req, res) => {
   if (req.body?.secret !== ADMIN_SECRET) return res.status(403).json({ error: 'forbidden' })
@@ -43,6 +46,53 @@ app.post('/api/admin/broadcast', (req, res) => {
   if (req.body?.secret !== ADMIN_SECRET) return res.status(403).json({ error: 'forbidden' })
   broadcastMsg = req.body?.message ?? ''
   res.json({ ok: true })
+})
+
+// ── 防詐筆記（每日一題，不重複）──────────────────────────────────────────────
+
+const TIP_TOPICS = [
+  '假冒銀行客服要求點連結', '假冒政府說涉及洗錢', '假冒快遞補繳郵資',
+  '網路交友後借錢', '假冒電商客服誤設分期', '中獎先繳手續費',
+  '高薪工作先繳保證金', '假冒親友借錢', '投資詐騙保證報酬', '假冒電信說欠費停話',
+  'AI換臉視訊投資詐騙', 'LINE群組假投資', '假網拍訂金消失', '假借貸先繳保證金',
+  '假冒檢察官要求轉帳', '求職先繳設備費', '加密貨幣無法出金', '假冒名人推薦投資',
+  '二次詐騙聲稱追回損失', '解除分期要求轉帳', '假公益捐款詐騙',
+  '假冒LINE客服凍結帳號', '假冒孫子孫女緊急借錢', '假冒醫院說家人急救',
+  '假冒台電水電欠費', '假冒保險業務員到期', '健康食品免費試用強制扣款',
+  '假冒里長發放補助', '電話中獎要繳稅金', '假冒國稅局退稅要確認帳號',
+]
+
+let usedTipTopics = []
+let currentDailyTip = null
+let currentTipDate = ''
+
+function pickDailyTip() {
+  const today = new Date().toISOString().slice(0, 10)
+  if (currentTipDate === today && currentDailyTip) return
+  let remaining = TIP_TOPICS.filter(t => !usedTipTopics.includes(t))
+  if (remaining.length === 0) { usedTipTopics = []; remaining = [...TIP_TOPICS] }
+  const pick = remaining[Math.floor(Math.random() * remaining.length)]
+  usedTipTopics.push(pick)
+  currentDailyTip = pick
+  currentTipDate = today
+}
+
+pickDailyTip()
+
+app.post('/api/admin/next-tip', (req, res) => {
+  if (req.body?.secret !== ADMIN_SECRET) return res.status(403).json({ error: 'forbidden' })
+  currentTipDate = ''
+  pickDailyTip()
+  res.json({ dailyTip: currentDailyTip, remaining: TIP_TOPICS.length - usedTipTopics.length, total: TIP_TOPICS.length })
+})
+
+app.post('/api/admin/reset-tips', (req, res) => {
+  if (req.body?.secret !== ADMIN_SECRET) return res.status(403).json({ error: 'forbidden' })
+  usedTipTopics = []
+  currentDailyTip = null
+  currentTipDate = ''
+  pickDailyTip()
+  res.json({ dailyTip: currentDailyTip, remaining: TIP_TOPICS.length - usedTipTopics.length, total: TIP_TOPICS.length })
 })
 
 // ── 題庫主題 ───────────────────────────────────────────────────────────────────
