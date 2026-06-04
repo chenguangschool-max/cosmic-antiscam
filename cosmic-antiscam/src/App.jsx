@@ -5,6 +5,7 @@ import Toast from './components/Toast'
 import Instructions from './pages/Instructions'
 import ProfileSetup from './pages/ProfileSetup'
 import WaitingRoom from './pages/WaitingRoom'
+import AdminPanel from './pages/AdminPanel'
 import MainMenu from './pages/MainMenu'
 import ModeSelect from './pages/ModeSelect'
 import Quiz from './pages/Quiz'
@@ -20,27 +21,29 @@ import OnlineBattle from './pages/OnlineBattle'
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
 const ADMIN_SECRET = 'cosmic888'
 
-function getInitStep() {
-  if (!localStorage.getItem('cosmicReady_v8')) return 'instructions'
-  return 'ready'
-}
-
-// 管理員模式：網址帶 ?admin=cosmic888 時自動啟用
 function checkAdmin() {
   const params = new URLSearchParams(window.location.search)
   if (params.get('admin') === ADMIN_SECRET) {
     localStorage.setItem('isAdmin', '1')
-    // 清掉網址參數
     window.history.replaceState({}, '', window.location.pathname)
   }
   return localStorage.getItem('isAdmin') === '1'
 }
 
+function getStep(serverVersion) {
+  const localVersion = localStorage.getItem('cosmicVersion')
+  if (String(serverVersion) !== String(localVersion)) return 'instructions'
+  if (!localStorage.getItem('cosmicReady_v8')) return 'instructions'
+  return 'ready'
+}
+
 export default function App() {
-  const [step, setStep] = useState(getInitStep)
+  const [step, setStep] = useState('instructions')
   const [gameOpen, setGameOpen] = useState(false)
+  const [serverVersion, setServerVersion] = useState(null)
   const [isAdmin] = useState(checkAdmin)
   const [toggling, setToggling] = useState(false)
+  const [resetting, setResetting] = useState(false)
   const [page, setPage] = useState('menu')
   const [currentMode, setCurrentMode] = useState(null)
   const [quizResult, setQuizResult] = useState(null)
@@ -48,17 +51,36 @@ export default function App() {
   const [multiResults, setMultiResults] = useState([])
   const [onlineRoom, setOnlineRoom] = useState(null)
 
-  // 輪詢遊戲狀態
+  const navigate = (p) => setPage(p)
+
+  const fetchStatus = async () => {
+    try {
+      const res = await fetch(`${SERVER}/api/status`)
+      const data = await res.json()
+      setGameOpen(data.open)
+      if (data.version !== undefined) {
+        const local = localStorage.getItem('cosmicVersion')
+        if (String(data.version) !== String(local)) {
+          // 版本不同 → 清除舊存檔，重新走流程
+          localStorage.removeItem('cosmicReady_v8')
+          localStorage.removeItem('playerName')
+          localStorage.setItem('cosmicVersion', String(data.version))
+          setStep('instructions')
+          setPage('menu')
+        }
+        setServerVersion(data.version)
+        if (local === null) {
+          localStorage.setItem('cosmicVersion', String(data.version))
+        }
+      }
+    } catch {}
+  }
+
   useEffect(() => {
-    const check = async () => {
-      try {
-        const res = await fetch(`${SERVER}/api/status`)
-        const data = await res.json()
-        setGameOpen(data.open)
-      } catch {}
-    }
-    check()
-    const interval = setInterval(check, 5000)
+    fetchStatus().then(() => {
+      setStep(getStep(localStorage.getItem('cosmicVersion')))
+    })
+    const interval = setInterval(fetchStatus, 5000)
     return () => clearInterval(interval)
   }, [])
 
@@ -76,51 +98,55 @@ export default function App() {
     setToggling(false)
   }
 
-  const navigate = (p) => setPage(p)
+  const handleReset = async () => {
+    setResetting(true)
+    try {
+      const res = await fetch(`${SERVER}/api/admin/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret: ADMIN_SECRET }),
+      })
+      const data = await res.json()
+      setGameOpen(data.open)
+      setServerVersion(data.version)
+    } catch {}
+    setResetting(false)
+  }
+
+  const markReady = () => {
+    localStorage.setItem('cosmicReady_v8', '1')
+    setStep('ready')
+  }
 
   return (
     <GameProvider>
       <Stars />
       <Toast />
 
-      {/* 管理員懸浮按鈕 */}
       {isAdmin && (
-        <div style={{
-          position: 'fixed', bottom: 24, right: 24, zIndex: 999,
-        }}>
-          <button onClick={handleToggle} disabled={toggling} style={{
-            padding: '14px 22px', borderRadius: 14, fontSize: 16, fontWeight: 700,
-            fontFamily: 'Noto Sans TC,sans-serif', cursor: 'pointer',
-            border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,.5)',
-            background: gameOpen ? 'rgba(255,80,80,.9)' : 'rgba(50,200,120,.9)',
-            color: '#fff', transition: 'all .2s',
-          }}>
-            {toggling ? '…' : gameOpen ? '🔒 關閉遊戲' : '🔓 開啟遊戲'}
-          </button>
-        </div>
+        <AdminPanel
+          gameOpen={gameOpen}
+          onToggle={handleToggle}
+          onReset={handleReset}
+          toggling={toggling}
+          resetting={resetting}
+        />
       )}
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 520, margin: '0 auto' }}>
 
-        {/* 第一步：使用說明 */}
         {step === 'instructions' && (
           <Instructions onDone={() => setStep('profile')} />
         )}
 
-        {/* 第二步：個人資料 */}
         {step === 'profile' && (
-          <ProfileSetup onDone={() => {
-            localStorage.setItem('cosmicReady_v8', '1')
-            setStep('ready')
-          }} />
+          <ProfileSetup onDone={markReady} />
         )}
 
-        {/* 等待畫面（遊戲未開啟且非管理員） */}
         {step === 'ready' && !gameOpen && !isAdmin && (
           <WaitingRoom />
         )}
 
-        {/* 主遊戲（遊戲已開啟，或管理員可直接進入） */}
         {step === 'ready' && (gameOpen || isAdmin) && (
           <>
             {page === 'menu'         && <MainMenu navigate={navigate} />}
