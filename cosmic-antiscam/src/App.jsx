@@ -5,7 +5,6 @@ import Toast from './components/Toast'
 import Instructions from './pages/Instructions'
 import ProfileSetup from './pages/ProfileSetup'
 import WaitingRoom from './pages/WaitingRoom'
-import AdminPanel from './pages/AdminPanel'
 import MainMenu from './pages/MainMenu'
 import ModeSelect from './pages/ModeSelect'
 import Quiz from './pages/Quiz'
@@ -19,16 +18,6 @@ import OnlineLobby from './pages/OnlineLobby'
 import OnlineBattle from './pages/OnlineBattle'
 
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
-const ADMIN_SECRET = 'cosmic888'
-
-function checkAdmin() {
-  const params = new URLSearchParams(window.location.search)
-  if (params.get('admin') === ADMIN_SECRET) {
-    localStorage.setItem('isAdmin', '1')
-    window.history.replaceState({}, '', window.location.pathname)
-  }
-  return localStorage.getItem('isAdmin') === '1'
-}
 
 function getStep(serverVersion) {
   const localVersion = localStorage.getItem('cosmicVersion')
@@ -41,13 +30,7 @@ export default function App() {
   const [step, setStep] = useState('instructions')
   const [gameOpen, setGameOpen] = useState(false)
   const [serverVersion, setServerVersion] = useState(null)
-  const [isAdmin] = useState(checkAdmin)
-  const [toggling, setToggling] = useState(false)
-  const [resetting, setResetting] = useState(false)
-  const [playerCount, setPlayerCount] = useState(0)
   const [dailyTip, setDailyTip] = useState(null)
-  const [remainingTips, setRemainingTips] = useState(null)
-  const [totalTips, setTotalTips] = useState(30)
   const [broadcastBanner, setBroadcastBanner] = useState('')
   const lastBroadcastRef = useRef('')
   const [page, setPage] = useState('menu')
@@ -64,10 +47,7 @@ export default function App() {
       const res = await fetch(`${SERVER}/api/status`)
       const data = await res.json()
       setGameOpen(data.open)
-      if (data.playerCount !== undefined) setPlayerCount(data.playerCount)
       if (data.dailyTip !== undefined) setDailyTip(data.dailyTip)
-      if (data.remainingTips !== undefined) setRemainingTips(data.remainingTips)
-      if (data.totalTips !== undefined) setTotalTips(data.totalTips)
       if (data.broadcast !== undefined) {
         const incoming = data.broadcast
         if (incoming !== lastBroadcastRef.current) {
@@ -78,11 +58,11 @@ export default function App() {
       if (data.version !== undefined) {
         const local = localStorage.getItem('cosmicVersion')
         if (String(data.version) !== String(local)) {
-          // 版本不同 → 清除舊存檔，重新走流程
           localStorage.removeItem('cosmicReady_v8')
           localStorage.removeItem('playerName')
           localStorage.setItem('cosmicVersion', String(data.version))
-          if (!isAdmin) { setStep('instructions'); setPage('menu') }
+          setStep('instructions')
+          setPage('menu')
         }
         setServerVersion(data.version)
         if (local === null) {
@@ -94,40 +74,11 @@ export default function App() {
 
   useEffect(() => {
     fetchStatus().then(() => {
-      setStep(isAdmin ? 'ready' : getStep(localStorage.getItem('cosmicVersion')))
+      setStep(getStep(localStorage.getItem('cosmicVersion')))
     })
     const interval = setInterval(fetchStatus, 5000)
     return () => clearInterval(interval)
   }, [])
-
-  const handleToggle = async () => {
-    setToggling(true)
-    try {
-      const res = await fetch(`${SERVER}/api/admin/toggle`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ secret: ADMIN_SECRET }),
-      })
-      const data = await res.json()
-      setGameOpen(data.open)
-    } catch {}
-    setToggling(false)
-  }
-
-  const handleReset = async () => {
-    setResetting(true)
-    try {
-      const res = await fetch(`${SERVER}/api/admin/reset`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ secret: ADMIN_SECRET }),
-      })
-      const data = await res.json()
-      setGameOpen(data.open)
-      setServerVersion(data.version)
-    } catch {}
-    setResetting(false)
-  }
 
   const markReady = () => {
     localStorage.setItem('cosmicReady_v8', '1')
@@ -138,25 +89,6 @@ export default function App() {
     <GameProvider>
       <Stars />
       <Toast />
-
-      {isAdmin && (
-        <AdminPanel
-          gameOpen={gameOpen}
-          onToggle={handleToggle}
-          onReset={handleReset}
-          toggling={toggling}
-          resetting={resetting}
-          playerCount={playerCount}
-          dailyTip={dailyTip}
-          remainingTips={remainingTips}
-          totalTips={totalTips}
-          onDailyTipChange={(d) => {
-            if (d.dailyTip !== undefined) setDailyTip(d.dailyTip)
-            if (d.remaining !== undefined) setRemainingTips(d.remaining)
-            if (d.total !== undefined) setTotalTips(d.total)
-          }}
-        />
-      )}
 
       {broadcastBanner && (
         <div style={{
@@ -188,11 +120,11 @@ export default function App() {
           <ProfileSetup onDone={markReady} />
         )}
 
-        {step === 'ready' && !gameOpen && !isAdmin && (
+        {step === 'ready' && !gameOpen && (
           <WaitingRoom />
         )}
 
-        {step === 'ready' && (gameOpen || isAdmin) && (
+        {step === 'ready' && gameOpen && (
           <>
             {page === 'menu'         && <MainMenu navigate={navigate} dailyTip={dailyTip} />}
             {page === 'instructions' && <Instructions onDone={() => navigate('menu')} isRevisit />}
