@@ -18,8 +18,10 @@ app.get('/health', (_, res) => res.json({ ok: true }))
 const ADMIN_SECRET = 'cosmic888'
 let gameOpen = false
 let gameVersion = 1
+let broadcastMsg = ''
+let onlineCount = 0
 
-app.get('/api/status', (_, res) => res.json({ open: gameOpen, version: gameVersion }))
+app.get('/api/status', (_, res) => res.json({ open: gameOpen, version: gameVersion, playerCount: onlineCount, broadcast: broadcastMsg }))
 
 app.post('/api/admin/toggle', (req, res) => {
   if (req.body?.secret !== ADMIN_SECRET) return res.status(403).json({ error: 'forbidden' })
@@ -32,8 +34,15 @@ app.post('/api/admin/reset', (req, res) => {
   if (req.body?.secret !== ADMIN_SECRET) return res.status(403).json({ error: 'forbidden' })
   gameVersion++
   gameOpen = false
+  broadcastMsg = ''
   io.emit('game-reset', { version: gameVersion })
   res.json({ version: gameVersion, open: gameOpen })
+})
+
+app.post('/api/admin/broadcast', (req, res) => {
+  if (req.body?.secret !== ADMIN_SECRET) return res.status(403).json({ error: 'forbidden' })
+  broadcastMsg = req.body?.message ?? ''
+  res.json({ ok: true })
 })
 
 // ── 題庫主題 ───────────────────────────────────────────────────────────────────
@@ -211,6 +220,7 @@ function roomView(room) {
 // ── Socket 事件 ────────────────────────────────────────────────────────────────
 
 io.on('connection', (socket) => {
+  onlineCount++
 
   socket.on('create-room', ({ name }) => {
     const code = makeCode()
@@ -273,6 +283,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
+    onlineCount = Math.max(0, onlineCount - 1)
     for (const [, room] of rooms) {
       const idx = room.players.findIndex(p => p.id === socket.id)
       if (idx === -1) continue

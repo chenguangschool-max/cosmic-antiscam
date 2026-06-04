@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { GameProvider } from './GameContext'
 import Stars from './components/Stars'
 import Toast from './components/Toast'
@@ -44,6 +44,9 @@ export default function App() {
   const [isAdmin] = useState(checkAdmin)
   const [toggling, setToggling] = useState(false)
   const [resetting, setResetting] = useState(false)
+  const [playerCount, setPlayerCount] = useState(0)
+  const [broadcastBanner, setBroadcastBanner] = useState('')
+  const lastBroadcastRef = useRef('')
   const [page, setPage] = useState('menu')
   const [currentMode, setCurrentMode] = useState(null)
   const [quizResult, setQuizResult] = useState(null)
@@ -58,6 +61,14 @@ export default function App() {
       const res = await fetch(`${SERVER}/api/status`)
       const data = await res.json()
       setGameOpen(data.open)
+      if (data.playerCount !== undefined) setPlayerCount(data.playerCount)
+      if (data.broadcast !== undefined) {
+        const incoming = data.broadcast
+        if (incoming !== lastBroadcastRef.current) {
+          lastBroadcastRef.current = incoming
+          setBroadcastBanner(incoming)
+        }
+      }
       if (data.version !== undefined) {
         const local = localStorage.getItem('cosmicVersion')
         if (String(data.version) !== String(local)) {
@@ -130,7 +141,29 @@ export default function App() {
           onReset={handleReset}
           toggling={toggling}
           resetting={resetting}
+          playerCount={playerCount}
+          version={serverVersion}
         />
+      )}
+
+      {broadcastBanner && (
+        <div style={{
+          position: 'fixed', top: 16, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 1000, maxWidth: 480, width: 'calc(100% - 32px)',
+          background: 'rgba(10,20,50,.92)', border: '1px solid rgba(91,141,238,.5)',
+          borderRadius: 12, padding: '12px 16px',
+          boxShadow: '0 4px 24px rgba(0,0,0,.6)',
+          display: 'flex', alignItems: 'flex-start', gap: 10,
+        }}>
+          <span style={{ fontSize: 18, flexShrink: 0 }}>📢</span>
+          <span style={{ flex: 1, fontSize: 14, color: '#c8dbff', lineHeight: 1.6, fontFamily: 'Noto Sans TC,sans-serif' }}>
+            {broadcastBanner}
+          </span>
+          <button onClick={() => setBroadcastBanner('')} style={{
+            background: 'none', border: 'none', color: 'rgba(140,180,255,.5)',
+            cursor: 'pointer', fontSize: 16, padding: '0 2px', flexShrink: 0,
+          }}>✕</button>
+        </div>
       )}
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 520, margin: '0 auto' }}>
