@@ -65,7 +65,7 @@ export default function AdminPanel({ gameOpen, onToggle, onReset, toggling, rese
 
   return (
     <div style={{
-      position: 'fixed', top: 16, left: 16, zIndex: 999,
+      position: 'fixed', bottom: 24, right: 24, zIndex: 999,
       background: '#0c1829', border: '1px solid rgba(91,141,238,.4)',
       borderRadius: 16, padding: 16, width: 240,
       maxHeight: 'calc(100vh - 32px)', overflowY: 'auto',
