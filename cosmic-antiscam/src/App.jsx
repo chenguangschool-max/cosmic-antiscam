@@ -3,6 +3,7 @@ import { GameProvider } from './GameContext'
 import Stars from './components/Stars'
 import Toast from './components/Toast'
 import Instructions from './pages/Instructions'
+import ProfileSetup from './pages/ProfileSetup'
 import MainMenu from './pages/MainMenu'
 import ModeSelect from './pages/ModeSelect'
 import Quiz from './pages/Quiz'
@@ -15,10 +16,13 @@ import MultiResult from './pages/MultiResult'
 import OnlineLobby from './pages/OnlineLobby'
 import OnlineBattle from './pages/OnlineBattle'
 
+function getInitStep() {
+  if (!localStorage.getItem('cosmicReady_v6')) return 'instructions'
+  return 'ready'
+}
+
 export default function App() {
-  const [showInstructions, setShowInstructions] = useState(
-    () => !localStorage.getItem('hasReadInstructions')
-  )
+  const [step, setStep] = useState(getInitStep)
   const [page, setPage] = useState('menu')
   const [currentMode, setCurrentMode] = useState(null)
   const [quizResult, setQuizResult] = useState(null)
@@ -28,39 +32,53 @@ export default function App() {
 
   const navigate = (p) => setPage(p)
 
-  const handleInstructionsDone = () => {
-    localStorage.setItem('hasReadInstructions', '1')
-    setShowInstructions(false)
-  }
-
   return (
     <GameProvider>
       <Stars />
       <Toast />
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 520, margin: '0 auto' }}>
-        {showInstructions && <Instructions onDone={handleInstructionsDone} />}
-        {!showInstructions && page === 'menu' && <MainMenu navigate={navigate} />}
-        {!showInstructions && page === 'instructions'  && <Instructions onDone={() => navigate('menu')} isRevisit />}
-        {!showInstructions && page === 'modeSelect'   && <ModeSelect navigate={navigate} onModeSelect={setCurrentMode} />}
-        {page === 'quiz'         && <Quiz mode={currentMode} navigate={navigate} onResult={setQuizResult} />}
-        {page === 'result'       && <Result result={quizResult} navigate={navigate} />}
-        {page === 'codex'        && <Codex navigate={navigate} />}
-        {page === 'shop'         && <Shop navigate={navigate} />}
-        {page === 'multiSetup'   && (
-          <MultiSetup navigate={navigate} onStart={(players) => { setMultiPlayers(players); navigate('multiQuiz') }} />
+
+        {/* 第一步：使用說明 */}
+        {step === 'instructions' && (
+          <Instructions onDone={() => setStep('profile')} />
         )}
-        {page === 'multiQuiz'    && (
-          <MultiQuiz players={multiPlayers} navigate={navigate} onDone={(results) => { setMultiResults(results); navigate('multiResult') }} />
+
+        {/* 第二步：個人資料 */}
+        {step === 'profile' && (
+          <ProfileSetup onDone={() => {
+            localStorage.setItem('cosmicReady_v6', '1')
+            setStep('ready')
+          }} />
         )}
-        {page === 'multiResult'  && (
-          <MultiResult results={multiResults} navigate={navigate} onPlayAgain={() => navigate('multiSetup')} />
+
+        {/* 主遊戲 */}
+        {step === 'ready' && (
+          <>
+            {page === 'menu'         && <MainMenu navigate={navigate} />}
+            {page === 'instructions' && <Instructions onDone={() => navigate('menu')} isRevisit />}
+            {page === 'modeSelect'   && <ModeSelect navigate={navigate} onModeSelect={setCurrentMode} />}
+            {page === 'quiz'         && <Quiz mode={currentMode} navigate={navigate} onResult={setQuizResult} />}
+            {page === 'result'       && <Result result={quizResult} navigate={navigate} />}
+            {page === 'codex'        && <Codex navigate={navigate} />}
+            {page === 'shop'         && <Shop navigate={navigate} />}
+            {page === 'multiSetup'   && (
+              <MultiSetup navigate={navigate} onStart={(players) => { setMultiPlayers(players); navigate('multiQuiz') }} />
+            )}
+            {page === 'multiQuiz'    && (
+              <MultiQuiz players={multiPlayers} navigate={navigate} onDone={(results) => { setMultiResults(results); navigate('multiResult') }} />
+            )}
+            {page === 'multiResult'  && (
+              <MultiResult results={multiResults} navigate={navigate} onPlayAgain={() => navigate('multiSetup')} />
+            )}
+            {page === 'onlineLobby'  && (
+              <OnlineLobby navigate={navigate} onRoomReady={(room) => setOnlineRoom(room)} />
+            )}
+            {page === 'onlineBattle' && onlineRoom && (
+              <OnlineBattle room={onlineRoom} navigate={navigate} />
+            )}
+          </>
         )}
-        {page === 'onlineLobby'  && (
-          <OnlineLobby navigate={navigate} onRoomReady={(room) => setOnlineRoom(room)} />
-        )}
-        {page === 'onlineBattle' && onlineRoom && (
-          <OnlineBattle room={onlineRoom} navigate={navigate} />
-        )}
+
       </div>
     </GameProvider>
   )
