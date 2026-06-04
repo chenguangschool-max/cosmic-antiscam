@@ -17,7 +17,7 @@ import OnlineLobby from './pages/OnlineLobby'
 import OnlineBattle from './pages/OnlineBattle'
 
 function getInitStep() {
-  if (!localStorage.getItem('cosmicReady_v7')) return 'instructions'
+  if (!localStorage.getItem('cosmicReady_v8')) return 'instructions'
   return 'ready'
 }
 
@@ -46,7 +46,7 @@ export default function App() {
         {/* 第二步：個人資料 */}
         {step === 'profile' && (
           <ProfileSetup onDone={() => {
-            localStorage.setItem('cosmicReady_v7', '1')
+            localStorage.setItem('cosmicReady_v8', '1')
             setStep('ready')
           }} />
         )}
