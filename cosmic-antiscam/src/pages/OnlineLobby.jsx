@@ -59,7 +59,7 @@ function CodeBoxes({ chars, onChange }) {
 
 export default function OnlineLobby({ navigate, onRoomReady }) {
   const [view, setView] = useState('home')
-  const [name, setName] = useState(() => localStorage.getItem('playerName') || '')
+  const name = localStorage.getItem('playerName') || '玩家'
   const [joinChars, setJoinChars] = useState(['', '', '', ''])
   const [roomCode, setRoomCode] = useState('')
   const [players, setPlayers] = useState([])
@@ -103,19 +103,15 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
   }, [])
 
   const handleCreate = () => {
-    if (!name.trim()) return setError('請輸入你的名稱')
-    localStorage.setItem('playerName', name.trim())
     setError('')
-    socket.emit('create-room', { name: name.trim() })
+    socket.emit('create-room', { name })
   }
 
   const handleJoin = () => {
-    if (!name.trim()) return setError('請輸入你的名稱')
     const code = joinChars.join('')
     if (code.length !== 4) return setError('請填滿 4 格代碼')
-    localStorage.setItem('playerName', name.trim())
     setError('')
-    socket.emit('join-room', { code, name: name.trim() })
+    socket.emit('join-room', { code, name })
   }
 
   const handleStart = () => socket.emit('start-game', { code: roomCode })
@@ -223,15 +219,16 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
         </div>
       </div>
 
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 13, color: 'rgba(140,180,255,.55)', letterSpacing: 1, marginBottom: 7 }}>你的名稱</div>
-        <input
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder='輸入名稱…'
-          maxLength={10}
-          style={inputStyle}
-        />
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 14px', borderRadius: 10, marginBottom: 20,
+        background: 'rgba(91,141,238,.08)', border: '1px solid rgba(91,141,238,.2)',
+      }}>
+        <span style={{ fontSize: 20 }}>🧑‍🚀</span>
+        <div>
+          <div style={{ fontSize: 12, color: 'rgba(140,180,255,.5)', marginBottom: 2 }}>參賽名稱</div>
+          <div style={{ fontSize: 16, color: '#c8dbff', fontWeight: 600 }}>{name}</div>
+        </div>
       </div>
 
       {view === 'joining' && (
