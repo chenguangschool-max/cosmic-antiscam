@@ -40,9 +40,8 @@ export default function AdminPanel({ gameOpen, onToggle, onReset, toggling, rese
       borderRadius: 16, padding: 18, minWidth: 220,
       boxShadow: '0 8px 32px rgba(0,0,0,.6)',
     }}>
-      <div style={{ fontSize: 13, color: 'rgba(140,180,255,.6)', fontWeight: 700, letterSpacing: 1, marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span>⚙️ 管理員控制台</span>
-        <span style={{ fontSize: 11, color: 'rgba(140,180,255,.35)', fontWeight: 400 }}>v{version ?? '—'}</span>
+      <div style={{ fontSize: 13, color: 'rgba(140,180,255,.6)', fontWeight: 700, letterSpacing: 1, marginBottom: 14 }}>
+        ⚙️ 管理員控制台
       </div>
 
       {/* 狀態列 */}

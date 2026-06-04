@@ -142,7 +142,6 @@ export default function App() {
           toggling={toggling}
           resetting={resetting}
           playerCount={playerCount}
-          version={serverVersion}
         />
       )}
 
