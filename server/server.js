@@ -17,7 +17,7 @@ app.get('/health', (_, res) => res.json({ ok: true }))
 // ── 遊戲開關與版本 ─────────────────────────────────────────────────────────────
 const ADMIN_SECRET = 'cosmic888'
 let gameOpen = false
-let gameVersion = 1
+let gameVersion = 2
 let broadcastMsg = ''
 let onlineCount = 0
 
