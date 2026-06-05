@@ -4,7 +4,6 @@ import Stars from './components/Stars'
 import Toast from './components/Toast'
 import Instructions from './pages/Instructions'
 import ProfileSetup from './pages/ProfileSetup'
-import AdminPanel from './pages/AdminPanel'
 import MainMenu from './pages/MainMenu'
 import ModeSelect from './pages/ModeSelect'
 import Quiz from './pages/Quiz'
@@ -18,16 +17,6 @@ import OnlineLobby from './pages/OnlineLobby'
 import OnlineBattle from './pages/OnlineBattle'
 
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
-const ADMIN_SECRET = 'cosmic888'
-
-function checkAdmin() {
-  const params = new URLSearchParams(window.location.search)
-  if (params.get('admin') === ADMIN_SECRET) {
-    localStorage.setItem('isAdmin', '1')
-    window.history.replaceState({}, '', window.location.pathname)
-  }
-  return localStorage.getItem('isAdmin') === '1'
-}
 
 function getStep(serverVersion) {
   const localVersion = localStorage.getItem('cosmicVersion')
@@ -38,15 +27,6 @@ function getStep(serverVersion) {
 
 export default function App() {
   const [step, setStep] = useState('instructions')
-  const [serverVersion, setServerVersion] = useState(null)
-  const [gameOpen, setGameOpen] = useState(false)
-  const [playerCount, setPlayerCount] = useState(0)
-  const [dailyTip, setDailyTip] = useState(null)
-  const [remainingTips, setRemainingTips] = useState(null)
-  const [totalTips, setTotalTips] = useState(null)
-  const [toggling, setToggling] = useState(false)
-  const [resetting, setResetting] = useState(false)
-  const [isAdmin] = useState(checkAdmin)
   const [broadcastBanner, setBroadcastBanner] = useState('')
   const lastBroadcastRef = useRef('')
   const [page, setPage] = useState('menu')
@@ -62,11 +42,6 @@ export default function App() {
     try {
       const res = await fetch(`${SERVER}/api/status`)
       const data = await res.json()
-      if (data.open !== undefined) setGameOpen(data.open)
-      if (data.playerCount !== undefined) setPlayerCount(data.playerCount)
-      if (data.dailyTip !== undefined) setDailyTip(data.dailyTip)
-      if (data.remainingTips !== undefined) setRemainingTips(data.remainingTips)
-      if (data.totalTips !== undefined) setTotalTips(data.totalTips)
       if (data.broadcast !== undefined) {
         const incoming = data.broadcast
         if (incoming !== lastBroadcastRef.current) {
@@ -83,10 +58,7 @@ export default function App() {
           setStep('instructions')
           setPage('menu')
         }
-        setServerVersion(data.version)
-        if (local === null) {
-          localStorage.setItem('cosmicVersion', String(data.version))
-        }
+        if (local === null) localStorage.setItem('cosmicVersion', String(data.version))
       }
     } catch {}
   }
@@ -99,35 +71,6 @@ export default function App() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleToggle = async () => {
-    setToggling(true)
-    try {
-      const res = await fetch(`${SERVER}/api/admin/toggle`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ secret: ADMIN_SECRET }),
-      })
-      const data = await res.json()
-      setGameOpen(data.open)
-    } catch {}
-    setToggling(false)
-  }
-
-  const handleReset = async () => {
-    setResetting(true)
-    try {
-      const res = await fetch(`${SERVER}/api/admin/reset`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ secret: ADMIN_SECRET }),
-      })
-      const data = await res.json()
-      setGameOpen(data.open)
-      setServerVersion(data.version)
-    } catch {}
-    setResetting(false)
-  }
-
   const markReady = () => {
     localStorage.setItem('cosmicReady_v9', '1')
     setStep('ready')
@@ -138,26 +81,6 @@ export default function App() {
       <Stars />
       <Toast />
 
-      {/* 管理員控制台 */}
-      {isAdmin && (
-        <AdminPanel
-          gameOpen={gameOpen}
-          onToggle={handleToggle}
-          onReset={handleReset}
-          toggling={toggling}
-          resetting={resetting}
-          playerCount={playerCount}
-          dailyTip={dailyTip}
-          remainingTips={remainingTips}
-          totalTips={totalTips}
-          onDailyTipChange={(data) => {
-            setDailyTip(data.dailyTip)
-            setRemainingTips(data.remainingTips)
-          }}
-        />
-      )}
-
-      {/* 廣播公告橫幅 */}
       {broadcastBanner && (
         <div style={{
           position: 'fixed', top: 16, left: '50%', transform: 'translateX(-50%)',
@@ -180,7 +103,6 @@ export default function App() {
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 520, margin: '0 auto' }}>
 
-        {/* 新手流程進度條 */}
         {(step === 'instructions' || step === 'profile') && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, padding: '18px 0 4px' }}>
             {[
@@ -210,13 +132,8 @@ export default function App() {
           </div>
         )}
 
-        {step === 'instructions' && (
-          <Instructions onDone={() => setStep('profile')} />
-        )}
-
-        {step === 'profile' && (
-          <ProfileSetup onDone={markReady} />
-        )}
+        {step === 'instructions' && <Instructions onDone={() => setStep('profile')} />}
+        {step === 'profile' && <ProfileSetup onDone={markReady} />}
 
         {step === 'ready' && (
           <>
@@ -244,7 +161,6 @@ export default function App() {
             )}
           </>
         )}
-
       </div>
     </GameProvider>
   )
