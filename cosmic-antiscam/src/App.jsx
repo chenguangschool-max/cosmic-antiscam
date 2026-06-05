@@ -16,7 +16,6 @@ import MultiQuiz from './pages/MultiQuiz'
 import MultiResult from './pages/MultiResult'
 import OnlineLobby from './pages/OnlineLobby'
 import OnlineBattle from './pages/OnlineBattle'
-import NoteBook from './pages/NoteBook'
 
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
 
@@ -30,7 +29,6 @@ function getStep(serverVersion) {
 export default function App() {
   const [step, setStep] = useState('instructions')
   const [serverVersion, setServerVersion] = useState(null)
-  const [dailyTip, setDailyTip] = useState(null)
   const [broadcastBanner, setBroadcastBanner] = useState('')
   const lastBroadcastRef = useRef('')
   const [page, setPage] = useState('menu')
@@ -46,7 +44,6 @@ export default function App() {
     try {
       const res = await fetch(`${SERVER}/api/status`)
       const data = await res.json()
-      if (data.dailyTip !== undefined) setDailyTip(data.dailyTip)
       if (data.broadcast !== undefined) {
         const incoming = data.broadcast
         if (incoming !== lastBroadcastRef.current) {
@@ -151,7 +148,7 @@ export default function App() {
 
         {step === 'ready' && (
           <>
-            {page === 'menu'         && <MainMenu navigate={navigate} dailyTip={dailyTip} />}
+            {page === 'menu'         && <MainMenu navigate={navigate} />}
             {page === 'instructions' && <Instructions onDone={() => navigate('menu')} isRevisit />}
             {page === 'modeSelect'   && <ModeSelect navigate={navigate} onModeSelect={setCurrentMode} />}
             {page === 'quiz'         && <Quiz mode={currentMode} navigate={navigate} onResult={setQuizResult} />}
@@ -172,9 +169,6 @@ export default function App() {
             )}
             {page === 'onlineBattle' && onlineRoom && (
               <OnlineBattle room={onlineRoom} navigate={navigate} />
-            )}
-            {page === 'notebook' && (
-              <NoteBook navigate={navigate} dailyTip={dailyTip} />
             )}
           </>
         )}

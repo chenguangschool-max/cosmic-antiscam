@@ -77,15 +77,6 @@ export default function Instructions({ onDone, isRevisit }) {
           </p>
         </Section>
 
-        {/* 防詐筆記 */}
-        <Section color='rgba(255,160,60,.07)' border='rgba(255,160,60,.25)'>
-          <SectionTitle color='#ffd4a0'>📒 防詐筆記</SectionTitle>
-          <p style={bodyText}>
-            每天由 AI 根據當日詐騙主題，生成一篇專屬學習筆記。內容包含詐騙手法解析、
-            為什麼容易上當，以及一句具體的自保建議。筆記會自動儲存，隨時可回顧過去的紀錄。
-          </p>
-        </Section>
-
         {/* 防詐提醒 */}
         <Section color='rgba(255,80,80,.07)' border='rgba(255,80,80,.25)'>
           <SectionTitle color='#ff9e9e'>🚨 現實生活防詐提醒</SectionTitle>

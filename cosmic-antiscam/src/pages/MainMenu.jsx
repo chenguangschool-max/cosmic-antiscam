@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useGame } from '../GameContext'
-import { EDU_TIPS } from '../data'
 
 const TIPS = [
   { icon:'🏦', text:'銀行不會用簡訊叫你點連結輸入密碼，收到就直接刪除。' },
@@ -84,12 +83,11 @@ function SettingsModal({ onClose }) {
   )
 }
 
-export default function MainMenu({ navigate, dailyTip }) {
+export default function MainMenu({ navigate }) {
   const { coins, level, getXpProgress, monsters, resetGame } = useGame()
   const { cur, pct, next } = getXpProgress()
   const unlocked = monsters.filter(m => m.unlocked).length
   const [showSettings, setShowSettings] = useState(false)
-  const tipData = dailyTip ? EDU_TIPS[dailyTip] : null
 
   return (
     <div style={{ padding:18, position:'relative', zIndex:2, minHeight:'100vh' }}>
@@ -135,43 +133,20 @@ export default function MainMenu({ navigate, dailyTip }) {
         </div>
       </div>
 
-      {/* 每日防詐筆記卡 */}
-      {tipData ? (
-        <div style={{
-          maxWidth:440, margin:'0 auto 14px',
-          padding:'13px 16px', borderRadius:14,
-          background:'rgba(255,120,60,.07)',
-          border:'1px solid rgba(255,120,60,.3)',
-        }}>
-          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
-            <span style={{ fontSize:12, color:'rgba(255,140,80,.7)', fontWeight:700, letterSpacing:1 }}>📒 今日防詐筆記</span>
-            {tipData.cat && (
-              <span style={{ fontSize:11, background:'rgba(255,140,80,.15)', color:'#ffb380', borderRadius:6, padding:'2px 7px', fontWeight:600 }}>{tipData.cat}</span>
-            )}
-          </div>
-          <div style={{ fontSize:15, color:'#fff4ec', fontWeight:700, marginBottom:8 }}>{dailyTip}</div>
-          {tipData.flags?.slice(0,2).map((f,i) => (
-            <div key={i} style={{ fontSize:13, color:'rgba(255,180,120,.8)', marginBottom:3 }}>🚩 {f}</div>
-          ))}
-          {tipData.action && (
-            <div style={{ fontSize:13, color:'#7ee8c5', marginTop:8, lineHeight:1.6 }}>✅ {tipData.action}</div>
-          )}
+      {/* 防詐小提醒 */}
+      <div style={{
+        maxWidth:440, margin:'0 auto 14px',
+        padding:'13px 16px', borderRadius:14,
+        background:'rgba(255,220,80,.07)',
+        border:'1px solid rgba(255,220,80,.28)',
+        display:'flex', alignItems:'flex-start', gap:12,
+      }}>
+        <span style={{ fontSize:26, flexShrink:0, lineHeight:1.3 }}>{tip.icon}</span>
+        <div>
+          <div style={{ fontSize:12, color:'rgba(255,220,80,.6)', fontWeight:700, letterSpacing:1, marginBottom:5 }}>💡 防詐小提醒</div>
+          <div style={{ fontSize:16, color:'rgba(255,240,180,.92)', lineHeight:1.75 }}>{tip.text}</div>
         </div>
-      ) : (
-        <div style={{
-          maxWidth:440, margin:'0 auto 14px',
-          padding:'13px 16px', borderRadius:14,
-          background:'rgba(255,220,80,.07)',
-          border:'1px solid rgba(255,220,80,.28)',
-          display:'flex', alignItems:'flex-start', gap:12,
-        }}>
-          <span style={{ fontSize:26, flexShrink:0, lineHeight:1.3 }}>{tip.icon}</span>
-          <div>
-            <div style={{ fontSize:12, color:'rgba(255,220,80,.6)', fontWeight:700, letterSpacing:1, marginBottom:5 }}>💡 防詐小提醒</div>
-            <div style={{ fontSize:16, color:'rgba(255,240,180,.92)', lineHeight:1.75 }}>{tip.text}</div>
-          </div>
-        </div>
-      )}
+      </div>
 
       {/* Menu grid */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, maxWidth:440, margin:'0 auto' }}>
@@ -194,10 +169,6 @@ export default function MainMenu({ navigate, dailyTip }) {
         <button style={{ ...menuBtn, background:'rgba(80,200,120,.09)', borderColor:'rgba(80,200,120,.32)', color:'#7ee8a0' }} onClick={() => navigate('onlineLobby')}>
           <span style={{ fontSize:22 }}>🌐</span>
           <div><div style={{ fontSize:16, fontWeight:500 }}>連線對戰</div><div style={{ fontSize:13, opacity:.6 }}>即時同步</div></div>
-        </button>
-        <button style={{ ...menuBtn, background:'rgba(255,160,60,.08)', borderColor:'rgba(255,160,60,.28)', color:'#ffd4a0', gridColumn:'1/-1' }} onClick={() => navigate('notebook')}>
-          <span style={{ fontSize:22 }}>📒</span>
-          <div><div style={{ fontSize:16, fontWeight:500 }}>防詐筆記</div><div style={{ fontSize:13, opacity:.6 }}>每日 AI 生成學習筆記</div></div>
         </button>
       </div>
 
