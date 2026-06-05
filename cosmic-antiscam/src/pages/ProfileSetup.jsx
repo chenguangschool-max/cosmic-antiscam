@@ -96,7 +96,7 @@ export default function ProfileSetup({ onDone }) {
 
           {field('⚧ 性別',
             <div style={{ display: 'flex', gap: 10 }}>
-              {['男', '女', '其他'].map(g => (
+              {['男', '女'].map(g => (
                 <button
                   key={g}
                   onClick={() => { setGender(g); setErr('') }}
