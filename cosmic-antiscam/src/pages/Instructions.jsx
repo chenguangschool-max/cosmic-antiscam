@@ -1,20 +1,5 @@
-import { useState, useEffect } from 'react'
-
-const TIMER_SECONDS = 90
-
 export default function Instructions({ onDone, isRevisit }) {
-  const [seconds, setSeconds] = useState(isRevisit ? 0 : TIMER_SECONDS)
-
-  useEffect(() => {
-    if (isRevisit) return
-    const t = setInterval(() => setSeconds(s => {
-      if (s <= 1) { clearInterval(t); return 0 }
-      return s - 1
-    }), 1000)
-    return () => clearInterval(t)
-  }, [])
-
-  const canProceed = isRevisit || seconds <= 0
+  const canProceed = true
 
   return (
     <div style={{ padding:'20px 18px 0', position:'relative', zIndex:2, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
@@ -93,24 +78,16 @@ export default function Instructions({ onDone, isRevisit }) {
       </div>
 
       <div style={{ padding:'16px 0 28px' }}>
-        {!isRevisit && seconds > 0 && (
-          <div style={{ textAlign:'center', fontSize:13, color:'rgba(140,180,255,.5)', marginBottom:10 }}>
-            請閱讀完畢，{seconds} 秒後可繼續
-          </div>
-        )}
-        <button onClick={canProceed ? onDone : undefined} style={{
+        <button onClick={onDone} style={{
           width:'100%', padding:16, borderRadius:14,
-          background: canProceed
-            ? 'linear-gradient(135deg,rgba(91,141,238,.35),rgba(167,139,250,.3))'
-            : 'rgba(91,141,238,.08)',
-          border: `1px solid ${canProceed ? 'rgba(91,141,238,.6)' : 'rgba(91,141,238,.2)'}`,
-          color: canProceed ? '#e0eaff' : 'rgba(140,180,255,.3)',
+          background: 'linear-gradient(135deg,rgba(91,141,238,.35),rgba(167,139,250,.3))',
+          border: '1px solid rgba(91,141,238,.6)',
+          color: '#e0eaff',
           fontSize:17, fontWeight:700,
-          cursor: canProceed ? 'pointer' : 'default',
+          cursor: 'pointer',
           fontFamily:'Noto Sans TC,sans-serif', letterSpacing:1,
-          transition:'all .3s',
         }}>
-          {isRevisit ? '← 返回主選單' : canProceed ? '我閱讀完了，前往設定 →' : `⏳ ${seconds}`}
+          {isRevisit ? '← 返回主選單' : '我閱讀完了，前往設定 →'}
         </button>
       </div>
     </div>
