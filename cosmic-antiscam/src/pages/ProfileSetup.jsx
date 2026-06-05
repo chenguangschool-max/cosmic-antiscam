@@ -1,10 +1,11 @@
 import { useState } from 'react'
 
 export default function ProfileSetup({ onDone }) {
-  const [nickname, setNickname] = useState('')
-  const [realName, setRealName] = useState('')
-  const [age, setAge] = useState('')
-  const [gender, setGender] = useState('')
+  const saved = JSON.parse(localStorage.getItem('playerProfile') || '{}')
+  const [nickname, setNickname] = useState(saved.nickname || '')
+  const [realName, setRealName] = useState(saved.realName || '')
+  const [age, setAge] = useState(saved.age ? String(saved.age) : '')
+  const [gender, setGender] = useState(saved.gender || '')
   const [err, setErr] = useState('')
 
   const handleSubmit = () => {

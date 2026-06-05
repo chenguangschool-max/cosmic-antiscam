@@ -20,8 +20,10 @@ const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
 
 function getStep(serverVersion) {
   const localVersion = localStorage.getItem('cosmicVersion')
+  // 版本不同 → 重新走流程
   if (String(serverVersion) !== String(localVersion)) return 'instructions'
-  if (!localStorage.getItem('cosmicReady_v9')) return 'instructions'
+  // 這個 session 還沒走完流程 → 從頭開始
+  if (!sessionStorage.getItem('sessionReady')) return 'instructions'
   return 'ready'
 }
 
@@ -73,6 +75,7 @@ export default function App() {
 
   const markReady = () => {
     localStorage.setItem('cosmicReady_v9', '1')
+    sessionStorage.setItem('sessionReady', '1')
     setStep('ready')
   }
 
