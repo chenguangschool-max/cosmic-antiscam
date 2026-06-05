@@ -18,13 +18,9 @@ import OnlineBattle from './pages/OnlineBattle'
 
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
 
-function getInitStep() {
-  if (sessionStorage.getItem('sessionReady')) return 'ready'
-  return 'instructions'
-}
 
 export default function App() {
-  const [step, setStep] = useState(getInitStep)
+  const [step, setStep] = useState('instructions')
   const [broadcastBanner, setBroadcastBanner] = useState('')
   const lastBroadcastRef = useRef('')
   const [page, setPage] = useState('menu')
