@@ -18,17 +18,13 @@ import OnlineBattle from './pages/OnlineBattle'
 
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
 
-function getStep(serverVersion) {
-  const localVersion = localStorage.getItem('cosmicVersion')
-  // 版本不同 → 重新走流程
-  if (String(serverVersion) !== String(localVersion)) return 'instructions'
-  // 這個 session 還沒走完流程 → 從頭開始
-  if (!sessionStorage.getItem('sessionReady')) return 'instructions'
-  return 'ready'
+function getInitStep() {
+  if (sessionStorage.getItem('sessionReady')) return 'ready'
+  return 'instructions'
 }
 
 export default function App() {
-  const [step, setStep] = useState('instructions')
+  const [step, setStep] = useState(getInitStep)
   const [broadcastBanner, setBroadcastBanner] = useState('')
   const lastBroadcastRef = useRef('')
   const [page, setPage] = useState('menu')
@@ -57,6 +53,7 @@ export default function App() {
           localStorage.removeItem('cosmicReady_v9')
           localStorage.removeItem('playerName')
           localStorage.setItem('cosmicVersion', String(data.version))
+          sessionStorage.removeItem('sessionReady')
           setStep('instructions')
           setPage('menu')
         }
@@ -66,9 +63,7 @@ export default function App() {
   }
 
   useEffect(() => {
-    fetchStatus().then(() => {
-      setStep(getStep(localStorage.getItem('cosmicVersion')))
-    })
+    fetchStatus()
     const interval = setInterval(fetchStatus, 5000)
     return () => clearInterval(interval)
   }, [])
