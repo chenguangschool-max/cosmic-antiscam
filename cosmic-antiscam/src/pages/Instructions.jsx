@@ -116,7 +116,7 @@ export default function Instructions({ onDone, isRevisit }) {
           fontFamily:'Noto Sans TC,sans-serif', letterSpacing:1,
           transition:'all .3s',
         }}>
-          {isRevisit ? '← 返回主選單' : canProceed ? '我閱讀完了，下一步 →' : `⏳ ${seconds}`}
+          {isRevisit ? '← 返回主選單' : canProceed ? '我閱讀完了，前往設定 →' : `⏳ ${seconds}`}
         </button>
       </div>
     </div>

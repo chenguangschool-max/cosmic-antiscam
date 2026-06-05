@@ -44,7 +44,7 @@ export default function ProfileSetup({ onDone }) {
       <div style={{ textAlign: 'center', marginBottom: 28 }}>
         <div style={{ fontSize: 48, marginBottom: 10 }}>🧑‍🚀</div>
         <div style={{ fontFamily: 'Orbitron,monospace', fontSize: 19, fontWeight: 900, color: '#fff', letterSpacing: 2 }}>
-          建立你的檔案
+          設定
         </div>
         <div style={{ fontSize: 14, color: 'rgba(180,200,255,.5)', marginTop: 6 }}>
           填寫個人資料以開始任務

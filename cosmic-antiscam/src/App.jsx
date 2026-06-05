@@ -111,6 +111,36 @@ export default function App() {
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 520, margin: '0 auto' }}>
 
+        {/* 新手流程進度條 */}
+        {(step === 'instructions' || step === 'profile') && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, padding: '18px 0 4px' }}>
+            {[
+              { label: '使用說明', idx: 0, active: step === 'instructions' },
+              { label: '設定', idx: 1, active: step === 'profile' },
+              { label: '主選單', idx: 2, active: false },
+            ].map((s, i, arr) => (
+              <div key={s.idx} style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: s.active ? 'rgba(91,141,238,.4)' : 'rgba(255,255,255,.07)',
+                    border: `2px solid ${s.active ? 'rgba(91,141,238,.9)' : 'rgba(255,255,255,.15)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 13, fontWeight: 700,
+                    color: s.active ? '#c8dbff' : 'rgba(140,180,255,.35)',
+                    boxShadow: s.active ? '0 0 12px rgba(91,141,238,.4)' : 'none',
+                    transition: 'all .3s',
+                  }}>{s.idx + 1}</div>
+                  <div style={{ fontSize: 11, color: s.active ? 'rgba(140,180,255,.8)' : 'rgba(140,180,255,.3)', fontFamily: 'Noto Sans TC,sans-serif', fontWeight: s.active ? 700 : 400 }}>{s.label}</div>
+                </div>
+                {i < arr.length - 1 && (
+                  <div style={{ width: 40, height: 2, background: 'rgba(91,141,238,.2)', margin: '0 4px 16px' }} />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         {step === 'instructions' && (
           <Instructions onDone={() => setStep('profile')} />
         )}
