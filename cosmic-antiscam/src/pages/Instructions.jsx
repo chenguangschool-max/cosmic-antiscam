@@ -1,4 +1,18 @@
+import { useState, useEffect } from 'react'
+
+const TIMER_SECONDS = 90
+
 export default function Instructions({ onDone, isRevisit }) {
+  const [seconds, setSeconds] = useState(isRevisit ? 0 : TIMER_SECONDS)
+
+  useEffect(() => {
+    if (isRevisit || seconds <= 0) return
+    const t = setInterval(() => setSeconds(s => s - 1), 1000)
+    return () => clearInterval(t)
+  }, [isRevisit, seconds])
+
+  const canProceed = isRevisit || seconds <= 0
+
   return (
     <div style={{ padding:'20px 18px 0', position:'relative', zIndex:2, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
 
@@ -76,14 +90,24 @@ export default function Instructions({ onDone, isRevisit }) {
       </div>
 
       <div style={{ padding:'16px 0 28px' }}>
-        <button onClick={onDone} style={{
+        {!isRevisit && seconds > 0 && (
+          <div style={{ textAlign:'center', fontSize:13, color:'rgba(140,180,255,.5)', marginBottom:10 }}>
+            請閱讀完畢，{seconds} 秒後可繼續
+          </div>
+        )}
+        <button onClick={canProceed ? onDone : undefined} style={{
           width:'100%', padding:16, borderRadius:14,
-          background:'linear-gradient(135deg,rgba(91,141,238,.35),rgba(167,139,250,.3))',
-          border:'1px solid rgba(91,141,238,.6)',
-          color:'#e0eaff', fontSize:17, fontWeight:700,
-          cursor:'pointer', fontFamily:'Noto Sans TC,sans-serif', letterSpacing:1,
+          background: canProceed
+            ? 'linear-gradient(135deg,rgba(91,141,238,.35),rgba(167,139,250,.3))'
+            : 'rgba(91,141,238,.08)',
+          border: `1px solid ${canProceed ? 'rgba(91,141,238,.6)' : 'rgba(91,141,238,.2)'}`,
+          color: canProceed ? '#e0eaff' : 'rgba(140,180,255,.3)',
+          fontSize:17, fontWeight:700,
+          cursor: canProceed ? 'pointer' : 'default',
+          fontFamily:'Noto Sans TC,sans-serif', letterSpacing:1,
+          transition:'all .3s',
         }}>
-          {isRevisit ? '← 返回主選單' : '我閱讀完了，下一步 →'}
+          {isRevisit ? '← 返回主選單' : canProceed ? '我閱讀完了，下一步 →' : `⏳ ${seconds}`}
         </button>
       </div>
     </div>
