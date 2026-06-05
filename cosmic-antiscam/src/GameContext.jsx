@@ -91,6 +91,7 @@ export function GameProvider({ children }) {
     setBag({})
     setMonsters(MONSTERS.map(m => ({ ...m, unlocked: false })))
     setJustUnlocked([])
+    localStorage.removeItem('cosmicDiaryNotes')
   }
 
   const clearJustUnlocked = () => setJustUnlocked([])
