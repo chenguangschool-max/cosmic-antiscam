@@ -1,5 +1,15 @@
+import { useState, useEffect } from 'react'
+
 export default function Instructions({ onDone, isRevisit }) {
-  const canProceed = true
+  const [seconds, setSeconds] = useState(isRevisit ? 0 : 90)
+
+  useEffect(() => {
+    if (isRevisit) return
+    const id = setInterval(() => setSeconds(s => s > 0 ? s - 1 : 0), 1000)
+    return () => clearInterval(id)
+  }, [isRevisit])
+
+  const canProceed = isRevisit || seconds === 0
 
   return (
     <div style={{ padding:'20px 18px 0', position:'relative', zIndex:2, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
@@ -78,16 +88,22 @@ export default function Instructions({ onDone, isRevisit }) {
       </div>
 
       <div style={{ padding:'16px 0 28px' }}>
-        <button onClick={onDone} style={{
+        {!isRevisit && !canProceed && (
+          <div style={{ textAlign:'center', fontSize:13, color:'rgba(140,180,255,.5)', marginBottom:10 }}>
+            請閱讀完畢，{seconds} 秒後可繼續
+          </div>
+        )}
+        <button onClick={canProceed ? onDone : undefined} style={{
           width:'100%', padding:16, borderRadius:14,
-          background: 'linear-gradient(135deg,rgba(91,141,238,.35),rgba(167,139,250,.3))',
-          border: '1px solid rgba(91,141,238,.6)',
-          color: '#e0eaff',
+          background: canProceed ? 'linear-gradient(135deg,rgba(91,141,238,.35),rgba(167,139,250,.3))' : 'rgba(91,141,238,.08)',
+          border: `1px solid ${canProceed ? 'rgba(91,141,238,.6)' : 'rgba(91,141,238,.2)'}`,
+          color: canProceed ? '#e0eaff' : 'rgba(140,180,255,.3)',
           fontSize:17, fontWeight:700,
-          cursor: 'pointer',
+          cursor: canProceed ? 'pointer' : 'default',
           fontFamily:'Noto Sans TC,sans-serif', letterSpacing:1,
+          transition:'all .3s',
         }}>
-          {isRevisit ? '← 返回主選單' : '我閱讀完了，前往設定 →'}
+          {isRevisit ? '← 返回主選單' : canProceed ? '我閱讀完了，前往設定 →' : `⏳ ${seconds}`}
         </button>
       </div>
     </div>
