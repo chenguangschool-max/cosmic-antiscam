@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { EDU_TIPS } from '../data'
 
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
@@ -13,23 +13,55 @@ function loadNotes() {
   try { return JSON.parse(localStorage.getItem('cosmicDiaryNotes') || '{}') } catch { return {} }
 }
 
-export default function NoteBook({ navigate, dailyTip }) {
+export default function NoteBook({ navigate, dailyTip: propTip }) {
   const key = todayKey()
-  const tipData = dailyTip ? EDU_TIPS[dailyTip] : null
   const notes = loadNotes()
 
+  const [dailyTip, setDailyTip] = useState(propTip || null)
   const [todayNote, setTodayNote] = useState(notes[key] || null)
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState('')
   const [showPast, setShowPast] = useState(false)
+  const [tipLoading, setTipLoading] = useState(!propTip)
+  const generatingRef = useRef(false)
 
+  const tipData = dailyTip ? EDU_TIPS[dailyTip] : null
   const pastEntries = Object.entries(notes)
     .filter(([k]) => k !== key)
     .sort((a, b) => b[0].localeCompare(a[0]))
 
+  // 若 prop 更新（App.jsx 稍後拿到），同步進來
   useEffect(() => {
-    if (todayNote || !dailyTip) return
-    generateNote()
+    if (propTip && !dailyTip) {
+      setDailyTip(propTip)
+      setTipLoading(false)
+    }
+  }, [propTip])
+
+  // 若 prop 沒有，自己去打 /api/status
+  useEffect(() => {
+    if (propTip) return
+    let cancelled = false
+    const fetchTip = async () => {
+      try {
+        const res = await fetch(`${SERVER}/api/status`)
+        const data = await res.json()
+        if (!cancelled && data.dailyTip) {
+          setDailyTip(data.dailyTip)
+          setTipLoading(false)
+        }
+      } catch {
+        if (!cancelled) setTipLoading(false)
+      }
+    }
+    fetchTip()
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
+    if (todayNote || !dailyTip || generatingRef.current) return
+    generatingRef.current = true
+    generateNote(dailyTip)
   }, [dailyTip])
 
   const generateNote = async () => {
