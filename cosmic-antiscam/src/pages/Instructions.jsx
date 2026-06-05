@@ -6,10 +6,13 @@ export default function Instructions({ onDone, isRevisit }) {
   const [seconds, setSeconds] = useState(isRevisit ? 0 : TIMER_SECONDS)
 
   useEffect(() => {
-    if (isRevisit || seconds <= 0) return
-    const t = setInterval(() => setSeconds(s => s - 1), 1000)
+    if (isRevisit) return
+    const t = setInterval(() => setSeconds(s => {
+      if (s <= 1) { clearInterval(t); return 0 }
+      return s - 1
+    }), 1000)
     return () => clearInterval(t)
-  }, [isRevisit, seconds])
+  }, [])
 
   const canProceed = isRevisit || seconds <= 0
 
