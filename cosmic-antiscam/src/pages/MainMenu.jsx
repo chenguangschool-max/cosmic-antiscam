@@ -195,6 +195,10 @@ export default function MainMenu({ navigate, dailyTip }) {
           <span style={{ fontSize:22 }}>🌐</span>
           <div><div style={{ fontSize:16, fontWeight:500 }}>連線對戰</div><div style={{ fontSize:13, opacity:.6 }}>即時同步</div></div>
         </button>
+        <button style={{ ...menuBtn, background:'rgba(255,160,60,.08)', borderColor:'rgba(255,160,60,.28)', color:'#ffd4a0', gridColumn:'1/-1' }} onClick={() => navigate('notebook')}>
+          <span style={{ fontSize:22 }}>📒</span>
+          <div><div style={{ fontSize:16, fontWeight:500 }}>防詐筆記</div><div style={{ fontSize:13, opacity:.6 }}>每日 AI 生成學習筆記</div></div>
+        </button>
       </div>
 
       {/* 重置存檔 */}

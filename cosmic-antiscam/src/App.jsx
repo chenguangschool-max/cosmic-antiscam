@@ -16,6 +16,7 @@ import MultiQuiz from './pages/MultiQuiz'
 import MultiResult from './pages/MultiResult'
 import OnlineLobby from './pages/OnlineLobby'
 import OnlineBattle from './pages/OnlineBattle'
+import NoteBook from './pages/NoteBook'
 
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
 
@@ -141,6 +142,9 @@ export default function App() {
             )}
             {page === 'onlineBattle' && onlineRoom && (
               <OnlineBattle room={onlineRoom} navigate={navigate} />
+            )}
+            {page === 'notebook' && (
+              <NoteBook navigate={navigate} dailyTip={dailyTip} />
             )}
           </>
         )}

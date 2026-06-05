@@ -17,7 +17,7 @@ app.get('/health', (_, res) => res.json({ ok: true }))
 // ── 遊戲開關與版本 ─────────────────────────────────────────────────────────────
 const ADMIN_SECRET = 'cosmic888'
 let gameOpen = false
-let gameVersion = 2
+let gameVersion = 3
 let broadcastMsg = ''
 let onlineCount = 0
 
@@ -93,6 +93,28 @@ app.post('/api/admin/reset-tips', (req, res) => {
   currentTipDate = ''
   pickDailyTip()
   res.json({ dailyTip: currentDailyTip, remaining: TIP_TOPICS.length - usedTipTopics.length, total: TIP_TOPICS.length })
+})
+
+// ── 防詐筆記 AI 生成 ──────────────────────────────────────────────────────────
+
+app.post('/api/generate-note', async (req, res) => {
+  const { topic, date } = req.body || {}
+  if (!topic) return res.status(400).json({ error: 'missing topic' })
+
+  try {
+    const prompt = `你是防詐騙教育專家，請以「今日防詐筆記」的形式，針對「${topic}」這個詐騙手法，用輕鬆易懂的繁體中文寫一篇約 120 字的短文。
+內容包含：這個詐騙的常見手法、為什麼人容易上當、以及一句具體的自保建議。
+語氣像是每日學習日記，親切不生硬。只輸出文章本文，不要標題。`
+
+    const msg = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    res.json({ note: msg.content[0].text.trim(), topic, date })
+  } catch (e) {
+    res.status(500).json({ error: 'generation failed' })
+  }
 })
 
 // ── 題庫主題 ───────────────────────────────────────────────────────────────────
