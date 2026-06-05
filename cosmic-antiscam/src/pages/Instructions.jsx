@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 export default function Instructions({ onDone, isRevisit }) {
-  const [seconds, setSeconds] = useState(isRevisit ? 0 : 90)
+  const [seconds, setSeconds] = useState(isRevisit ? 0 : 40)
 
   useEffect(() => {
     if (isRevisit) return
