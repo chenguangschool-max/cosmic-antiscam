@@ -22,7 +22,7 @@ const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
 function getStep(serverVersion) {
   const localVersion = localStorage.getItem('cosmicVersion')
   if (String(serverVersion) !== String(localVersion)) return 'instructions'
-  if (!localStorage.getItem('cosmicReady_v8')) return 'instructions'
+  if (!localStorage.getItem('cosmicReady_v9')) return 'instructions'
   return 'ready'
 }
 
@@ -56,7 +56,7 @@ export default function App() {
       if (data.version !== undefined) {
         const local = localStorage.getItem('cosmicVersion')
         if (String(data.version) !== String(local)) {
-          localStorage.removeItem('cosmicReady_v8')
+          localStorage.removeItem('cosmicReady_v9')
           localStorage.removeItem('playerName')
           localStorage.setItem('cosmicVersion', String(data.version))
           setStep('instructions')
@@ -79,7 +79,7 @@ export default function App() {
   }, [])
 
   const markReady = () => {
-    localStorage.setItem('cosmicReady_v8', '1')
+    localStorage.setItem('cosmicReady_v9', '1')
     setStep('ready')
   }
 
