@@ -46,7 +46,7 @@ export default function App() {
       if (data.version !== undefined) {
         const local = localStorage.getItem('cosmicVersion')
         if (String(data.version) !== String(local)) {
-          localStorage.removeItem('cosmicReady_v10')
+          localStorage.removeItem('cosmicReady_v11')
           localStorage.removeItem('playerName')
           localStorage.setItem('cosmicVersion', String(data.version))
           sessionStorage.removeItem('sessionReady')
@@ -65,7 +65,7 @@ export default function App() {
   }, [])
 
   const markReady = () => {
-    localStorage.setItem('cosmicReady_v10', '1')
+    localStorage.setItem('cosmicReady_v11', '1')
     sessionStorage.setItem('sessionReady', '1')
     setStep('ready')
   }
