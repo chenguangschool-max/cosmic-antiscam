@@ -1,3 +1,16 @@
+const TIPS = [
+  '這是一款訓練你識破詐騙的遊戲。',
+  '每題會出現一則訊息，你來判斷：正常，還是詐騙？',
+  '在時間結束前點選答案，答對得金幣和經驗值。',
+  '答題後會顯示解說，幫你了解詐騙手法。',
+  '累積經驗值可以升等，解鎖圖鑑裡的詐騙怪獸。',
+  '金幣可以在商店買道具，例如加時、跳題、防護盾。',
+  '圖鑑收錄 30 種詐騙手法，解鎖後可查看辨識與應對方式。',
+  '要求立即轉帳、中獎要先繳費，都是詐騙！',
+  '銀行和政府不會用簡訊要你提供帳號或密碼。',
+  '遇到可疑訊息，撥打 165 反詐騙專線。',
+]
+
 export default function Instructions({ onDone, isRevisit }) {
   return (
     <div style={{ padding:'20px 18px 0', position:'relative', zIndex:2, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
@@ -11,22 +24,19 @@ export default function Instructions({ onDone, isRevisit }) {
       </div>
 
       <div style={{ flex:1, overflowY:'auto', paddingBottom:16 }}>
-
-        <Section color='rgba(91,141,238,.18)' border='rgba(91,141,238,.3)'>
-          <SectionTitle>🎯 遊戲目的</SectionTitle>
-          <p style={bodyText}>判斷訊息是「正常」還是「詐騙」，答對得金幣和經驗值，等級提升！</p>
-          <p style={bodyText}>答題後會有解說，幫你認識各種詐騙手法。</p>
-        </Section>
-
-        <Section color='rgba(255,80,80,.07)' border='rgba(255,80,80,.25)'>
-          <SectionTitle color='#ff9e9e'>🚨 防詐提醒</SectionTitle>
-          <Remind text="要求立即轉帳 → 先打電話給家人確認" />
-          <Remind text="銀行／政府不會簡訊要你提供帳密" />
-          <Remind text="中獎還要先繳費 = 100% 詐騙" />
-          <Remind text="親友突然換號借錢 → 用舊號碼確認" />
-          <Remind text="不確定？撥 165 反詐騙專線" />
-        </Section>
-
+        <div style={{ padding:'16px', borderRadius:12, background:'rgba(91,141,238,.12)', border:'1px solid rgba(91,141,238,.25)' }}>
+          {TIPS.map((tip, i) => (
+            <div key={i} style={{ display:'flex', gap:12, alignItems:'flex-start', marginBottom:14 }}>
+              <div style={{
+                width:26, height:26, borderRadius:'50%', flexShrink:0,
+                background:'rgba(91,141,238,.25)', border:'1px solid rgba(91,141,238,.45)',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:13, fontWeight:700, color:'#a8c4ff',
+              }}>{i + 1}</div>
+              <div style={{ fontSize:16, color:'rgba(210,225,255,.9)', lineHeight:1.8, paddingTop:2 }}>{tip}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div style={{ padding:'16px 0 28px' }}>
@@ -43,30 +53,3 @@ export default function Instructions({ onDone, isRevisit }) {
     </div>
   )
 }
-
-function Section({ children, color, border }) {
-  return (
-    <div style={{ marginBottom:14, padding:'14px 16px', borderRadius:12, background:color, border:`1px solid ${border}` }}>
-      {children}
-    </div>
-  )
-}
-
-function SectionTitle({ children, color }) {
-  return (
-    <div style={{ fontSize:15, fontWeight:700, color: color || '#a8c4ff', letterSpacing:1, marginBottom:10 }}>
-      {children}
-    </div>
-  )
-}
-
-function Remind({ text }) {
-  return (
-    <div style={{ display:'flex', gap:8, alignItems:'flex-start', marginBottom:8 }}>
-      <span style={{ color:'rgba(255,120,90,.8)', flexShrink:0, fontSize:16 }}>•</span>
-      <div style={{ fontSize:16, color:'rgba(255,200,190,.85)', lineHeight:1.8 }}>{text}</div>
-    </div>
-  )
-}
-
-const bodyText = { fontSize:15, color:'rgba(200,220,255,.8)', lineHeight:1.8, marginBottom:8 }
