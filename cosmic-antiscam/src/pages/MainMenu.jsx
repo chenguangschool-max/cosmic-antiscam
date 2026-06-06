@@ -166,6 +166,10 @@ export default function MainMenu({ navigate }) {
           <span style={{ fontSize:22 }}>🌐</span>
           <div><div style={{ fontSize:16, fontWeight:500 }}>連線對戰</div><div style={{ fontSize:13, opacity:.6 }}>即時同步</div></div>
         </button>
+        <button style={{ ...menuBtn, background:'rgba(167,139,250,.09)', borderColor:'rgba(167,139,250,.35)', color:'#c4b5fd', gridColumn:'1/-1' }} onClick={() => navigate('detective')}>
+          <span style={{ fontSize:22 }}>🔍</span>
+          <div><div style={{ fontSize:16, fontWeight:500 }}>偵探模式</div><div style={{ fontSize:13, opacity:.6 }}>調查真實案件</div></div>
+        </button>
       </div>
 
       {/* 重置存檔 */}

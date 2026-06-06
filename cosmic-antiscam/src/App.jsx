@@ -15,6 +15,7 @@ import MultiQuiz from './pages/MultiQuiz'
 import MultiResult from './pages/MultiResult'
 import OnlineLobby from './pages/OnlineLobby'
 import OnlineBattle from './pages/OnlineBattle'
+import DetectiveMode from './pages/DetectiveMode'
 
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
 
@@ -46,7 +47,7 @@ export default function App() {
       if (data.version !== undefined) {
         const local = localStorage.getItem('cosmicVersion')
         if (String(data.version) !== String(local)) {
-          localStorage.removeItem('cosmicReady_v16')
+          localStorage.removeItem('cosmicReady_v17')
           localStorage.removeItem('playerName')
           localStorage.setItem('cosmicVersion', String(data.version))
           sessionStorage.removeItem('sessionReady')
@@ -65,7 +66,7 @@ export default function App() {
   }, [])
 
   const markReady = () => {
-    localStorage.setItem('cosmicReady_v16', '1')
+    localStorage.setItem('cosmicReady_v17', '1')
     sessionStorage.setItem('sessionReady', '1')
     setStep('ready')
   }
@@ -153,6 +154,7 @@ export default function App() {
             {page === 'onlineBattle' && onlineRoom && (
               <OnlineBattle room={onlineRoom} navigate={navigate} />
             )}
+            {page === 'detective' && <DetectiveMode navigate={navigate} />}
           </>
         )}
       </div>
