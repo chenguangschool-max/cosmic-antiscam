@@ -17,62 +17,56 @@ export default function Instructions({ onDone, isRevisit }) {
         {/* 遊戲目的 */}
         <Section color='rgba(91,141,238,.18)' border='rgba(91,141,238,.3)'>
           <SectionTitle>🎯 遊戲目的</SectionTitle>
-          <p style={bodyText}>
-            這是一個訓練防詐騙能力的遊戲。你會看到各種訊息，要判斷它是「正常通知」還是「詐騙訊息」。
-            答題愈準確，得到的金幣和經驗值愈多，等級也會提升！
-          </p>
+          <p style={bodyText}>判斷訊息是「正常」還是「詐騙」，答對得金幣和經驗值，等級提升！</p>
         </Section>
 
         {/* 如何作答 */}
         <Section color='rgba(91,141,238,.1)' border='rgba(91,141,238,.2)'>
           <SectionTitle>📋 如何作答</SectionTitle>
-          <Step n="1" text="仔細閱讀畫面上出現的星際通訊訊息" />
-          <Step n="2" text="根據訊息內容判斷：是「正常事件」還是「異常詐騙」" />
-          <Step n="3" text="在時間倒數結束前，點擊下方的選項按鈕作答" />
-          <Step n="4" text="系統立即告訴你答對或答錯，並說明理由" />
-          <Step n="5" text="連續答完 10 題後，查看本局總成績" />
+          <Step n="1" text="閱讀訊息" />
+          <Step n="2" text="判斷：正常 or 詐騙？" />
+          <Step n="3" text="時間內點選答案" />
+          <Step n="4" text="查看解說" />
+          <Step n="5" text="10 題後看成績" />
         </Section>
 
         {/* 遊戲模式 */}
         <Section color='rgba(167,139,250,.08)' border='rgba(167,139,250,.22)'>
           <SectionTitle>🎮 遊戲模式</SectionTitle>
-          <ModeRow emoji='🧑' name='新手模式' desc='時間充裕（30秒），適合第一次玩的朋友' />
-          <ModeRow emoji='⭐' name='高手模式' desc='時間緊迫（15秒），考驗你的判斷速度' />
-          <ModeRow emoji='📚' name='教育模式' desc='答完每題後，詳細說明詐騙手法與預防方式' />
-          <ModeRow emoji='🌴' name='假日模式' desc='輕鬆節奏（35秒），適合休閒練習' />
-          <ModeRow emoji='👥' name='多人對戰' desc='2至4人輪流答題，看誰的防詐能力最強' />
-          <ModeRow emoji='🌐' name='連線對戰' desc='與其他裝置的朋友即時連線，同步競賽' />
+          <ModeRow emoji='🧑' name='新手' desc='30 秒' />
+          <ModeRow emoji='⭐' name='高手' desc='15 秒' />
+          <ModeRow emoji='📚' name='教育' desc='答後有詳細解說' />
+          <ModeRow emoji='🌴' name='假日' desc='35 秒輕鬆玩' />
+          <ModeRow emoji='👥' name='多人對戰' desc='2–4 人輪流答' />
+          <ModeRow emoji='🌐' name='連線對戰' desc='跨裝置即時競賽' />
         </Section>
 
         {/* 金幣與道具 */}
         <Section color='rgba(255,210,50,.07)' border='rgba(255,210,50,.22)'>
           <SectionTitle>🪙 金幣與道具</SectionTitle>
-          <p style={bodyText}>答對題目可以獲得金幣，金幣可以在「商店」購買道具：</p>
-          <Item emoji='🐢' name='冷靜龜' desc='本題答題時間延長 10 秒' />
-          <Item emoji='🛡️' name='防護盾' desc='答錯一次不扣分' />
-          <Item emoji='⏰' name='時間停止器' desc='暫停倒數計時 15 秒' />
-          <Item emoji='🎫' name='跳題卡' desc='略過當前這一題' />
-          <Item emoji='🧲' name='金幣磁鐵' desc='答對額外獲得 5 枚金幣' />
-          <Item emoji='💰' name='雙倍金幣' desc='本回合答對金幣全部翻倍' />
+          <p style={bodyText}>答對得金幣 → 商店買道具</p>
+          <Item emoji='🐢' name='冷靜龜' desc='+10 秒' />
+          <Item emoji='🛡️' name='防護盾' desc='答錯不扣分' />
+          <Item emoji='⏰' name='時間停止器' desc='暫停 15 秒' />
+          <Item emoji='🎫' name='跳題卡' desc='略過這題' />
+          <Item emoji='🧲' name='金幣磁鐵' desc='+5 金幣/答對' />
+          <Item emoji='💰' name='雙倍金幣' desc='本回合翻倍' />
         </Section>
 
         {/* 圖鑑 */}
         <Section color='rgba(80,200,240,.07)' border='rgba(80,200,240,.2)'>
-          <SectionTitle>📖 圖鑑收集</SectionTitle>
-          <p style={bodyText}>
-            遊戲中共有 30 隻詐騙怪獸！答題升級可以自動解鎖怪獸，也可以花金幣在圖鑑中解鎖。
-            解鎖後可以查看每隻怪獸的詳細介紹、辨識方式和應對方法。
-          </p>
+          <SectionTitle>📖 圖鑑</SectionTitle>
+          <p style={bodyText}>30 隻詐騙怪獸，升級自動解鎖或花金幣解鎖，查看辨識與應對方式。</p>
         </Section>
 
         {/* 防詐提醒 */}
         <Section color='rgba(255,80,80,.07)' border='rgba(255,80,80,.25)'>
-          <SectionTitle color='#ff9e9e'>🚨 現實生活防詐提醒</SectionTitle>
-          <Remind text="任何要求你「立即轉帳」的訊息，先停下來，打電話給家人確認！" />
-          <Remind text="正規銀行、政府機關、醫院，絕對不會用電話或簡訊要求你提供帳號密碼。" />
-          <Remind text="收到中獎通知卻要先繳費？這 100% 是詐騙，直接忽略！" />
-          <Remind text="孫子、親友突然換號碼緊急借錢？先用舊號碼打回去確認本人。" />
-          <Remind text="不確定真假時，撥打 165 反詐騙專線查證，24 小時都有人接聽。" />
+          <SectionTitle color='#ff9e9e'>🚨 防詐提醒</SectionTitle>
+          <Remind text="要求立即轉帳 → 先打電話給家人確認" />
+          <Remind text="銀行／政府不會簡訊要你提供帳密" />
+          <Remind text="中獎還要先繳費 = 100% 詐騙" />
+          <Remind text="親友突然換號借錢 → 用舊號碼確認" />
+          <Remind text="不確定？撥 165 反詐騙專線" />
         </Section>
 
       </div>
