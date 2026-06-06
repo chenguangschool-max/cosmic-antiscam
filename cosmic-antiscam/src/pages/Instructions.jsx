@@ -37,7 +37,6 @@ export default function Instructions({ onDone, isRevisit }) {
           <ModeRow emoji='⭐' name='高手' desc='15 秒' />
           <ModeRow emoji='📚' name='教育' desc='答後有詳細解說' />
           <ModeRow emoji='🌴' name='假日' desc='35 秒輕鬆玩' />
-          <ModeRow emoji='👥' name='多人對戰' desc='2–4 人輪流答' />
           <ModeRow emoji='🌐' name='連線對戰' desc='跨裝置即時競賽' />
         </Section>
 
