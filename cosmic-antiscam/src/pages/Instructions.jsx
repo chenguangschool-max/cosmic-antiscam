@@ -11,11 +11,19 @@ const TIPS = [
   '遇到可疑訊息，撥打 165 反詐騙專線。',
 ]
 
+const REMINDS = [
+  '要求立即轉帳 → 先打電話給家人確認',
+  '銀行／政府不會簡訊要你提供帳密',
+  '中獎還要先繳費 = 100% 詐騙',
+  '親友突然換號借錢 → 用舊號碼確認',
+  '不確定？撥 165 反詐騙專線',
+]
+
 export default function Instructions({ onDone, isRevisit }) {
   return (
     <div style={{ padding:'20px 18px 0', position:'relative', zIndex:2, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
 
-      <div style={{ textAlign:'center', marginBottom:28 }}>
+      <div style={{ textAlign:'center', marginBottom:24 }}>
         <div style={{ fontSize:46, marginBottom:8 }}>🛸</div>
         <div style={{ fontFamily:'Orbitron,monospace', fontSize:19, fontWeight:900, color:'#fff', letterSpacing:2 }}>
           宇宙防詐任務
@@ -23,20 +31,35 @@ export default function Instructions({ onDone, isRevisit }) {
         <div style={{ fontSize:15, color:'rgba(180,200,255,.45)', marginTop:3 }}>使用說明</div>
       </div>
 
-      <div style={{ flex:1, overflowY:'auto', paddingBottom:16 }}>
-        <div style={{ padding:'16px', borderRadius:12, background:'rgba(91,141,238,.12)', border:'1px solid rgba(91,141,238,.25)' }}>
+      <div style={{ flex:1, overflowY:'auto', paddingBottom:16, display:'flex', flexDirection:'column', gap:14 }}>
+
+        {/* 使用說明 */}
+        <div style={{ padding:'14px 16px', borderRadius:12, background:'rgba(91,141,238,.12)', border:'1px solid rgba(91,141,238,.28)' }}>
+          <div style={{ fontSize:15, fontWeight:700, color:'#a8c4ff', letterSpacing:1, marginBottom:12 }}>📋 使用說明</div>
           {TIPS.map((tip, i) => (
-            <div key={i} style={{ display:'flex', gap:12, alignItems:'flex-start', marginBottom:14 }}>
+            <div key={i} style={{ display:'flex', gap:12, alignItems:'flex-start', marginBottom:12 }}>
               <div style={{
-                width:26, height:26, borderRadius:'50%', flexShrink:0,
+                width:24, height:24, borderRadius:'50%', flexShrink:0,
                 background:'rgba(91,141,238,.25)', border:'1px solid rgba(91,141,238,.45)',
                 display:'flex', alignItems:'center', justifyContent:'center',
-                fontSize:13, fontWeight:700, color:'#a8c4ff',
+                fontSize:12, fontWeight:700, color:'#a8c4ff',
               }}>{i + 1}</div>
-              <div style={{ fontSize:16, color:'rgba(210,225,255,.9)', lineHeight:1.8, paddingTop:2 }}>{tip}</div>
+              <div style={{ fontSize:15, color:'rgba(210,225,255,.9)', lineHeight:1.8, paddingTop:2 }}>{tip}</div>
             </div>
           ))}
         </div>
+
+        {/* 防詐提醒 */}
+        <div style={{ padding:'14px 16px', borderRadius:12, background:'rgba(255,80,80,.07)', border:'1px solid rgba(255,80,80,.25)' }}>
+          <div style={{ fontSize:15, fontWeight:700, color:'#ff9e9e', letterSpacing:1, marginBottom:12 }}>🚨 防詐提醒</div>
+          {REMINDS.map((text, i) => (
+            <div key={i} style={{ display:'flex', gap:8, alignItems:'flex-start', marginBottom:10 }}>
+              <span style={{ color:'rgba(255,120,90,.8)', flexShrink:0, fontSize:16 }}>•</span>
+              <div style={{ fontSize:15, color:'rgba(255,200,190,.9)', lineHeight:1.8 }}>{text}</div>
+            </div>
+          ))}
+        </div>
+
       </div>
 
       <div style={{ padding:'16px 0 28px' }}>
