@@ -4,8 +4,8 @@ import { DETECTIVE_CASES } from '../data/detectiveCases'
 
 export default function DetectiveMode({ navigate }) {
   const { addCoins, addXp } = useGame()
-  const [phase, setPhase] = useState('intro') // intro | investigate | answer | feedback | result
-  const [caseData] = useState(DETECTIVE_CASES[0])
+  const [phase, setPhase] = useState('caseSelect')
+  const [caseData, setCaseData] = useState(null)
   const [qIndex, setQIndex] = useState(0)
   const [trust, setTrust] = useState(0) // 0–100, victim's trust in scammer
   const [flagged, setFlagged] = useState({}) // { evidenceId: true }
@@ -18,7 +18,7 @@ export default function DetectiveMode({ navigate }) {
   const timerRef = useRef(null)
   const trustRef = useRef(0)
 
-  const q = caseData.questions[qIndex]
+  const q = caseData?.questions[qIndex]
 
   useEffect(() => {
     if (phase === 'investigate') {
@@ -104,8 +104,10 @@ export default function DetectiveMode({ navigate }) {
     }
   }
 
+  if (phase === 'caseSelect') return <CaseSelectScreen cases={DETECTIVE_CASES} onSelect={(c) => { setCaseData(c); setPhase('intro') }} navigate={navigate} />
+  if (!caseData) return null
   if (phase === 'intro') return <IntroScreen c={caseData} onStart={() => setPhase('investigate')} navigate={navigate} />
-  if (phase === 'result') return <ResultScreen c={caseData} coins={Math.min(300, earnedCoins)} correct={correctCount} total={caseData.questions.length} trust={trust} navigate={navigate} />
+  if (phase === 'result') return <ResultScreen c={caseData} coins={Math.min(300, earnedCoins)} correct={correctCount} total={caseData.questions.length} trust={trust} navigate={navigate} onBack={() => { setPhase('caseSelect'); setCaseData(null); setQIndex(0); setTrust(0); setEarnedCoins(0); setCorrectCount(0); setQResults([]) }} />
 
   return (
     <div style={{ padding:'16px 16px 0', position:'relative', zIndex:2, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
@@ -129,7 +131,8 @@ export default function DetectiveMode({ navigate }) {
       <div style={{ background:'rgba(91,141,238,.08)', border:'1px solid rgba(91,141,238,.2)', borderRadius:12, padding:'12px 14px', marginBottom:12 }}>
         <div style={{ fontSize:12, color:'rgba(140,180,255,.6)', marginBottom:6 }}>📍 現場情況</div>
         <div style={{ fontSize:14, color:'rgba(210,225,255,.9)', lineHeight:1.7 }}>{q.scene}</div>
-        {q.message && (
+        {q.lineChat && <LineChat messages={q.lineChat} />}
+        {!q.lineChat && q.message && (
           <div style={{ marginTop:10, background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.1)', borderRadius:10, padding:'10px 12px' }}>
             <div style={{ fontSize:13, color:'rgba(255,220,160,.9)', lineHeight:1.7, fontStyle:'italic' }}>💬 {q.message}</div>
           </div>
@@ -185,6 +188,14 @@ export default function DetectiveMode({ navigate }) {
                       background:'rgba(10,20,50,.7)', border:'1px solid rgba(91,141,238,.2)',
                       borderRadius:'0 0 10px 10px', padding:'10px 14px', marginTop:-1,
                     }}>
+                      {ev.image && (
+                        <img
+                          src={ev.image}
+                          alt={ev.label}
+                          onError={e => { e.target.style.display = 'none' }}
+                          style={{ width:'100%', maxHeight:180, objectFit:'cover', borderRadius:8, marginBottom:10, display:'block' }}
+                        />
+                      )}
                       <pre style={{ fontSize:12, color:'rgba(200,220,255,.8)', lineHeight:1.8, whiteSpace:'pre-wrap', margin:0, fontFamily:'Noto Sans TC,sans-serif' }}>
                         {ev.content}
                       </pre>
@@ -320,8 +331,7 @@ function IntroScreen({ c, onStart, navigate }) {
   )
 }
 
-function ResultScreen({ c, coins, correct, total, trust, navigate }) {
-  const pct = correct / total
+function ResultScreen({ c, coins, correct, total, trust, navigate, onBack }) {
   const saved = trust < 50
   return (
     <div style={{ padding:'24px 18px', position:'relative', zIndex:2, textAlign:'center' }}>
@@ -330,7 +340,7 @@ function ResultScreen({ c, coins, correct, total, trust, navigate }) {
         {saved ? '案件偵破！' : trust < 80 ? '勉強阻止' : '案件失敗'}
       </div>
       <div style={{ fontSize:13, color:'rgba(180,200,255,.7)', marginBottom:16, lineHeight:1.7 }}>
-        {saved ? `你成功降低了${c.victim}對詐騙集團的信任，她沒有繼續操作！` : trust < 80 ? `你找出了部分線索，但${c.victim}仍有些動搖。` : `${c.victim}最終還是被詐騙集團說服了...`}
+        {saved ? `你成功降低了${c.victim}對詐騙集團的信任，成功阻止！` : trust < 80 ? `你找出了部分線索，但${c.victim}仍有些動搖。` : `${c.victim}最終還是被詐騙集團說服了...`}
       </div>
       <div style={{ background:'rgba(91,141,238,.1)', border:'1px solid rgba(91,141,238,.25)', borderRadius:14, padding:'16px', marginBottom:20 }}>
         <div style={{ fontSize:13, color:'rgba(140,180,255,.6)', marginBottom:12 }}>案件結算 {c.caseNumber}</div>
@@ -341,8 +351,72 @@ function ResultScreen({ c, coins, correct, total, trust, navigate }) {
         </div>
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:8, maxWidth:260, margin:'0 auto' }}>
-        <button onClick={() => navigate('detective')} style={btnMain}>再查一次 🔍</button>
+        <button onClick={onBack} style={btnMain}>選擇其他案件 🗂</button>
         <button onClick={() => navigate('menu')} style={btnSub}>回主選單</button>
+      </div>
+    </div>
+  )
+}
+
+function CaseSelectScreen({ cases, onSelect, navigate }) {
+  const categoryColor = { fraud:'#fb923c', invest:'#ec4899', social:'#a78bfa', cyber:'#38bdf8', romance:'#f472b6' }
+  return (
+    <div style={{ padding:'20px 18px', position:'relative', zIndex:2, minHeight:'100vh' }}>
+      <button style={{ background:'rgba(255,255,255,.07)', border:'1px solid rgba(255,255,255,.14)', borderRadius:20, padding:'5px 13px', color:'rgba(180,200,255,.7)', fontSize:12, cursor:'pointer', marginBottom:20 }} onClick={() => navigate('menu')}>← 返回</button>
+      <div style={{ textAlign:'center', marginBottom:22 }}>
+        <div style={{ fontSize:40, marginBottom:6 }}>🔍</div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:15, fontWeight:900, color:'#fff', letterSpacing:2 }}>偵探模式</div>
+        <div style={{ fontSize:12, color:'rgba(140,180,255,.5)', marginTop:4 }}>165 反詐騙特別調查組 — 選擇案件</div>
+      </div>
+      {cases.map((c, i) => (
+        <div key={c.id} onClick={() => onSelect(c)} style={{
+          background:'rgba(91,141,238,.07)', border:'1px solid rgba(91,141,238,.22)',
+          borderRadius:14, padding:'14px 16px', marginBottom:10, cursor:'pointer',
+        }}>
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
+            <span style={{ fontFamily:'Orbitron,monospace', fontSize:10, color:'rgba(140,180,255,.5)' }}>{c.caseNumber}</span>
+            <span style={{ flex:1, fontSize:15, fontWeight:700, color:'#e0eaff' }}>{c.title}</span>
+          </div>
+          <div style={{ display:'flex', gap:12, fontSize:12 }}>
+            <span style={{ color:'rgba(140,180,255,.6)' }}>受害者 <span style={{ color:'#c8dbff' }}>{c.victim}</span></span>
+            <span style={{ color:'rgba(255,150,150,.6)' }}>損失 <span style={{ color:'#ff9e9e' }}>{c.loss}</span></span>
+          </div>
+          <div style={{ marginTop:6, fontSize:11, padding:'2px 9px', borderRadius:20, background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.1)', color:'rgba(180,200,255,.6)', display:'inline-block' }}>
+            {c.method}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function LineChat({ messages }) {
+  const scammerName = messages.find(m => m.sender === 'scammer')?.name || '未知聯繫人'
+  return (
+    <div style={{ borderRadius:10, overflow:'hidden', marginTop:12, border:'1px solid rgba(0,0,0,.2)' }}>
+      <div style={{ background:'#00b900', padding:'8px 12px', display:'flex', alignItems:'center', gap:8 }}>
+        <div style={{ width:28, height:28, borderRadius:'50%', background:'rgba(255,255,255,.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, flexShrink:0 }}>💬</div>
+        <span style={{ color:'#fff', fontSize:13, fontWeight:600 }}>{scammerName}</span>
+        <span style={{ marginLeft:'auto', fontSize:10, color:'rgba(255,255,255,.6)' }}>LINE</span>
+      </div>
+      <div style={{ background:'#c3e1be', padding:'10px 8px', display:'flex', flexDirection:'column', gap:8, maxHeight:220, overflowY:'auto' }}>
+        {messages.map((msg, i) => (
+          <div key={i} style={{ display:'flex', justifyContent: msg.sender === 'victim' ? 'flex-end' : 'flex-start', alignItems:'flex-end', gap:5 }}>
+            {msg.sender === 'scammer' && (
+              <div style={{ width:30, height:30, borderRadius:'50%', background:'#00b900', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, flexShrink:0 }}>💬</div>
+            )}
+            {msg.sender === 'scammer' && (
+              <div>
+                <div style={{ fontSize:10, color:'rgba(0,0,0,.45)', marginBottom:2 }}>{msg.name}</div>
+                <div style={{ background:'#fff', color:'#222', borderRadius:'2px 12px 12px 12px', padding:'8px 11px', fontSize:13, lineHeight:1.55, maxWidth:220 }}>{msg.text}</div>
+              </div>
+            )}
+            {msg.sender === 'victim' && (
+              <div style={{ background:'#00b900', color:'#fff', borderRadius:'12px 2px 12px 12px', padding:'8px 11px', fontSize:13, lineHeight:1.55, maxWidth:220 }}>{msg.text}</div>
+            )}
+            <div style={{ fontSize:10, color:'rgba(0,0,0,.35)', flexShrink:0, marginBottom:2 }}>{msg.time}</div>
+          </div>
+        ))}
       </div>
     </div>
   )

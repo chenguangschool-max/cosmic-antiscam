@@ -10,8 +10,12 @@ export const DETECTIVE_CASES = [
     questions: [
       {
         id: 'q1',
-        scene: '林女士在臉書看到酪梨廣告，留言區有很多人說「剛買過，很甜！」。她私訊賣家後，賣家說：',
-        message: '「加我 LINE 比較方便聯繫，臉書訊息常常漏掉，而且可以傳照片給你看商品喔 😊」',
+        scene: '林女士在臉書看到酪梨廣告，留言區有很多人說「剛買過，很甜！」。她私訊賣家，對話如下：',
+        lineChat: [
+          { sender: 'victim',  name: '林女士',         text: '請問酪梨一箱多少錢？可以貨到付款嗎？', time: '14:30' },
+          { sender: 'scammer', name: '台灣有機農場直銷', text: '您好！一箱 5kg 只要 $450，今天剛到新貨超新鮮🥑', time: '14:31' },
+          { sender: 'scammer', name: '台灣有機農場直銷', text: '臉書訊息常常會漏掉…加我 LINE 比較方便，可以傳照片給你看 😊 ID：organic_farm_tw2024', time: '14:31' },
+        ],
         question: '偵探，這個場景有幾個可疑線索？找出來再作答。',
         timeLimit: 25,
         evidence: [
@@ -33,7 +37,8 @@ export const DETECTIVE_CASES = [
             id: 'e1c',
             label: '酪梨商品照片',
             icon: '🥑',
-            content: '商品照片分析：\n• 圖片清晰，看起來新鮮\n• 圖片以反向圖片搜尋比對：\n  在多個不同農場網站出現過\n\n→ 照片疑似盜用',
+            image: 'https://images.unsplash.com/photo-1519162808019-7de1baab3d5a?w=340&q=75&auto=format',
+            content: '商品照片分析：\n• 圖片清晰，看起來新鮮\n• 圖片以反向圖片搜尋比對：\n  在多個不同農場網站出現過\n\n→ 照片疑似盜用自他人網站',
             isSuspicious: true,
           },
           {
@@ -60,8 +65,13 @@ export const DETECTIVE_CASES = [
       },
       {
         id: 'q2',
-        scene: '林女士加了 LINE 後，賣家說要用黑貓宅急便貨到付款，傳來以下資料：',
-        message: '「這是我們合作的物流，有保障！客服會協助你完成設定。」',
+        scene: '林女士加了 LINE 後，賣家說要用黑貓宅急便貨到付款，並傳來「客服帳號」請她聯繫：',
+        lineChat: [
+          { sender: 'scammer', name: '台灣有機農場直銷', text: '姐姐好，我們配合的物流是黑貓宅急便，有保障！先加一下客服完成設定喔 👇', time: '14:45' },
+          { sender: 'scammer', name: '台灣有機農場直銷', text: '黑貓客服 LINE ID：yamato_service09847\n麻煩按照客服指示操作，很快的！', time: '14:46' },
+          { sender: 'victim',  name: '林女士',           text: '好，我去加他', time: '14:47' },
+          { sender: 'scammer', name: '黑貓客服-台灣專員', text: '您好林小姐！請先點選以下連結完成貨到付款身份驗證：yamato-tw-service.net/verify', time: '14:50' },
+        ],
         question: '偵探，以下資料哪些有問題？',
         timeLimit: 25,
         evidence: [
@@ -110,8 +120,13 @@ export const DETECTIVE_CASES = [
       },
       {
         id: 'q3',
-        scene: '假客服傳來操作指示，要林女士：1) 開通無卡提款功能 2) 設定網路銀行 3) 產生提款 QR 碼並拍照傳給對方',
-        message: '「這只是銀行驗證，確認交易身分用的，不會真的扣錢，放心！」',
+        scene: '假客服繼續引導林女士操作，要求產生 QR 碼：',
+        lineChat: [
+          { sender: 'scammer', name: '黑貓客服-台灣專員', text: '最後一個步驟！請開啟銀行 App → 設定「無卡提款」→ 產生 QR 碼，截圖傳給我確認身份 📱', time: '15:30' },
+          { sender: 'victim',  name: '林女士',           text: '這樣銀行帳戶安全嗎…？', time: '15:31' },
+          { sender: 'scammer', name: '黑貓客服-台灣專員', text: '完全安全！只是系統驗證身份用的，不會真的扣錢，很多人都這樣操作 😊 快點完成就可以等收貨了！', time: '15:31' },
+          { sender: 'victim',  name: '林女士',           text: '好…我操作看看', time: '15:33' },
+        ],
         question: '偵探，檢視以下證據後作答：',
         timeLimit: 20,
         evidence: [
@@ -160,8 +175,13 @@ export const DETECTIVE_CASES = [
       },
       {
         id: 'q4',
-        scene: '林女士傳出 QR 碼後，客服說「帳號疑似異常無法解鎖，請再試一次」，並要求她重新產生 QR 碼。',
-        message: '「系統偵測到你的帳號需要再次驗證，請重新操作一次，這次一定可以成功！」',
+        scene: '林女士傳出 QR 碼後，客服說帳號異常，要她重新操作：',
+        lineChat: [
+          { sender: 'scammer', name: '黑貓客服-台灣專員', text: '收到了！但系統顯示您的帳號驗證未完成，可能是網路問題，麻煩再產生一次 QR 碼傳給我 🔄', time: '15:50' },
+          { sender: 'victim',  name: '林女士',           text: '咦？我剛才已經傳過了啊…', time: '15:51' },
+          { sender: 'scammer', name: '黑貓客服-台灣專員', text: '那個資料讀取失敗了，重新操作一次就好！訂單快完成了，再幫我一下 🙏', time: '15:51' },
+          { sender: 'victim',  name: '林女士',           text: '好，我再試試…', time: '15:53' },
+        ],
         question: '偵探，為什麼詐騙集團要她「再試一次」？',
         timeLimit: 20,
         evidence: [
@@ -257,6 +277,164 @@ export const DETECTIVE_CASES = [
           { text: '等明天去銀行處理', correct: false, explanation: '等不得！帳戶裡還有 12 萬，今晚可能繼續被盜。現在就要凍結。' },
         ],
         suspiciousIds: [],
+      },
+    ],
+  },
+
+  // ─────────────── 案件 #0048 ───────────────
+  {
+    id: 'fake-police-2024',
+    caseNumber: '#0048',
+    title: '假警察安全帳戶詐騙案',
+    victim: '張老師',
+    loss: '1,260 萬元',
+    method: '假冒公務員 + 安全帳戶',
+    intro: '國中老師張嘉玲接到「NCC 官員」電話，說她的手機涉及詐騙案。你是 165 反詐騙偵探，必須在張老師每一步都找出破綻，阻止她把積蓄全部交出去。',
+    questions: [
+      {
+        id: 'q1',
+        scene: '張老師接到陌生來電，對方自稱是 NCC（國家通訊傳播委員會）官員：',
+        message: '「張小姐您好，我是 NCC 業務組李主任，您的手機號碼 0912-XXXXXX 目前被人盜用，每天自動發出 500 則詐騙簡訊，已有多名民眾對您提出申告，情況相當嚴重，需要轉接刑警大隊處理。」',
+        question: '偵探，這通電話有什麼問題？',
+        timeLimit: 25,
+        evidence: [
+          { id: 'e1a', label: 'NCC 的業務範圍', icon: '🏛️', content: 'NCC 負責事項：\n• 廣播電視管理\n• 電信市場管理\n\nNCC 不會：\n• 主動致電民眾通知涉案\n• 受理或轉介刑事申告\n\n→ NCC 根本沒有「申告通知」業務', isSuspicious: true },
+          { id: 'e1b', label: '來電號碼', icon: '📞', content: '電話號碼分析：\n• 顯示：02-2343-XXXX\n• NCC 公務電話：02-2343-4000\n\n⚠️ 來電顯示可以偽造（號碼欺騙技術）\n→ 顯示正確號碼不代表是真的 NCC', isSuspicious: true },
+          { id: 'e1c', label: '「轉接刑警大隊」的說法', icon: '🚔', content: '正規程序分析：\n• NCC 不具備轉接刑警的業務\n• 刑事案件由警方主動調查，不透過其他機關「轉接」\n\n→ 這是詐騙劇本的標準「第二關卡人」設計', isSuspicious: true },
+          { id: 'e1d', label: '張老師的手機狀態', icon: '📱', content: '手機查詢：\n• 無異常撥號紀錄\n• 手機未安裝不明 App\n\n→ 完全沒有被盜用的跡象', isSuspicious: false },
+        ],
+        options: [
+          { text: 'NCC 不打這種電話，「轉接刑警」更是假的，立刻掛斷並撥 165 確認', correct: true, explanation: '正確！NCC 不會主動打電話通知涉案，也不會幫你轉接刑警。來電顯示可以偽造，掛斷後自行查詢 NCC 官方電話確認。' },
+          { text: '先聽完看看，可能是真的', correct: false, explanation: '繼續聽下去就會進入下一個詐騙陷阱。每多聊一分鐘，對方就多一分機會讓你信任他們。' },
+          { text: '要求對方傳公文來確認身份', correct: false, explanation: '對方會傳來偽造公文！詐騙集團備有各種假公文，要求公文反而讓你更容易被說服。' },
+        ],
+        suspiciousIds: ['e1a', 'e1b', 'e1c'],
+      },
+      {
+        id: 'q2',
+        scene: '電話轉接後，自稱「陳偵查員」的人加了張老師的 LINE，傳來一份「搜索票」：',
+        lineChat: [
+          { sender: 'scammer', name: '刑事警察局-陳偵查員', text: '張嘉玲小姐您好，您的帳戶涉嫌洗錢，案件重大，請配合偵查。這是針對您的搜索票，請查閱。', time: '10:15' },
+          { sender: 'victim',  name: '張老師', text: '什麼？我從來沒做過任何違法的事…', time: '10:17' },
+          { sender: 'scammer', name: '刑事警察局-陳偵查員', text: '我們知道，所以才聯繫您。請配合調查才能洗清嫌疑。此事機密，請勿告訴任何人，包括家人。', time: '10:18' },
+        ],
+        question: '偵探，這份「搜索票」和這個偵查員有什麼問題？',
+        timeLimit: 25,
+        evidence: [
+          { id: 'e2a', label: '搜索票文件', icon: '📄', content: '文件鑑識：\n• 公文字號：「刑偵字第113-0088741號」\n• 正確格式應為：「刑偵字第1130088741號」（無橫線）\n• 法院印章字體不統一\n• 法官署名處有塗改痕跡\n\n→ 這是偽造公文', isSuspicious: true },
+          { id: 'e2b', label: '偵查員的 LINE 帳號', icon: '📱', content: '帳號資料：\n• LINE ID：detective_chen_1107\n• 帳號建立：13 天前\n• 共同好友：0\n\n→ 真實刑警不用個人 LINE 帳號辦案\n→ 偵查程序透過正式傳票', isSuspicious: true },
+          { id: 'e2c', label: '「偵查不公開，不能告訴家人」', icon: '🤫', content: '法律意義分析：\n• 偵查不公開是保護當事人隱私\n• 不是禁止當事人與家人溝通\n• 要你「不告訴任何人」= 切斷支援系統\n\n→ 這是心理控制手段', isSuspicious: true },
+          { id: 'e2d', label: '搜索票上的案件描述', icon: '📋', content: '案件描述：\n• 案由：疑似協助洗錢\n• 涉案金額：約 350 萬\n\n→ 刑事警察局確實存在偵七隊\n→ 但案件描述可以完全偽造', isSuspicious: false },
+        ],
+        options: [
+          { text: '公文格式有誤 + 用私人 LINE 辦案 + 禁止告訴家人，全都是假的，告知家人並撥 110', correct: true, explanation: '正確！真實警察絕不用個人 LINE 帳號辦案。最重要的是：打破「保密要求」，馬上告訴家人！詐騙集團最怕你找到第二個判斷者。' },
+          { text: '搜索票看起來是真的，先配合看看', correct: false, explanation: '搜索票是偽造的！詐騙集團備有製作精良的假公文，外觀以假亂真，只有細節才會出現破綻。' },
+          { text: '要求改用電話而非 LINE 聯繫', correct: false, explanation: '問題不是用什麼通訊工具，而是整個情境都是假的。改用電話也只是換一個詐騙管道。' },
+        ],
+        suspiciousIds: ['e2a', 'e2b', 'e2c'],
+      },
+      {
+        id: 'q3',
+        scene: '「陳偵查員」要求張老師把存款提出來放到「政府安全帳戶」：',
+        lineChat: [
+          { sender: 'scammer', name: '刑事警察局-陳偵查員', text: '為了保護您的資產，需要您把名下存款提領現金，放到政府指定「監管帳戶」，等案件結束後原數奉還，這是資金公證程序。', time: '11:30' },
+          { sender: 'victim',  name: '張老師', text: '這樣安全嗎…金額很大耶', time: '11:32' },
+          { sender: 'scammer', name: '刑事警察局-陳偵查員', text: '如果不配合，法院可能認定您是主謀，刑責更重。請記住，此事機密，不可讓家人知道。', time: '11:33' },
+        ],
+        question: '偵探，「安全帳戶」這個說法本身就是最大的破綻：',
+        timeLimit: 20,
+        evidence: [
+          { id: 'e3a', label: '「安全帳戶」是否真實存在', icon: '🏦', content: '165 反詐騙公告：\n「任何要求轉帳到安全帳戶的都是詐騙」\n\n政府從未設立「安全帳戶」\n這個詞只存在於詐騙劇本中\n\n→ 聽到「安全帳戶」= 立刻掛斷', isSuspicious: true },
+          { id: 'e3b', label: '「不配合就算主謀」的威脅', icon: '⚠️', content: '法律分析：\n• 真實調查需要出庭作証\n• 從來不需要「把錢交出來證明清白」\n• 警察不能因你拒絕交錢而逮捕你\n\n→ 這是恐嚇話術', isSuspicious: true },
+          { id: 'e3c', label: '帳戶目前狀態', icon: '💳', content: '銀行查詢：\n• 帳戶完全正常\n• 無異常交易記錄\n\n→ 犯罪組織根本沒有動過帳戶', isSuspicious: false },
+        ],
+        options: [
+          { text: '「安全帳戶」= 詐騙，立刻掛斷，告訴家人，撥 165 確認', correct: true, explanation: '完全正確！「安全帳戶」這個詞在現實中不存在，聽到就是詐騙。最重要的是打破「保密要求」，馬上告訴家人！' },
+          { text: '先提一小部分，看看對方是否真的還錢', correct: false, explanation: '對方拿到任何金額就會消失。一旦轉出，你就是受害者了。' },
+          { text: '要求對方提供安全帳戶的銀行資訊', correct: false, explanation: '對方會提供一個人頭帳號。你照做的話，錢就沒了。' },
+        ],
+        suspiciousIds: ['e3a', 'e3b'],
+      },
+    ],
+  },
+
+  // ─────────────── 案件 #0049 ───────────────
+  {
+    id: 'pig-slaughter-2024',
+    caseNumber: '#0049',
+    title: '殺豬盤感情投資詐騙案',
+    victim: '阿怡',
+    loss: '160 萬元',
+    method: '交友詐騙 + 假投資平台',
+    intro: '35 歲單身上班族阿怡在交友 App 認識了「志豪」，三週的甜蜜聊天後，志豪開始介紹「投資機會」。你是 165 反詐騙偵探，找出殺豬盤的每個陷阱。',
+    questions: [
+      {
+        id: 'q1',
+        scene: '阿怡在 Pairs 交友 App 與「志豪」配對，開始聊天：',
+        lineChat: [
+          { sender: 'scammer', name: '志豪 ✈️新加坡', text: '早安！今天台北天氣怎樣？我在新加坡這邊好熱喔 ☀️', time: '07:35' },
+          { sender: 'victim',  name: '阿怡', text: '哈哈今天也是晴天。你在新加坡做什麼工作呢？', time: '07:42' },
+          { sender: 'scammer', name: '志豪 ✈️新加坡', text: '金融業，幫企業做資產配置。你昨天說要開會，會議順利嗎？我一直掛念著你說的事 😊', time: '07:45' },
+        ],
+        question: '偵探，交友初期有什麼可疑訊號？',
+        timeLimit: 25,
+        evidence: [
+          { id: 'e1a', label: '志豪的大頭貼', icon: '📸', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=280&q=75&auto=format', content: '圖片反向搜尋結果：\n• 這張照片出現在多個韓國 IG 帳號\n• 原始上傳者是首爾一位模特兒\n• 志豪的帳號建立才 6 週\n\n→ 使用他人照片是網路詐騙的高度警示訊號', isSuspicious: true },
+          { id: 'e1b', label: '三週互動模式', icon: '💬', content: '聊天分析：\n• 每天 7:00 早安、22:00 晚安，從不間斷\n• 記得所有細節：你的主管名字、你媽媽的生日\n• 但三週內從未視訊通話\n• 每次說要視訊都以「開會」中斷\n\n→ 迴避視訊是深偽或詐騙的特徵', isSuspicious: true },
+          { id: 'e1c', label: '「旅居新加坡的台灣人」身份', icon: '✈️', content: '身份核查：\n• 無法提供任何公司名稱\n• 細問就模糊帶過\n• 辦公室背景無法查到地址\n\n→ 身份資訊模糊、無法驗證', isSuspicious: true },
+          { id: 'e1d', label: '阿怡的感受', icon: '💕', content: '「他比我認識的所有男生都體貼，記住了我說過的每一件事。」\n\n→ 這是「養豬期」：大量情感投入\n   → 降低防衛心 → 建立信任', isSuspicious: false },
+        ],
+        options: [
+          { text: '照片是盜用的，三週沒視訊，這是殺豬盤的「養豬期」，立刻要求視訊確認', correct: true, explanation: '正確！反向圖片搜尋是識破詐騙的利器。要求立即視訊——如果對方一直找藉口拒絕，就是詐騙。' },
+          { text: '他很體貼，可能只是害羞不想視訊', correct: false, explanation: '三週的噓寒問暖是「養豬」的劇本，不是真實感情。「他很關心我」正是詐騙集團要你這樣想的。' },
+          { text: '等相處更久再確認，現在沒有實質損失', correct: false, explanation: '等越久，情感投入越深，越難理性判斷。殺豬盤讓你在有感情時才開口要錢，讓你難以拒絕。' },
+        ],
+        suspiciousIds: ['e1a', 'e1b', 'e1c'],
+      },
+      {
+        id: 'q2',
+        scene: '三週後，志豪提到投資機會：',
+        lineChat: [
+          { sender: 'scammer', name: '志豪 ✈️新加坡', text: '我表哥在新加坡教我用一個平台，上週用 10 萬賺了 3 萬，妳要不要也試試看？我帶妳！', time: '21:10' },
+          { sender: 'victim',  name: '阿怡', text: '我最近沒什麼閒錢…', time: '21:15' },
+          { sender: 'scammer', name: '志豪 ✈️新加坡', text: '沒關係，我借妳！等妳賺了再還我就好。分享給妳才有意義，反正我只在乎妳開心 🥰', time: '21:16' },
+        ],
+        question: '偵探，「投資邀請」出現了——有什麼破綻？',
+        timeLimit: 25,
+        evidence: [
+          { id: 'e2a', label: '「亞太財富通」平台', icon: '📱', content: '平台調查：\n• Google Play / App Store：搜尋不到\n• 安裝方式：掃描 QR Code 直接安裝\n• 公司登記查詢：無任何記錄\n\n→ 合法投資平台一定在金管會有登記，且可在官方 App Store 下載', isSuspicious: true },
+          { id: 'e2b', label: '「我借妳去投資」的提議', icon: '💸', content: '分析：\n• 真實的朋友不會「借你錢去投資風險平台」\n• 這個話術讓你沒有金錢負擔感\n• 「不用擔心」= 降低謹慎心\n\n→ 讓你快速進入平台的心理操作', isSuspicious: true },
+          { id: 'e2c', label: '「上週賺了 3 萬」的截圖', icon: '📊', content: '截圖鑑識：\n• 帳戶名稱區域刻意模糊\n• 截圖字體、間距與真實 App 略有不同\n\n→ 截圖可以偽造，不能證明平台真實性', isSuspicious: true },
+          { id: 'e2d', label: '感情發展時機', icon: '💕', content: '時間軸：\n三週密集噓寒問暖後，才第一次提到「投資」。\n\n→ 情感積累到一定程度才開口\n   這是殺豬盤的標準「殺豬」起手式', isSuspicious: false },
+        ],
+        options: [
+          { text: 'App 查不到、QR Code 安裝、公司無登記——這是假平台，感情不能代替查證', correct: true, explanation: '正確！合法投資平台一定在金管會有登記，可上 fsc.gov.tw 查詢。App 只能 QR Code 安裝是最大紅旗。' },
+          { text: '試試看，先投少一點沒關係', correct: false, explanation: '「先投少一點」正是詐騙設計的引導！初期小額一定顯示獲利，目的是讓你加碼大額資金。' },
+          { text: '他願意借我錢，說明他是認真的', correct: false, explanation: '「借你錢去投資」讓你沒有損失感，讓你更容易大膽加碼大額。這才是目的。' },
+        ],
+        suspiciousIds: ['e2a', 'e2b', 'e2c'],
+      },
+      {
+        id: 'q3',
+        scene: '阿怡投入 3 萬後，一週顯示獲利，志豪建議加碼：',
+        lineChat: [
+          { sender: 'scammer', name: '志豪 ✈️新加坡', text: '妳看！帳面已經 37,000 了，妳賺了 7,000 喔 🎉 妳相信我了吧？', time: '14:20' },
+          { sender: 'victim',  name: '阿怡', text: '真的耶！可以提款嗎？', time: '14:25' },
+          { sender: 'scammer', name: '志豪 ✈️新加坡', text: '可以，但我建議妳繼續放！現在有大行情，VIP 最少要 50 萬才能進場，機會難得…', time: '14:26' },
+        ],
+        question: '偵探，「先讓你賺一點」是最精密的陷阱：',
+        timeLimit: 20,
+        evidence: [
+          { id: 'e3a', label: '「放水」策略', icon: '🎣', content: '詐騙集團運作邏輯：\n• 平台後台完全由詐騙集團控制\n• 帳面數字是他們輸入的，不是真實市場\n• 允許小額提款 = 「放水」，建立信任\n• 一旦加碼大額，就再也無法提款\n\n→ 「小賺」是誘餌', isSuspicious: true },
+          { id: 'e3b', label: '「VIP 大行情」的時機', icon: '⏰', content: '時機分析：\n• 剛確認可以賺錢，立刻提出需要更大金額\n• 「VIP 門檻」50 萬\n• 「機會難得」製造緊迫感\n\n→ 趁你相信的時候，要求加碼才是目的', isSuspicious: true },
+          { id: 'e3c', label: '提款 3,000 元成功', icon: '💰', content: '提款測試：\n• 申請提款 3,000 元\n• 隔天真的到帳了\n\n→ 這是「放水」的一環\n→ 成功提款不代表大額資金也能出來', isSuspicious: false },
+        ],
+        options: [
+          { text: '小額提款成功不代表大額安全——立刻把所有錢提出，停止加碼', correct: true, explanation: '正確！允許小額提款是詐騙的「放水」策略。他們的目標是讓你加碼大額後無法出金。趁還能提款，立刻把所有金額提出。' },
+          { text: '提款成功說明平台是真的，加碼 50 萬', correct: false, explanation: '這正是「放水」的效果！小額出金是為了讓你大額加碼。160 萬就是這樣被騙走的。' },
+          { text: '繼續觀察幾週看看', correct: false, explanation: '觀察越久，投入越深，越難停損。等你真的要大額提款時，才會發現要先繳稅才能出金。' },
+        ],
+        suspiciousIds: ['e3a', 'e3b'],
       },
     ],
   },
