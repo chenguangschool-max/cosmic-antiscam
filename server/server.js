@@ -298,7 +298,71 @@ function shuffle(arr) {
   return a
 }
 
-async function genRoomQuestions() {
+const DETECTIVE_TYPES = ['假冒電商客服解除分期', '假冒銀行釣魚簡訊', '假冒警察安全帳戶', '假投資LINE群組', '交友詐騙殺豬盤', '假冒快遞補費', '假求職先付保證金', '假冒健保退費', '二手交易詐騙', 'AI深偽名人投資']
+
+async function genDetectiveQ() {
+  const t = DETECTIVE_TYPES[Math.floor(Math.random() * DETECTIVE_TYPES.length)]
+  const prompt = `你是台灣防詐騙教育遊戲設計師。生成一道「連線偵探模式」題目，類型：${t}。
+
+規定：
+- 台灣日常生活場景，不要宇宙主題
+- 情境描述要包含 2-3 個隱藏的可疑細節（不要直說是詐騙）
+- 3 個選項：A=正確防詐行動，B=錯誤配合詐騙，C=部分正確但不夠
+- 只回傳 JSON，不含其他文字：
+
+{"signal":"情境標題（8字內）","text":"情境描述（70-110字，第三人稱，包含可疑細節）","choices":["A. 選項文字","B. 選項文字","C. 選項文字"],"answer":0,"explanation":"這是詐騙，因為…（20-35字）"}`
+
+  for (let i = 0; i < 2; i++) {
+    try {
+      const msg = await anthropic.messages.create({ model: 'claude-haiku-4-5-20251001', max_tokens: 512, messages: [{ role: 'user', content: prompt }] })
+      const q = parseJson(msg.content[0].text)
+      q.timeLimit = 30
+      return q
+    } catch (e) { if (i === 1) throw e; await new Promise(r => setTimeout(r, 1000)) }
+  }
+}
+
+async function genLifeSimQ() {
+  const isScam = Math.random() < 0.65
+  const prompt = `你是台灣防詐騙教育遊戲設計師。生成一道「連線人生模擬器」題目，類型：${isScam ? '詐騙情境' : '正常情境'}。
+
+規定：
+- 台灣日常生活，第一人稱「你」
+- 情境中不要直接說是否詐騙
+- 4 個選項（emoji+文字，各15字內）
+- assetChanges：${isScam ? '損失選項 -3000 到 -200000，安全選項 0 到 +500' : '全部 0 到 +300'}
+- answer = 最佳選項 index（assetChange 最高者）
+- 只回傳 JSON，不含其他文字：
+
+{"signal":"情境標題（8字內）","text":"情境描述（60-90字）","choices":["🔍 選項A","📞 選項B","💳 選項C","❌ 選項D"],"answer":最佳index,"explanation":"解析（20-30字）","assetChanges":[數字,數字,數字,數字]}`
+
+  for (let i = 0; i < 2; i++) {
+    try {
+      const msg = await anthropic.messages.create({ model: 'claude-haiku-4-5-20251001', max_tokens: 512, messages: [{ role: 'user', content: prompt }] })
+      const q = parseJson(msg.content[0].text)
+      q.timeLimit = 25
+      return q
+    } catch (e) { if (i === 1) throw e; await new Promise(r => setTimeout(r, 1000)) }
+  }
+}
+
+async function genRoomQuestions(mode = 'quiz') {
+  if (mode === 'detective') {
+    const questions = []
+    for (let i = 0; i < 10; i++) {
+      try { questions.push(await genDetectiveQ()) }
+      catch { questions.push(shuffle(FALLBACK_QUESTIONS)[0]) }
+    }
+    return questions
+  }
+  if (mode === 'lifesim') {
+    const questions = []
+    for (let i = 0; i < 10; i++) {
+      try { questions.push(await genLifeSimQ()) }
+      catch { questions.push(shuffle(FALLBACK_QUESTIONS)[0]) }
+    }
+    return questions
+  }
   try {
     const scamTopics = shuffle(SCAM_TOPICS).slice(0, 7)
     const normalTopics = shuffle(NORMAL_TOPICS).slice(0, 3)
@@ -342,16 +406,16 @@ function roomView(room) {
 io.on('connection', (socket) => {
   onlineCount++
 
-  socket.on('create-room', ({ name }) => {
+  socket.on('create-room', ({ name, mode = 'quiz' }) => {
     const code = makeCode()
     const room = {
-      code, host: socket.id,
+      code, host: socket.id, mode,
       players: [{ id: socket.id, name, score: 0 }],
       state: 'lobby', questions: [], currentQ: 0, answers: {}, timer: null,
     }
     rooms.set(code, room)
     socket.join(code)
-    socket.emit('room-joined', { code, isHost: true, players: room.players.map(p => ({ name: p.name, score: 0 })) })
+    socket.emit('room-joined', { code, isHost: true, mode, players: room.players.map(p => ({ name: p.name, score: 0 })) })
   })
 
   socket.on('join-room', ({ code, name }) => {
@@ -362,7 +426,7 @@ io.on('connection', (socket) => {
 
     room.players.push({ id: socket.id, name, score: 0 })
     socket.join(code.toUpperCase().trim())
-    socket.emit('room-joined', { code: room.code, isHost: false, players: room.players.map(p => ({ name: p.name, score: 0 })) })
+    socket.emit('room-joined', { code: room.code, isHost: false, mode: room.mode, players: room.players.map(p => ({ name: p.name, score: 0 })) })
     io.to(room.code).emit('room-update', { players: room.players.map(p => ({ name: p.name, score: 0 })) })
   })
 
@@ -375,11 +439,11 @@ io.on('connection', (socket) => {
     io.to(code).emit('game-generating')
 
     try {
-      room.questions = await genRoomQuestions()
+      room.questions = await genRoomQuestions(room.mode)
       room.state = 'playing'
       room.currentQ = 0
       room.players.forEach(p => { p.score = 0 })
-      io.to(code).emit('game-start', { total: room.questions.length })
+      io.to(code).emit('game-start', { total: room.questions.length, mode: room.mode })
       setTimeout(() => sendQuestion(room), 1200)
     } catch (e) {
       console.error('Question generation failed:', e)
@@ -441,7 +505,10 @@ function sendQuestion(room) {
     total: room.questions.length,
     signal: q.signal,
     text: q.text,
-    timeLimit: TIME_LIMIT,
+    timeLimit: q.timeLimit || TIME_LIMIT,
+    choices: q.choices || null,
+    assetChanges: q.assetChanges || null,
+    mode: room.mode,
   })
 
   room.timer = setTimeout(() => revealQuestion(room), TIME_LIMIT * 1000)

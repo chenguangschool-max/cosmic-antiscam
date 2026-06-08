@@ -10,24 +10,30 @@ export default function OnlineBattle({ room, navigate }) {
   const [qIndex, setQIndex] = useState(0)
   const [total, setTotal] = useState(10)
   const [timer, setTimer] = useState(20)
-  const [myAnswer, setMyAnswer] = useState(null)   // null | 0 | 1
+  const [myAnswer, setMyAnswer] = useState(null)
   const [questionResult, setQuestionResult] = useState(null)
   const [scores, setScores] = useState([])
   const [finalResults, setFinalResults] = useState(null)
   const [speaking, setSpeaking] = useState(false)
+  const [roomMode, setRoomMode] = useState('quiz')
+  const [assets, setAssets] = useState(1_000_000)
+  const assetsRef = useRef(1_000_000)
 
   const timerRef = useRef(null)
+  const myAnswerRef = useRef(null)
 
   useEffect(() => {
-    socket.on('game-start', ({ total: t }) => {
+    socket.on('game-start', ({ total: t, mode }) => {
       setTotal(t)
+      setRoomMode(mode || 'quiz')
       setPhase('question')
     })
 
-    socket.on('new-question', ({ index, total: t, signal, text, timeLimit }) => {
+    socket.on('new-question', ({ index, total: t, signal, text, timeLimit, choices, assetChanges, mode }) => {
       window.speechSynthesis?.cancel()
       setSpeaking(false)
-      setQ({ signal, text })
+      setQ({ signal, text, choices, assetChanges })
+      if (mode) setRoomMode(mode)
       setQIndex(index)
       setTotal(t)
       setMyAnswer(null)
@@ -40,6 +46,16 @@ export default function OnlineBattle({ room, navigate }) {
       clearTimer()
       setQuestionResult({ correctAnswer, explanation, playerAnswers })
       setScores(s)
+      // lifesim: apply asset change
+      setQ(prev => {
+        if (prev?.assetChanges && prev.assetChanges[myAnswerRef.current] !== undefined) {
+          const change = prev.assetChanges[myAnswerRef.current]
+          const next = Math.max(0, assetsRef.current + change)
+          assetsRef.current = next
+          setAssets(next)
+        }
+        return prev
+      })
       setPhase('result')
     })
 
@@ -110,6 +126,7 @@ export default function OnlineBattle({ room, navigate }) {
 
   const handleAnswer = (val) => {
     if (myAnswer !== null || phase !== 'question') return
+    myAnswerRef.current = val
     setMyAnswer(val)
     socket.emit('submit-answer', { code: room.code, val })
   }
@@ -153,6 +170,11 @@ export default function OnlineBattle({ room, navigate }) {
           <div style={{ fontSize: 44, marginBottom: 8 }}>🏆</div>
           <div style={titleStyle}>最終結果</div>
           <div style={{ fontSize: 12, color: 'rgba(180,200,255,.4)', marginTop: 5 }}>共 {total} 題</div>
+          {roomMode === 'lifesim' && (
+            <div style={{ marginTop: 10, fontSize: 14, color: assets > 500000 ? '#7ee8c5' : '#ff9e9e', fontWeight: 600 }}>
+              💰 你的剩餘資產：{assets.toLocaleString('zh-TW')} 元 = {Math.floor(assets/1000)} 防詐金幣
+            </div>
+          )}
         </div>
 
         {finalResults.map((r, i) => (
@@ -229,26 +251,7 @@ export default function OnlineBattle({ room, navigate }) {
 
       {/* 選項 */}
       {q && phase !== 'result' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {[{ label: '✅ 這是正常事件', val: 0 }, { label: '🚨 這是異常詐騙', val: 1 }].map((o, i) => {
-            const selected = myAnswer === o.val
-            return (
-              <button key={o.val} onClick={() => handleAnswer(o.val)} disabled={myAnswer !== null} style={{
-                display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-                background: selected ? 'rgba(91,141,238,.2)' : 'rgba(255,255,255,.04)',
-                border: `1px solid ${selected ? 'rgba(91,141,238,.7)' : 'rgba(91,141,238,.2)'}`,
-                borderRadius: 11, padding: '12px 15px', color: selected ? '#c8dbff' : 'var(--text)',
-                fontSize: 13, cursor: myAnswer !== null ? 'default' : 'pointer', textAlign: 'left',
-                fontFamily: 'Noto Sans TC,sans-serif',
-              }}>
-                <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(91,141,238,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
-                  {['A', 'B'][i]}
-                </span>
-                {o.label}
-              </button>
-            )
-          })}
-        </div>
+        <ChoiceButtons q={q} myAnswer={myAnswer} onAnswer={handleAnswer} />
       )}
 
       {/* 等待其他人 */}
@@ -268,21 +271,7 @@ export default function OnlineBattle({ room, navigate }) {
         <>
           {/* 正確答案 highlight */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
-            {[{ label: '✅ 這是正常事件', val: 0 }, { label: '🚨 這是異常詐騙', val: 1 }].map((o, i) => {
-              const isCorrect = o.val === questionResult.correctAnswer
-              const isMine = myAnswer === o.val
-              let bg = 'rgba(255,255,255,.04)', bc = 'rgba(91,141,238,.2)', col = 'var(--text)'
-              if (isCorrect) { bg = 'rgba(50,200,150,.17)'; bc = 'rgba(50,200,150,.55)'; col = '#8ee8c5' }
-              else if (isMine) { bg = 'rgba(255,80,80,.14)'; bc = 'rgba(255,80,80,.45)'; col = '#ffaaaa' }
-              return (
-                <div key={o.val} style={{ display: 'flex', alignItems: 'center', gap: 10, background: bg, border: `1px solid ${bc}`, borderRadius: 11, padding: '12px 15px', color: col, fontSize: 13 }}>
-                  <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(91,141,238,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
-                    {['A', 'B'][i]}
-                  </span>
-                  {o.label}
-                </div>
-              )
-            })}
+            <ResultChoices q={q} questionResult={questionResult} myAnswer={myAnswer} />
           </div>
 
           {/* 我的結果 */}
@@ -294,6 +283,11 @@ export default function OnlineBattle({ room, navigate }) {
           }}>
             {notAnswered ? '⏰ 未作答' : myCorrect ? '✅ 答對！' : '❌ 答錯了'}
             {' '}{questionResult.explanation}
+            {q?.assetChanges && myAnswer !== null && (
+              <span style={{ marginLeft: 8, fontWeight: 700, color: q.assetChanges[myAnswer] < 0 ? '#ff9e9e' : '#7ee8c5' }}>
+                {q.assetChanges[myAnswer] < 0 ? ` 💸 −${Math.abs(q.assetChanges[myAnswer]).toLocaleString()}` : q.assetChanges[myAnswer] > 0 ? ` ✨ +${q.assetChanges[myAnswer].toLocaleString()}` : ' ✅ 安全'}
+              </span>
+            )}
           </div>
 
           {/* 玩家作答狀況 */}
@@ -332,6 +326,59 @@ export default function OnlineBattle({ room, navigate }) {
       )}
     </div>
   )
+}
+
+const LABELS = ['A', 'B', 'C', 'D']
+const DEFAULT_CHOICES = [{ label: '✅ 這是正常事件', val: 0 }, { label: '🚨 這是異常詐騙', val: 1 }]
+
+function ChoiceButtons({ q, myAnswer, onAnswer }) {
+  const choices = q?.choices
+    ? q.choices.map((label, i) => ({ label, val: i }))
+    : DEFAULT_CHOICES
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {choices.map((o, i) => {
+        const selected = myAnswer === o.val
+        return (
+          <button key={o.val} onClick={() => onAnswer(o.val)} disabled={myAnswer !== null} style={{
+            display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+            background: selected ? 'rgba(91,141,238,.2)' : 'rgba(255,255,255,.04)',
+            border: `1px solid ${selected ? 'rgba(91,141,238,.7)' : 'rgba(91,141,238,.2)'}`,
+            borderRadius: 11, padding: '12px 15px', color: selected ? '#c8dbff' : 'var(--text)',
+            fontSize: 13, cursor: myAnswer !== null ? 'default' : 'pointer', textAlign: 'left',
+            fontFamily: 'Noto Sans TC,sans-serif',
+          }}>
+            <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(91,141,238,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
+              {LABELS[i]}
+            </span>
+            {o.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function ResultChoices({ q, questionResult, myAnswer }) {
+  const choices = q?.choices
+    ? q.choices.map((label, i) => ({ label, val: i }))
+    : DEFAULT_CHOICES
+  return choices.map((o, i) => {
+    const isCorrect = o.val === questionResult.correctAnswer
+    const isMine = myAnswer === o.val
+    let bg = 'rgba(255,255,255,.04)', bc = 'rgba(91,141,238,.2)', col = 'var(--text)'
+    if (isCorrect) { bg = 'rgba(50,200,150,.17)'; bc = 'rgba(50,200,150,.55)'; col = '#8ee8c5' }
+    else if (isMine) { bg = 'rgba(255,80,80,.14)'; bc = 'rgba(255,80,80,.45)'; col = '#ffaaaa' }
+    return (
+      <div key={o.val} style={{ display: 'flex', alignItems: 'center', gap: 10, background: bg, border: `1px solid ${bc}`, borderRadius: 11, padding: '11px 14px', color: col, fontSize: 13 }}>
+        <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(91,141,238,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
+          {LABELS[i]}
+        </span>
+        {o.label}
+        {isCorrect && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓ 正解</span>}
+      </div>
+    )
+  })
 }
 
 const page = { padding: 18, position: 'relative', zIndex: 2, minHeight: '100vh' }

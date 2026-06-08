@@ -57,9 +57,17 @@ function CodeBoxes({ chars, onChange }) {
   )
 }
 
+const MODE_OPTIONS = [
+  { id: 'quiz',     emoji: '🚀', label: '答題模式',   desc: '判斷詐騙或正常' },
+  { id: 'detective',emoji: '🔍', label: '偵探模式',   desc: '找出情境中的陷阱' },
+  { id: 'lifesim',  emoji: '🎭', label: '人生模擬器', desc: '選擇行動保住資產' },
+]
+
 export default function OnlineLobby({ navigate, onRoomReady }) {
   const [view, setView] = useState('home')
   const name = localStorage.getItem('playerName') || '玩家'
+  const [gameMode, setGameMode] = useState('quiz')
+  const [roomMode, setRoomMode] = useState('quiz')
   const [joinChars, setJoinChars] = useState(['', '', '', ''])
   const [roomCode, setRoomCode] = useState('')
   const [players, setPlayers] = useState([])
@@ -76,11 +84,12 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
   useEffect(() => {
     socket.connect()
     socket.on('connect_error', () => setError('無法連接伺服器，請確認後端已啟動'))
-    socket.on('room-joined', ({ code, isHost: host, players: ps }) => {
+    socket.on('room-joined', ({ code, isHost: host, mode, players: ps }) => {
       roomCodeRef.current = code
       isHostRef.current = host
       setRoomCode(code)
       setIsHost(host)
+      setRoomMode(mode || 'quiz')
       setPlayers(ps)
       setError('')
       setView('waiting')
@@ -104,7 +113,7 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
 
   const handleCreate = () => {
     setError('')
-    socket.emit('create-room', { name })
+    socket.emit('create-room', { name, mode: gameMode })
   }
 
   const handleJoin = () => {
@@ -163,6 +172,14 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
             把代碼分享給朋友，他們輸入後就能加入
           </div>
         </div>
+
+        {/* 模式顯示 */}
+        {(() => { const m = MODE_OPTIONS.find(o => o.id === roomMode); return m ? (
+          <div style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 14px', borderRadius:10, background:'rgba(91,141,238,.08)', border:'1px solid rgba(91,141,238,.2)', marginBottom:16 }}>
+            <span style={{ fontSize:18 }}>{m.emoji}</span>
+            <div><div style={{ fontSize:13, color:'#c8dbff', fontWeight:600 }}>{m.label}</div><div style={{ fontSize:11, color:'rgba(140,180,255,.5)' }}>{m.desc}</div></div>
+          </div>
+        ) : null })()}
 
         <div style={{ marginBottom: 22 }}>
           <div style={{ fontSize: 13, color: 'rgba(140,180,255,.55)', letterSpacing: 1, marginBottom: 9 }}>
@@ -243,10 +260,34 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
       {error && <div style={errBox}>{error}</div>}
 
       {view === 'home' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <button onClick={handleCreate} style={primaryBtn}>🏠 建立房間</button>
-          <button onClick={() => { setView('joining'); setError('') }} style={secondaryBtn}>🔗 加入房間</button>
-        </div>
+        <>
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 12, color: 'rgba(140,180,255,.5)', letterSpacing: 1, marginBottom: 8 }}>選擇遊戲模式</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+              {MODE_OPTIONS.map(m => (
+                <button key={m.id} onClick={() => setGameMode(m.id)} style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '11px 14px', borderRadius: 11,
+                  background: gameMode === m.id ? 'rgba(91,141,238,.2)' : 'rgba(255,255,255,.04)',
+                  border: `1px solid ${gameMode === m.id ? 'rgba(91,141,238,.7)' : 'rgba(91,141,238,.15)'}`,
+                  color: gameMode === m.id ? '#c8dbff' : 'rgba(180,200,255,.55)',
+                  cursor: 'pointer', textAlign: 'left', fontFamily: 'Noto Sans TC,sans-serif',
+                }}>
+                  <span style={{ fontSize: 20, flexShrink: 0 }}>{m.emoji}</span>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: gameMode === m.id ? 600 : 400 }}>{m.label}</div>
+                    <div style={{ fontSize: 11, opacity: .6, marginTop: 1 }}>{m.desc}</div>
+                  </div>
+                  {gameMode === m.id && <span style={{ marginLeft: 'auto', fontSize: 14 }}>✓</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <button onClick={handleCreate} style={primaryBtn}>🏠 建立房間</button>
+            <button onClick={() => { setView('joining'); setError('') }} style={secondaryBtn}>🔗 加入房間</button>
+          </div>
+        </>
       )}
       {view === 'joining' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
