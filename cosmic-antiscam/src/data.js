@@ -1,3 +1,5 @@
+import { SCAM_CASES } from './data/scamCases'
+
 export const MONSTERS = [
   { id:'m01', code:'α-01', emoji:'👾', name:'仿冒銀行使者',   type:'fraud',  tl:'假冒詐騙', stars:2, desc:'偽裝銀行客服，要求點連結輸入帳密。',                           defeat:'正規銀行不用訊息叫你輸入密碼。',             reward:50,  lv:1,  cr:0,    unlocked:false },
   { id:'m02', code:'α-02', emoji:'🕷️', name:'快遞補費蜘蛛',   type:'fraud',  tl:'假冒詐騙', stars:2, desc:'偽裝快遞要求先上網補繳郵資。',                               defeat:'正規快遞不要求先上網補費。',                 reward:50,  lv:1,  cr:80,   unlocked:false },
@@ -400,9 +402,21 @@ export const EDU_TIPS = {
   },
 }
 
+const REAL_CASES = SCAM_CASES.map(c => ({
+  signal: c.signal,
+  text: c.text,
+  answer: c.answer,
+  explanation: c.explanation,
+  topic: c.keyword,
+  realCase: true,
+}))
+
+const ALL_QUESTIONS = [...STATIC_QUESTIONS, ...REAL_CASES]
+
 export function generateQuestion(isScam, usedTopics) {
-  const pool = STATIC_QUESTIONS.filter(q => (q.answer === (isScam ? 1 : 0)) && !usedTopics.includes(q.topic))
-  const fallback = STATIC_QUESTIONS.filter(q => q.answer === (isScam ? 1 : 0))
+  const expected = isScam ? 1 : 0
+  const pool = ALL_QUESTIONS.filter(q => q.answer === expected && !usedTopics.includes(q.topic))
+  const fallback = ALL_QUESTIONS.filter(q => q.answer === expected)
   const src = pool.length ? pool : fallback
   return Promise.resolve({ ...src[Math.floor(Math.random() * src.length)] })
 }
