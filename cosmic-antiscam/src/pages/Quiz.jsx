@@ -5,6 +5,12 @@ import UnlockOverlay from '../components/UnlockOverlay'
 
 const starsH = n => '★'.repeat(n) + '☆'.repeat(5-n)
 
+function cleanForSpeech(text) {
+  return text
+    .replace(/(\d{1,2})\/(\d{1,2})/g, '$1月$2日')   // 6/14 → 6月14日
+    .replace(/(\d+)%/g, '$1 percent')                // 避免 % 被誤讀
+}
+
 export default function Quiz({ mode, navigate, onResult }) {
   const { coins, bag, addCoins, spendCoins: _sc, addXp, monsters, unlockMonster } = useGame()
   const [questions, setQuestions] = useState([])
@@ -70,7 +76,7 @@ export default function Quiz({ mode, navigate, onResult }) {
     const cur = questions[currentQ]
     if (!cur || answered) return
     window.speechSynthesis?.cancel()
-    const u = new SpeechSynthesisUtterance(cur.text)
+    const u = new SpeechSynthesisUtterance(cleanForSpeech(cur.text))
     u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 0.9
     u.onstart = () => setSpeaking(true)
     u.onend = () => setSpeaking(false)
@@ -123,7 +129,7 @@ export default function Quiz({ mode, navigate, onResult }) {
     if (!window.speechSynthesis || !q) return
     if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return }
     window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(q.text)
+    const u = new SpeechSynthesisUtterance(cleanForSpeech(q.text))
     u.lang = 'zh-TW'; u.pitch = 0.9
     u.rate = 0.88
     u.onstart = () => setSpeaking(true)

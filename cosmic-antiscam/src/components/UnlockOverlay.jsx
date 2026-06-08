@@ -18,7 +18,7 @@ export default function UnlockOverlay({ monster, isCoin, onClose }) {
         <div style={{ fontFamily:'Orbitron,monospace', fontSize:11, color:'rgba(255,210,50,.75)', letterSpacing:1, marginBottom:5 }}>✦ 怪物解鎖 ✦</div>
         <div style={{ fontSize:17, fontWeight:700, color:'#e0eaff', marginBottom:3 }}>{m.name}</div>
         <div style={{ fontSize:15, color:'var(--gold)', marginBottom:7, letterSpacing:2 }}>{starsH(m.stars)}</div>
-        <div style={{ fontSize:11, color:'rgba(180,200,255,.6)', lineHeight:1.6, marginBottom:12 }}>{m.desc}</div>
+        <div style={{ fontSize:13, color:'rgba(200,220,255,.88)', lineHeight:1.7, marginBottom:12 }}>{m.desc}</div>
         <div style={{ fontSize:19, fontWeight:700, color:'var(--gold)', marginBottom:14 }}>
           {isCoin ? '已解鎖！' : `🪙 +${m.reward} 金幣獎勵`}
         </div>
