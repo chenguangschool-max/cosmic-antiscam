@@ -170,6 +170,10 @@ export default function MainMenu({ navigate }) {
           <span style={{ fontSize:22 }}>🔍</span>
           <div><div style={{ fontSize:16, fontWeight:500 }}>偵探模式</div><div style={{ fontSize:13, opacity:.6 }}>調查真實案件</div></div>
         </button>
+        <button style={{ ...menuBtn, background:'rgba(50,200,150,.09)', borderColor:'rgba(50,200,150,.35)', color:'#6ee8c0', gridColumn:'1/-1' }} onClick={() => navigate('lifeSim')}>
+          <span style={{ fontSize:22 }}>🎭</span>
+          <div><div style={{ fontSize:16, fontWeight:500 }}>真實人生模擬器</div><div style={{ fontSize:13, opacity:.6 }}>模擬資產 1,000,000 元起</div></div>
+        </button>
       </div>
 
       {/* 重置存檔 */}

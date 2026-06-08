@@ -117,6 +117,54 @@ app.post('/api/generate-note', async (req, res) => {
   }
 })
 
+// ── 真實人生模擬器 — 情境生成 ─────────────────────────────────────────────────
+
+app.post('/api/life-scenario', async (req, res) => {
+  const { usedIds = [] } = req.body
+  const isScam = Math.random() < 0.65
+
+  const prompt = `你是台灣防詐騙教育遊戲「真實人生模擬器」的劇本生成師。
+
+請生成 1 個台灣日常生活情境，讓玩家在不知情的情況下做出選擇。
+
+規定：
+- 必須是繁體中文，台灣真實場景
+- 故事中不要直接說「這是詐騙」或「這是正常的」
+- isScam = ${isScam}
+- 提供 4 個行動選項，每個都要有不同的後果
+- assetChange（單位：新台幣）：${isScam ? '最差的選項損失 -3000 到 -300000，最好的選項 0 到 +500' : '全部選項 0 到 +500，無負數'}
+- 已使用的 ID（請勿重複）：${usedIds.slice(-20).join(',')}
+
+只回傳以下 JSON，不要其他文字：
+{
+  "id": "ls_${Math.random().toString(36).slice(2, 10)}",
+  "title": "情境標題（不超過10字）",
+  "story": "故事（80-120字，第一人稱，生動真實）",
+  "choices": [
+    {"icon":"emoji","label":"選項（不超過15字）","consequence":"後果（30-50字）","assetChange":數字},
+    {"icon":"emoji","label":"選項","consequence":"後果","assetChange":數字},
+    {"icon":"emoji","label":"選項","consequence":"後果","assetChange":數字},
+    {"icon":"emoji","label":"選項","consequence":"後果","assetChange":數字}
+  ],
+  "isScam": ${isScam},
+  "bestChoiceIdx": 最佳選項index,
+  "explanation": "防詐解析（40-60字）"
+}`
+
+  try {
+    const msg = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1200,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    const scenario = parseJson(msg.content[0].text)
+    res.json({ scenario })
+  } catch (e) {
+    console.error('life-scenario failed:', e.message)
+    res.status(500).json({ error: 'generation failed' })
+  }
+})
+
 // ── 題庫主題 ───────────────────────────────────────────────────────────────────
 
 const SCAM_TOPICS = [

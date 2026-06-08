@@ -1,0 +1,156 @@
+export const LIFE_SCENARIOS = [
+  {
+    id: 'ls_a001', title: 'Facebook 購物廣告', isScam: true, bestChoiceIdx: 2,
+    story: '你在滑 Facebook 時看到廣告：「高山有機酪梨 10 顆特價 299 元，限時搶購！」點進去後出現一個很像 Momo 購物的網站，商品評價清一色五顆星，結帳頁面要求輸入信用卡號、有效期限與背面三碼。你最近確實想買酪梨。',
+    choices: [
+      { icon: '💳', label: '直接輸入信用卡結帳', consequence: '兩週後信用卡帳單出現多筆陌生消費，合計 18,600 元，網站已無法開啟，客服電話是空號。', assetChange: -18600 },
+      { icon: '🛒', label: '加入購物車先看看', consequence: '你繼續瀏覽，發現網址與 Momo 官網不同，商品描述有多處錯別字，確認是仿冒網站後離開。', assetChange: 0 },
+      { icon: '🔍', label: '先 Google 搜尋這個網站', consequence: '搜尋後找到大量負評，寫著「付款後沒收到貨」和「信用卡被盜刷」，你立刻關掉網站。', assetChange: 0 },
+      { icon: '📞', label: '撥打 165 確認', consequence: '165 專員確認這是仿冒購物網站，提醒你不要輸入任何資料。你安全避開，還獲得小額檢舉獎勵。', assetChange: 500 },
+    ],
+    explanation: '仿冒購物網站（一頁式廣告詐騙）複製知名電商外觀，以低價誘騙輸入信用卡資料。購物前搜尋商家名稱加「詐騙」，或撥 165 確認。',
+  },
+  {
+    id: 'ls_a002', title: '蝦皮客服來電', isScam: true, bestChoiceIdx: 0,
+    story: '你接到自稱「蝦皮客服」的電話，對方說你昨天在蝦皮的訂單因系統失誤被誤設為每月自動扣款 3,999 元共 12 期，需要你依照指示操作網路銀行才能解除，還說出你最近購買的商品名稱，聽起來很可信。',
+    choices: [
+      { icon: '📱', label: '掛斷，自己登入蝦皮 App 查', consequence: '登入後確認沒有任何分期設定，打給蝦皮官方客服，對方確認根本沒有這通電話，你安全了。', assetChange: 0 },
+      { icon: '🏧', label: '依指示操作網路銀行', consequence: '你按照對方指示操作後，帳戶內的 85,000 元全數被轉走，再也無法聯繫到對方。', assetChange: -85000 },
+      { icon: '💳', label: '提供信用卡號讓對方退款', consequence: '你提供卡號與背面三碼後，信用卡遭盜刷 23,500 元，購買了多筆你不認識的交易。', assetChange: -23500 },
+      { icon: '📞', label: '要求轉接蝦皮官方客服', consequence: '對方說「無法轉接」並不斷催促，這不合理——你掛斷了，安全避開詐騙。', assetChange: 0 },
+    ],
+    explanation: '解除分期詐騙：詐騙集團取得你的交易資料，假冒客服來電。ATM 和網路銀行無法解除分期，只要電話要求操作網銀就掛斷，撥蝦皮官方 02-6636-5959 確認。',
+  },
+  {
+    id: 'ls_a003', title: 'LINE 投資群組', isScam: true, bestChoiceIdx: 3,
+    story: '你被一個陌生人加入「2026 台股 VIP 菁英群」，群裡不斷有人曬出幾十萬的獲利截圖。自稱「黃老師」的人私訊你，說你有投資天賦，邀你加入專屬計畫，「保證每月 12% 報酬，你先投 3 萬元，一週後讓你看到獲利，我的學員平均三個月翻三倍。」',
+    choices: [
+      { icon: '💸', label: '先投 3 萬元試試', consequence: '一週後帳面顯示獲利 4,200 元，但要提領需再投 10 萬啟動「高級帳戶」，之後完全無法出金。', assetChange: -30000 },
+      { icon: '💬', label: '問群裡的人實際情況', consequence: '你私訊幾位「獲利會員」，發現回應都像複製貼上，確認是托兒，你立刻退出群組。', assetChange: 0 },
+      { icon: '📊', label: '要求看詳細投資說明書', consequence: '黃老師說「說明書只給正式會員，先匯款才能看」，你意識到不合理，立刻封鎖對方。', assetChange: 0 },
+      { icon: '🔍', label: '上金管會官網查黃老師執照', consequence: '金管會查不到「黃老師」的任何執照，你確認是詐騙並舉報，安全避開了損失。', assetChange: 0 },
+    ],
+    explanation: '養套殺詐騙（LINE 群組假投資）：用托兒製造獲利假象，讓你加碼後無法出金。任何保證報酬的投資都是詐騙，執照可上金管會官網查詢。',
+  },
+  {
+    id: 'ls_a004', title: '宅急便補費簡訊', isScam: true, bestChoiceIdx: 2,
+    story: '你收到簡訊：「【黑貓宅急便】您有一件包裹因地址不詳無法投遞，請點選連結補繳運費 35 元，逾期將退回發件方：http://t-cat-delivery.net」你最近網購了幾樣東西，不確定是否有包裹要來。',
+    choices: [
+      { icon: '🔗', label: '點開連結補繳 35 元', consequence: '進入偽裝成黑貓的釣魚網站，輸入信用卡資料後被盜刷 16,800 元，包裹當然也沒有收到。', assetChange: -16800 },
+      { icon: '📦', label: '直接上黑貓官網查詢', consequence: '登入黑貓官網（t-cat.com.tw）查詢，沒有任何待領包裹，確認簡訊是詐騙。', assetChange: 0 },
+      { icon: '📞', label: '撥打 0800-020-1230 黑貓客服', consequence: '客服確認你沒有任何待補費包裹，這是詐騙簡訊，建議你封鎖並檢舉該號碼。', assetChange: 300 },
+      { icon: '🗑️', label: '忽略這則簡訊', consequence: '你謹慎地忽略不明簡訊，後來確認那是詐騙，你的資產完好無缺。', assetChange: 0 },
+    ],
+    explanation: '釣魚簡訊（包裹補費詐騙）：黑貓官網是 t-cat.com.tw，任何 .net 或不明網域都是假網址。快遞通知不要點簡訊連結，自行上官網查詢。',
+  },
+  {
+    id: 'ls_a005', title: '檢察官來電', isScam: true, bestChoiceIdx: 0,
+    story: '你接到電話，對方自稱「台北地檢署陳檢察官」，說你的帳戶被犯罪集團盜用來洗錢，現在是重大刑案共犯，要求你「配合調查，將存款轉入政府安全帳戶，案件結束後全額返還，此為機密行動，絕對不能告訴任何人」，語氣嚴肅且充滿壓迫感。',
+    choices: [
+      { icon: '☎️', label: '掛斷後撥打 165 確認', consequence: '165 告訴你，世界上根本不存在「安全帳戶」，這是詐騙，你的資產安全了。', assetChange: 0 },
+      { icon: '🏦', label: '依指示轉帳到安全帳戶', consequence: '你將 350,000 元轉入「安全帳戶」，之後電話再也打不通，錢完全消失了。', assetChange: -350000 },
+      { icon: '📢', label: '告訴家人後再決定', consequence: '家人聽完後立刻說「這絕對是詐騙！」政府機關不會電話要求轉帳或保密，你安全了。', assetChange: 0 },
+      { icon: '📋', label: '要求對方先傳公文', consequence: '對方說「公文需要費用才能下發」，你識破這是詐騙，掛斷電話。', assetChange: 0 },
+    ],
+    explanation: '假冒公務員詐騙：「安全帳戶」根本不存在，這個詞本身就是詐騙標誌。「不能告訴任何人」是要隔絕你的支援系統。掛斷後撥 165 或 110。',
+  },
+  {
+    id: 'ls_a006', title: '高薪居家工作廣告', isScam: true, bestChoiceIdx: 2,
+    story: '你在 104 看到廣告：「誠徵居家資料輸入員，每日 2-3 小時，月薪 65,000 元，無需經驗，立即可上工。」你傳訊息後 HR 說你通過審查，只需先繳 3,500 元設備保證金，「到職第一個月薪資退還」，並要你匯款到一個個人帳號。',
+    choices: [
+      { icon: '💸', label: '先繳保證金，反正會退', consequence: '匯款後 HR 消失，帳號無法聯繫，3,500 元有去無回。這只是你的損失。', assetChange: -3500 },
+      { icon: '📋', label: '要求見面簽正式合約', consequence: '對方說「居家工作不需要見面」並繼續催繳，你識破是詐騙，封鎖對方。', assetChange: 0 },
+      { icon: '🔍', label: '上公司登記系統查詢', consequence: '查詢後找不到這家公司的統一編號，確認是詐騙，完全沒有損失。', assetChange: 0 },
+      { icon: '🏢', label: '要求提供公司地址', consequence: '對方給了一個地址，你 Google Map 一查是空地，進一步確認是詐騙，安全。', assetChange: 0 },
+    ],
+    explanation: '求職先付費詐騙：正規公司絕對不要求員工繳保證金。月薪 65,000 只需 2-3 小時根本不存在。收到求職廣告先查公司統一編號或要求見面簽約。',
+  },
+  {
+    id: 'ls_a007', title: '交友軟體的她', isScam: true, bestChoiceIdx: 1,
+    story: '你在 Instagram 認識了「Vivian」，她每天早晚問候，記住你說的每一件事，三週後主動示好。某天她說：「我最近靠加密貨幣賺了很多，是老師帶我入場的，你要不要一起？只要先投 5 萬，我帶你賺，直接轉帳給我就好，我來操盤。」',
+    choices: [
+      { icon: '💸', label: '匯 5 萬試試，感情是真的', consequence: '錢轉出後 Vivian 的帳號變成私人，完全無法聯繫，你的 50,000 元消失了。', assetChange: -50000 },
+      { icon: '📹', label: '要求視訊通話確認是真人', consequence: 'Vivian 找各種藉口拒絕視訊，你識破這是殺豬盤，封鎖了對方。', assetChange: 0 },
+      { icon: '🔍', label: '搜尋她推薦的平台名稱', consequence: '搜尋後找到大量受害者貼文，寫著這是詐騙平台，你立刻中止了聯繫。', assetChange: 0 },
+      { icon: '⏳', label: '說還沒準備好，繼續觀察', consequence: '你繼續和她聊，發現她每次話題都繞回「投資」，最終確認是詐騙，安全離開。', assetChange: 0 },
+    ],
+    explanation: '殺豬盤詐騙：先「養豬」（建立感情）再「殺豬」（騙取金錢）。網路上認識的人要求投資或匯款，先要求視訊通話，無法視訊就是詐騙。',
+  },
+  {
+    id: 'ls_a008', title: '國稅局退稅簡訊', isScam: true, bestChoiceIdx: 2,
+    story: '你收到簡訊：「【財政部國稅局】您 2025 年度所得稅退稅款 8,200 元，因原帳戶資料異常無法匯入，請點選連結確認帳戶資料，逾期視同放棄：http://tax-refund-gov.net」你確實有申報所得稅。',
+    choices: [
+      { icon: '🔗', label: '點連結輸入帳戶資料', consequence: '你輸入帳號和密碼後，帳戶被盜用辦理信用貸款，負債 45,000 元才發現。', assetChange: -45000 },
+      { icon: '📧', label: '回覆簡訊詢問更多資訊', consequence: '對方要你「儘快點連結」，你意識到政府不會這樣催促，確認是詐騙，不再回應。', assetChange: 0 },
+      { icon: '🌐', label: '自行前往財政部官網查詢', consequence: '登入財政部電子申報系統，退稅早已入原帳戶，簡訊是詐騙，資產安全。', assetChange: 0 },
+      { icon: '📞', label: '撥打 0800-000-321 國稅局', consequence: '客服確認退稅已入帳，此簡訊為詐騙，建議封鎖該號碼，你安全了。', assetChange: 200 },
+    ],
+    explanation: '假冒政府退稅詐騙：政府網址結尾一定是 gov.tw，.net 是假網址。退稅會直接入帳，不會要求另外確認帳戶。收到後自行上財政部官網查詢。',
+  },
+  {
+    id: 'ls_a009', title: '馬斯克加密貨幣活動', isScam: true, bestChoiceIdx: 3,
+    story: '你在 YouTube 看到一段影片，馬斯克本人說話（口型完全對上），推薦「比特幣 2.0 限時空投，存入 0.1 BTC，平台自動送你 0.2 BTC！限時 24 小時！」下方留言都說「真的賺到了！感謝馬斯克！」',
+    choices: [
+      { icon: '🪙', label: '立刻存入 0.1 BTC 試試', consequence: '你將約 350,000 元的比特幣存入後，平台消失，比特幣無法追回，損失慘重。', assetChange: -350000 },
+      { icon: '💬', label: '私訊留言的人確認', consequence: '你傳訊給幾個留言者，都說「請趕快存入，名額快滿了」，語氣一模一樣，你識破是托兒。', assetChange: 0 },
+      { icon: '🔗', label: '點影片連結進入平台', consequence: '進入仿冒平台，網站精美但域名不對，你仔細看後關掉，沒有輸入任何資料。', assetChange: 0 },
+      { icon: '🔍', label: '搜尋「馬斯克空投詐騙」', consequence: '馬斯克本人從未辦過「存幣送幣」活動，相關影片均為 AI 深偽，你識破詐騙。', assetChange: 0 },
+    ],
+    explanation: 'AI Deepfake 名人詐騙：「存入送更多」在加密貨幣圈永遠是詐騙，沒有例外。馬斯克從未辦過此類活動。遇到名人推薦，先搜尋官方聲明。',
+  },
+  {
+    id: 'ls_a010', title: '中獎電話來了', isScam: true, bestChoiceIdx: 0,
+    story: '你接到電話，對方說你的手機號碼在「全聯年度抽獎」被隨機抽中，獲得二等獎 50 萬元現金！恭喜你！領獎前需先繳納 5% 中獎稅 25,000 元到指定帳戶，繳款後三個工作天會匯入獎金。對方聽起來非常開心且熱情。',
+    choices: [
+      { icon: '☎️', label: '掛斷，撥打全聯官方電話確認', consequence: '全聯客服告訴你，他們從未舉辦這樣的抽獎活動，這是詐騙，你沒有損失。', assetChange: 0 },
+      { icon: '💸', label: '先繳 25,000 元稅金試試', consequence: '繳款後獎金永遠沒來，無法聯繫到對方，25,000 元有去無回。', assetChange: -25000 },
+      { icon: '📋', label: '要求對方傳中獎公告', consequence: '對方傳來一份看起來很正式的文件，但細看域名和格式都有問題，你識破後掛斷。', assetChange: 0 },
+      { icon: '❓', label: '問是否有參加這個抽獎', consequence: '你從未在全聯登記參加任何抽獎——你連資料都沒有填過，確認是詐騙，掛斷。', assetChange: 0 },
+    ],
+    explanation: '中獎先繳費詐騙：合法抽獎中獎稅由主辦方代扣，絕不要求得獎者先行繳納。從未參加的抽獎卻中獎，100% 是詐騙。掛斷後撥官方電話確認。',
+  },
+  {
+    id: 'ls_b001', title: '銀行消費通知', isScam: false, bestChoiceIdx: 0,
+    story: '你的手機收到銀行簡訊：「您的信用卡末四碼 3456 於今日 14:23 在全聯福利中心（松山門市）消費 386 元，交易序號 TW20260608-0091。如非本人操作，請撥打卡片背面客服電話或登入行動銀行凍結卡片。」你確實今天下午去全聯買了東西。',
+    choices: [
+      { icon: '✅', label: '確認是本人消費，不動作', consequence: '一切正常，這就是標準的銀行消費通知，提供官方管道讓你查詢，沒有任何問題。', assetChange: 0 },
+      { icon: '📱', label: '登入行動銀行確認明細', consequence: '明細顯示今日全聯消費 386 元，完全正確，你確認了一切正常。', assetChange: 0 },
+      { icon: '🔗', label: '點簡訊中的連結確認', consequence: '這則簡訊沒有任何連結！正規銀行消費通知不會附連結，你正確識別了通知格式。', assetChange: 200 },
+      { icon: '☎️', label: '撥卡片背面電話確認', consequence: '客服確認這是正常消費通知，你多了解了一個確認管道，一切安全。', assetChange: 0 },
+    ],
+    explanation: '正常的銀行消費通知：包含具體金額、地點、時間和交易序號，只提供官方管道聯繫，不附連結、不要求立即行動。這是正常的。',
+  },
+  {
+    id: 'ls_b002', title: '台電電費帳單', isScam: false, bestChoiceIdx: 3,
+    story: '你收到電子郵件，主旨「台灣電力公司帳單通知」，內容：「您 6 月份電費帳單金額 1,650 元，帳單日 6/15，繳費截止日 7/5。可至各大超商、郵局或台電官方網站繳費，如已繳費請忽略。帳單編號：TPC-20260615-0087。客服：0800-833-099」',
+    choices: [
+      { icon: '🏪', label: '至便利超商用帳單號碼繳費', consequence: '順利繳款，一切正常，收據確認金額正確。', assetChange: 0 },
+      { icon: '💻', label: '至台電官方網站繳費', consequence: '登入台電網站確認帳單，金額吻合，順利完成繳費。', assetChange: 0 },
+      { icon: '🔗', label: '搜尋信中是否有釣魚連結', consequence: '信件只說明繳費管道，沒有要你點連結或提供帳密，這是正常帳單通知。', assetChange: 0 },
+      { icon: '✅', label: '正確識別為正常帳單', consequence: '你識別出：有帳單編號、官方客服電話、多種正規繳費管道——這是合法通知！', assetChange: 200 },
+    ],
+    explanation: '正常的電費帳單通知：有帳單編號、明確金額、繳費截止日、多種官方繳費管道和客服電話。不要求你提供信用卡資料或點不明連結。',
+  },
+  {
+    id: 'ls_b003', title: '健保費退費通知', isScam: false, bestChoiceIdx: 1,
+    story: '健保署 App 收到推播通知：「您的健保費退費 1,200 元已於今日入帳，歸還至您的原繳費帳戶。可至健保署官網或撥打 1955 全民健保服務專線查詢，退費說明請至健保署官網。感謝您的配合。」',
+    choices: [
+      { icon: '🔍', label: '搜尋此退費是否為真實政策', consequence: '確認是年度健保費盈餘退費政策，你的 1,200 元已入帳，完全合法正常。', assetChange: 0 },
+      { icon: '📱', label: '登入健保署 App 確認退費', consequence: '退費記錄完整顯示，金額和日期都正確，錢確實入帳了，一切正常。', assetChange: 0 },
+      { icon: '📞', label: '撥打 1955 確認退費', consequence: '客服確認是正常的年度退費，你的帳戶已收到 1,200 元，完全沒有問題。', assetChange: 100 },
+      { icon: '🔗', label: '搜尋「健保退費詐騙」', consequence: '這次退費是真實的政府政策，不是詐騙。你搜尋後確認，帳戶正常收到 1,200 元。', assetChange: 0 },
+    ],
+    explanation: '正常的政府退費通知：退費直接入原帳戶，不要求你另外確認帳號、操作 ATM 或提供任何密碼。這是合法的健保費盈餘退費。',
+  },
+  {
+    id: 'ls_b004', title: '正常面試邀請信', isScam: false, bestChoiceIdx: 0,
+    story: '你在 LinkedIn 應徵「數位行銷專員」後，收到來自 @company.com.tw 的官方信箱回信，邀請你到台北市信義區 XX 大樓 18 樓面試，薪資 38,000–45,000 元，面試時間明確，附上公司官網、地址 Google Map 連結和面試官姓名聯絡電話。',
+    choices: [
+      { icon: '✅', label: '確認是合法邀請，準時赴約', consequence: '面試順利，這是一家真實存在的公司，有正式辦公室，面試流程完全合規。', assetChange: 0 },
+      { icon: '🔍', label: '先搜尋公司名稱確認合法', consequence: '公司有正式官網、媒體報導和 LinkedIn 主頁，確認是合法公司，放心赴約。', assetChange: 0 },
+      { icon: '💰', label: '問是否需要先繳保證金', consequence: '對方表示不需要任何費用，進一步確認是正規公司——合法企業從不向求職者收費。', assetChange: 0 },
+      { icon: '📋', label: '要求對方提供統一編號', consequence: '對方立即提供，你查詢確認是合法登記的公司，你識別了正規求職廣告的特徵。', assetChange: 200 },
+    ],
+    explanation: '正常的求職面試邀請：來自官方信箱、說明地點、薪資和面試官資訊，不要求繳任何費用。合法雇主從不向求職者收取保證金或設備費。',
+  },
+]
