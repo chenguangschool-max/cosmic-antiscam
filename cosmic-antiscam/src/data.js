@@ -1,4 +1,4 @@
-import { SCAM_CASES } from './data/scamCases'
+import { SCAM_CASES } from './scamCases'
 
 export const MONSTERS = [
   { id:'m01', code:'α-01', emoji:'👾', name:'仿冒銀行使者',   type:'fraud',  tl:'假冒詐騙', stars:2, desc:'偽裝銀行客服，要求點連結輸入帳密。',                           defeat:'正規銀行不用訊息叫你輸入密碼。',             reward:50,  lv:1,  cr:0,    unlocked:false },
@@ -46,10 +46,11 @@ export const ITEMS = [
 ]
 
 export const MODES = [
-  { id:'beginner', emoji:'🧑', name:'新手模式', desc:'提示較多，時間充裕。',       tags:['提示','30秒','新手'],   time:30 },
-  { id:'expert',   emoji:'⭐', name:'高手模式', desc:'無提示，時間緊迫。',         tags:['無提示','15秒','挑戰'], time:15 },
-  { id:'edu',      emoji:'📚', name:'教育模式', desc:'每題後提供詳細說明。',       tags:['題後說明','25秒','學習'],time:25 },
-  { id:'holiday',  emoji:'🌴', name:'假日模式', desc:'輕鬆休閒娛樂玩法。',         tags:['輕鬆','35秒','娛樂'],   time:35 },
+  { id:'beginner',  emoji:'🧑',  name:'新手模式',     desc:'提示較多，時間充裕。',         tags:['提示','30秒','新手'],       time:30 },
+  { id:'expert',    emoji:'⭐',  name:'高手模式',     desc:'無提示，時間緊迫。',           tags:['無提示','15秒','挑戰'],     time:15 },
+  { id:'edu',       emoji:'📚',  name:'教育模式',     desc:'每題後提供詳細說明。',         tags:['題後說明','25秒','學習'],   time:25 },
+  { id:'holiday',   emoji:'🌴',  name:'假日模式',     desc:'輕鬆休閒娛樂玩法。',           tags:['輕鬆','35秒','娛樂'],       time:35 },
+  { id:'realcase',  emoji:'📰',  name:'真實案例模式', desc:'依據台灣真實詐騙案例出題，無需 AI、秒速載入。', tags:['真實案例','25秒','無AI'], time:25 },
 ]
 
 export const SCAM_TOPICS = [
@@ -412,6 +413,15 @@ const REAL_CASES = SCAM_CASES.map(c => ({
 }))
 
 const ALL_QUESTIONS = [...STATIC_QUESTIONS, ...REAL_CASES]
+
+export function generateRealCaseQuestion(isScam, usedTopics) {
+  const expected = isScam ? 1 : 0
+  const pool = SCAM_CASES.filter(c => c.answer === expected && !usedTopics.includes(c.keyword))
+  const fallback = SCAM_CASES.filter(c => c.answer === expected)
+  const src = pool.length ? pool : fallback
+  const c = src[Math.floor(Math.random() * src.length)]
+  return { signal: c.signal, text: c.text, answer: c.answer, explanation: c.explanation, topic: c.keyword, realCase: true }
+}
 
 export function generateQuestion(isScam, usedTopics) {
   const expected = isScam ? 1 : 0

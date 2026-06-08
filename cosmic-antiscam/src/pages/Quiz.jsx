@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useGame } from '../GameContext'
-import { ITEMS, generateQuestion, EDU_TIPS } from '../data'
+import { ITEMS, generateQuestion, generateRealCaseQuestion, EDU_TIPS } from '../data'
 import UnlockOverlay from '../components/UnlockOverlay'
 
 const starsH = n => '★'.repeat(n) + '☆'.repeat(5-n)
@@ -28,9 +28,15 @@ export default function Quiz({ mode, navigate, onResult }) {
   const planRef = useRef([])
   const timerRef = useRef(null)
 
+  const isRealCase = mode?.id === 'realcase'
+
   useEffect(() => {
-    const p = [1,1,0,1,1,0,1,1,1,0]
-    for (let i = p.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [p[i],p[j]]=[p[j],p[i]] }
+    const p = isRealCase
+      ? [1,1,0,1,1,1,0,1,1,1]  // 8 scam 2 normal — fixed ratio for real cases
+      : [1,1,0,1,1,0,1,1,1,0]
+    if (!isRealCase) {
+      for (let i = p.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [p[i],p[j]]=[p[j],p[i]] }
+    }
     planRef.current = p
     loadQuestion(0, p)
     return () => clearInterval(timerRef.current)
@@ -40,13 +46,18 @@ export default function Quiz({ mode, navigate, onResult }) {
     const p = plan || planRef.current
     if (idx >= 10) return
     try {
-      const q = await generateQuestion(p[idx] === 1, usedTopics.current)
+      const q = isRealCase
+        ? generateRealCaseQuestion(p[idx] === 1, usedTopics.current)
+        : await generateQuestion(p[idx] === 1, usedTopics.current)
       usedTopics.current.push(q.topic)
       setQuestions(prev => { const next=[...prev]; next[idx]=q; return next })
-      if (idx + 1 < 10) generateQuestion(p[idx+1]===1, usedTopics.current).then(q2 => {
+      if (idx + 1 < 10) {
+        const q2 = isRealCase
+          ? generateRealCaseQuestion(p[idx+1]===1, usedTopics.current)
+          : await generateQuestion(p[idx+1]===1, usedTopics.current)
         usedTopics.current.push(q2.topic)
         setQuestions(prev => { const next=[...prev]; next[idx+1]=q2; return next })
-      })
+      }
     } catch(e) { console.error(e) }
   }
 
