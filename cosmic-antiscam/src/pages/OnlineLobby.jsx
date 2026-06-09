@@ -4,28 +4,31 @@ import { socket } from '../socket'
 function CodeBoxes({ chars, onChange }) {
   const refs = [useRef(), useRef(), useRef(), useRef()]
   const [shake, setShake] = useState(null)
+  const flash = (i) => { setShake(i); setTimeout(() => setShake(null), 400) }
 
-  const flash = (i) => {
-    setShake(i)
-    setTimeout(() => setShake(null), 400)
+  const commit = (i, ch) => {
+    if ('IO01'.includes(ch)) { flash(i); return }
+    if (!/^[A-Z2-9]$/.test(ch)) return
+    onChange(chars.map((c, idx) => idx === i ? ch : c))
+    if (i < 3) setTimeout(() => refs[i + 1].current?.focus(), 10)
   }
 
+  // onChange 處理手機鍵盤（e.key 在手機上是 'Unidentified'）
+  const handleChange = (i, e) => {
+    const v = e.target.value.toUpperCase()
+    if (!v) { onChange(chars.map((c, idx) => idx === i ? '' : c)); return }
+    const ch = v.replace(chars[i] || '', '').slice(-1) || v.slice(-1)
+    commit(i, ch)
+  }
+
+  // onKeyDown 處理桌機的 Backspace 跨格導航
   const handleKey = (i, e) => {
     if (e.key === 'Backspace') {
-      if (chars[i]) {
-        onChange(chars.map((c, idx) => idx === i ? '' : c))
-      } else if (i > 0) {
-        onChange(chars.map((c, idx) => idx === i - 1 ? '' : c))
-        refs[i - 1].current?.focus()
-      }
+      if (chars[i]) onChange(chars.map((c, idx) => idx === i ? '' : c))
+      else if (i > 0) { onChange(chars.map((c, idx) => idx === i - 1 ? '' : c)); refs[i - 1].current?.focus() }
       return
     }
-    const ch = e.key.toUpperCase()
-    if (!/^[A-Z0-9]$/.test(ch)) return
-    if ('IO01'.includes(ch)) { flash(i); return }
-    const next = chars.map((c, idx) => idx === i ? ch : c)
-    onChange(next)
-    if (i < 3) refs[i + 1].current?.focus()
+    if (e.key.length === 1) commit(i, e.key.toUpperCase())
   }
 
   return (
@@ -35,9 +38,13 @@ function CodeBoxes({ chars, onChange }) {
           <input
             ref={refs[i]}
             value={chars[i]}
-            onChange={() => {}}
+            onChange={e => handleChange(i, e)}
             onKeyDown={e => handleKey(i, e)}
-            maxLength={1}
+            maxLength={2}
+            autoCapitalize="characters"
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck={false}
             style={{
               width: 62, height: 72, borderRadius: 12, textAlign: 'center',
               background: shake === i ? 'rgba(255,80,80,.18)' : chars[i] ? 'rgba(91,141,238,.18)' : 'rgba(255,255,255,.05)',
