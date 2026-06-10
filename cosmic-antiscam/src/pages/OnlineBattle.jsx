@@ -115,7 +115,9 @@ export default function OnlineBattle({ room, navigate }) {
     if (!window.speechSynthesis || !q) return
     if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return }
     window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(`發件人：${q.signal}。${q.text}`)
+    const prefix = (roomMode === 'scamsim' || roomMode === 'lifesim' || roomMode === 'detective')
+      ? (q.signal ? q.signal + '。' : '') : `發件人：${q.signal}。`
+    const u = new SpeechSynthesisUtterance(prefix + q.text)
     u.lang = 'zh-TW'
     u.rate = 0.88
     u.onstart = () => setSpeaking(true)
@@ -170,7 +172,7 @@ export default function OnlineBattle({ room, navigate }) {
           <div style={{ fontSize: 44, marginBottom: 8 }}>🏆</div>
           <div style={titleStyle}>最終結果</div>
           <div style={{ fontSize: 12, color: 'rgba(180,200,255,.4)', marginTop: 5 }}>共 {total} 題</div>
-          {roomMode === 'lifesim' && (
+          {(roomMode === 'lifesim' || roomMode === 'scamsim') && (
             <div style={{ marginTop: 10, fontSize: 14, color: assets > 500000 ? '#7ee8c5' : '#ff9e9e', fontWeight: 600 }}>
               💰 你的剩餘資產：{assets.toLocaleString('zh-TW')} 元 = {Math.floor(assets/1000)} 防詐金幣
             </div>
@@ -227,12 +229,22 @@ export default function OnlineBattle({ room, navigate }) {
         <div style={{ height: '100%', width: `${(qIndex + 1) / total * 100}%`, background: 'linear-gradient(90deg,#5b8dee,#a78bfa)', borderRadius: 3, transition: 'width .4s' }} />
       </div>
 
+      {/* 詐騙模擬器：資產顯示 */}
+      {(roomMode === 'scamsim' || roomMode === 'lifesim') && (
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', background:'rgba(50,200,150,.07)', border:'1px solid rgba(50,200,150,.22)', borderRadius:10, padding:'7px 14px', marginBottom:10 }}>
+          <span style={{ fontSize:12, color:'rgba(140,180,255,.5)' }}>💰 你的資產</span>
+          <span style={{ fontSize:14, fontWeight:700, color: assets > 500000 ? '#7ee8c5' : '#ff9e9e' }}>
+            {assets.toLocaleString('zh-TW')} 元
+          </span>
+        </div>
+      )}
+
       {/* 題目卡 */}
       {q && (
         <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(91,141,238,.22)', borderRadius: 12, padding: 16, marginBottom: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
             <div style={{ fontSize: 10, color: 'rgba(140,180,255,.55)', letterSpacing: 1 }}>
-              📡 宇宙訊號偵測中
+              {roomMode === 'scamsim' || roomMode === 'lifesim' ? '💸 詐騙情境' : roomMode === 'detective' ? '🔍 偵探情境' : '📡 詐騙訊息偵測'}
             </div>
             <button onClick={speakQuestion} style={{
               display: 'flex', alignItems: 'center', gap: 4,
@@ -245,7 +257,19 @@ export default function OnlineBattle({ room, navigate }) {
               {speaking ? '⏹ 停止' : '🔊 朗讀'}
             </button>
           </div>
-          <div style={{ fontSize: 13, lineHeight: 1.8, color: '#e0eaff' }}>{q.text}</div>
+          {/* 情境標題（詐騙模擬器 / 偵探模式） */}
+          {(roomMode === 'scamsim' || roomMode === 'lifesim' || roomMode === 'detective') && q.signal && (
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#e0eaff', marginBottom: 8 }}>
+              {roomMode === 'detective' ? '📌 ' : '🎬 '}{q.signal}
+            </div>
+          )}
+          {/* 答題模式：顯示發件人 */}
+          {roomMode !== 'scamsim' && roomMode !== 'lifesim' && roomMode !== 'detective' && q.signal && (
+            <div style={{ fontSize: 11, color: 'rgba(255,200,100,.7)', marginBottom: 6 }}>
+              📮 發件人：{q.signal}
+            </div>
+          )}
+          <div style={{ fontSize: 14, lineHeight: 1.85, color: '#e0eaff' }}>{q.text}</div>
         </div>
       )}
 
