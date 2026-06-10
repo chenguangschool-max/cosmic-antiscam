@@ -30,6 +30,7 @@ export default function Quiz({ mode, navigate, onResult }) {
   const [justUnlockedMonster, setJustUnlockedMonster] = useState(null)
   const [ulQueue, setUlQueue] = useState([])
   const [speaking, setSpeaking] = useState(false)
+  const [confirmItem, setConfirmItem] = useState(null)
   const usedTopics = useRef([])
   const planRef = useRef([])
   const timerRef = useRef(null)
@@ -206,24 +207,6 @@ export default function Quiz({ mode, navigate, onResult }) {
         </div>
       </div>
 
-      {/* item bar */}
-      <div style={{ display:'flex', gap:7, marginBottom:11, flexWrap:'wrap' }}>
-        {['turtle','clock','pass'].map(id => {
-          const qty = bagState[id]||0; if (!qty) return null
-          const item = ITEMS.find(i => i.id===id)
-          return (
-            <button key={id} onClick={() => handleUseItem(item)} style={{
-              display:'flex', alignItems:'center', gap:4,
-              background:'rgba(255,255,255,.05)', border:'1px solid rgba(91,141,238,.18)',
-              borderRadius:20, padding:'7px 14px', fontSize:14, cursor:'pointer', color:'#c8dbff',
-              opacity: usedItems[id] ? .3 : 1, pointerEvents: usedItems[id] ? 'none':'auto',
-              fontFamily:'Noto Sans TC,sans-serif',
-            }}>
-              {item.emoji} {item.name} <span style={{ color:'var(--gold)', fontSize:12 }}>x{qty}</span>
-            </button>
-          )
-        })}
-      </div>
 
       {/* question card */}
       <div style={{ background:'rgba(255,255,255,.04)', border:`1px solid ${isEdu ? 'rgba(91,141,238,.32)' : 'rgba(91,141,238,.2)'}`, borderRadius:12, padding:16, marginBottom:12, minHeight:95 }}>
@@ -362,6 +345,63 @@ export default function Quiz({ mode, navigate, onResult }) {
         }}>
           {currentQ+1 >= 10 ? '查看結果 →' : '下一題 →'}
         </button>
+      )}
+
+      {/* 右下角道具浮鈕 */}
+      {['turtle','clock','pass'].some(id => (bagState[id]||0) > 0) && (
+        <div style={{ position:'fixed', bottom:24, right:16, zIndex:60, display:'flex', flexDirection:'column', gap:8, alignItems:'flex-end' }}>
+          {['turtle','clock','pass'].map(id => {
+            const qty = bagState[id] || 0; if (!qty) return null
+            const item = ITEMS.find(i => i.id === id)
+            const used = !!usedItems[id]
+            return (
+              <button key={id} onClick={() => !used && !answered && setConfirmItem(item)} style={{
+                display:'flex', alignItems:'center', gap:6,
+                background:'rgba(8,16,40,.92)', border:`1px solid ${used ? 'rgba(91,141,238,.15)' : 'rgba(91,141,238,.5)'}`,
+                borderRadius:24, padding:'9px 15px', fontSize:15,
+                cursor: used || answered ? 'default' : 'pointer',
+                color: used || answered ? 'rgba(180,200,255,.3)' : '#c8dbff',
+                backdropFilter:'blur(10px)', boxShadow: used ? 'none' : '0 2px 12px rgba(91,141,238,.2)',
+                opacity: answered && !used ? 0.4 : 1,
+                fontFamily:'Noto Sans TC,sans-serif',
+              }}>
+                <span>{item.emoji}</span>
+                <span style={{ fontSize:13 }}>{item.name}</span>
+                <span style={{ background:'rgba(255,210,50,.18)', borderRadius:10, padding:'1px 7px', fontSize:11, color:'#ffd27a', fontWeight:600 }}>x{qty}</span>
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      {/* 道具使用確認彈窗 */}
+      {confirmItem && (
+        <div style={{ position:'fixed', inset:0, zIndex:110, display:'flex', alignItems:'flex-end', justifyContent:'flex-end', padding:'0 16px 100px' }}
+          onClick={() => setConfirmItem(null)}>
+          <div style={{
+            background:'rgba(8,16,40,.97)', border:'1px solid rgba(91,141,238,.45)',
+            borderRadius:18, padding:'18px 18px 14px', width:240,
+            boxShadow:'0 8px 32px rgba(0,0,0,.6)', backdropFilter:'blur(12px)',
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize:30, marginBottom:8, textAlign:'center' }}>{confirmItem.emoji}</div>
+            <div style={{ fontSize:15, fontWeight:700, color:'#e0eaff', marginBottom:4, textAlign:'center' }}>{confirmItem.name}</div>
+            <div style={{ fontSize:12, color:'rgba(140,180,255,.6)', marginBottom:14, textAlign:'center', lineHeight:1.6 }}>{confirmItem.desc}</div>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => setConfirmItem(null)} style={{
+                flex:1, padding:'11px 0', borderRadius:11,
+                background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.12)',
+                color:'rgba(180,200,255,.6)', fontSize:14, cursor:'pointer',
+                fontFamily:'Noto Sans TC,sans-serif',
+              }}>取消</button>
+              <button onClick={() => { handleUseItem(confirmItem); setConfirmItem(null) }} style={{
+                flex:1, padding:'11px 0', borderRadius:11,
+                background:'rgba(91,141,238,.28)', border:'1px solid rgba(91,141,238,.65)',
+                color:'#c8dbff', fontSize:14, fontWeight:700, cursor:'pointer',
+                fontFamily:'Noto Sans TC,sans-serif',
+              }}>使用</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* unlock queue */}
