@@ -4,7 +4,8 @@ import { DETECTIVE_CASES } from '../data/detectiveCases'
 
 export default function DetectiveMode({ navigate }) {
   const { addCoins, addXp } = useGame()
-  const [phase, setPhase] = useState('caseSelect')
+  const [phase, setPhase] = useState('start')
+  const [aiLoading, setAiLoading] = useState(false)
   const [caseData, setCaseData] = useState(null)
   const [qIndex, setQIndex] = useState(0)
   const [trust, setTrust] = useState(0) // 0–100, victim's trust in scammer
@@ -154,10 +155,34 @@ export default function DetectiveMode({ navigate }) {
     }
   }
 
-  if (phase === 'caseSelect') return <CaseSelectScreen cases={DETECTIVE_CASES} onSelect={(c) => { setCaseData(c); setPhase('intro') }} navigate={navigate} />
+  const resetCase = () => {
+    setCaseData(null); setQIndex(0); setTrust(0); trustRef.current = 0
+    setEarnedCoins(0); setCorrectCount(0); setQResults([])
+    setSelected(null); setFlagged({}); setOpenEvidence(null)
+  }
+
+  const handleAiStart = async () => {
+    setAiLoading(true)
+    try {
+      const res = await fetch('https://cosmic-antiscam-production.up.railway.app/api/generate-detective-case', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
+      })
+      const data = await res.json()
+      setCaseData(data.case)
+      setPhase('intro')
+    } catch {
+      const fb = DETECTIVE_CASES[Math.floor(Math.random() * DETECTIVE_CASES.length)]
+      setCaseData(fb)
+      setPhase('intro')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  if (phase === 'start') return <StartScreen onStart={handleAiStart} loading={aiLoading} navigate={navigate} />
   if (!caseData) return null
   if (phase === 'intro') return <IntroScreen c={caseData} onStart={() => setPhase('investigate')} navigate={navigate} />
-  if (phase === 'result') return <ResultScreen c={caseData} coins={Math.min(300, earnedCoins)} correct={correctCount} total={caseData.questions.length} trust={trust} navigate={navigate} onBack={() => { setPhase('caseSelect'); setCaseData(null); setQIndex(0); setTrust(0); setEarnedCoins(0); setCorrectCount(0); setQResults([]) }} />
+  if (phase === 'result') return <ResultScreen c={caseData} coins={Math.min(300, earnedCoins)} correct={correctCount} total={caseData.questions.length} trust={trust} navigate={navigate} onBack={() => { resetCase(); setPhase('start') }} />
 
   return (
     <div style={{ padding:'16px 16px 0', position:'relative', zIndex:2, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
@@ -407,8 +432,47 @@ function ResultScreen({ c, coins, correct, total, trust, navigate, onBack }) {
         </div>
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:8, maxWidth:260, margin:'0 auto' }}>
-        <button onClick={onBack} style={btnMain}>選擇其他案件 🗂</button>
+        <button onClick={onBack} style={btnMain}>再來一案 🔍</button>
         <button onClick={() => navigate('menu')} style={btnSub}>回主選單</button>
+      </div>
+    </div>
+  )
+}
+
+function StartScreen({ onStart, loading, navigate }) {
+  return (
+    <div style={{ padding:'24px 18px', position:'relative', zIndex:2, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
+      <button style={{ alignSelf:'flex-start', background:'rgba(255,255,255,.07)', border:'1px solid rgba(255,255,255,.14)', borderRadius:20, padding:'5px 13px', color:'rgba(180,200,255,.7)', fontSize:12, cursor:'pointer', marginBottom:24 }} onClick={() => navigate('menu')}>← 返回</button>
+      <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center' }}>
+        <div style={{ fontSize:72, marginBottom:14 }}>🔍</div>
+        <div style={{ fontFamily:'Orbitron,monospace', fontSize:18, fontWeight:900, color:'#fff', letterSpacing:2, marginBottom:6 }}>偵探模式</div>
+        <div style={{ fontSize:12, color:'rgba(140,180,255,.5)', marginBottom:28 }}>165 反詐騙特別調查組</div>
+        <div style={{ background:'rgba(91,141,238,.09)', border:'1px solid rgba(91,141,238,.22)', borderRadius:14, padding:'16px 20px', marginBottom:32, maxWidth:320, textAlign:'left' }}>
+          <div style={{ fontSize:12, color:'rgba(140,180,255,.6)', marginBottom:8, fontFamily:'Orbitron,monospace' }}>任務說明</div>
+          <div style={{ fontSize:13, color:'rgba(200,220,255,.8)', lineHeight:1.85 }}>
+            • AI 自動生成真實詐騙案件<br/>
+            • 調查現場線索，標記可疑項目<br/>
+            • 時間越快、線索越準，金幣越多<br/>
+            • 阻止受害者被騙，最高 300 金幣
+          </div>
+        </div>
+      </div>
+      <div style={{ paddingBottom:28 }}>
+        <button onClick={onStart} disabled={loading} style={{
+          width:'100%', padding:16, borderRadius:14,
+          background: loading ? 'rgba(91,141,238,.12)' : 'linear-gradient(135deg,rgba(91,141,238,.35),rgba(167,139,250,.3))',
+          border:'1px solid rgba(91,141,238,.6)',
+          color: loading ? 'rgba(180,200,255,.5)' : '#e0eaff',
+          fontSize:16, fontWeight:700, cursor: loading ? 'default' : 'pointer',
+          fontFamily:'Noto Sans TC,sans-serif', letterSpacing:1,
+        }}>
+          {loading ? '⏳ AI 生成案件中…' : '開始調查 🔍'}
+        </button>
+        {loading && (
+          <div style={{ textAlign:'center', fontSize:12, color:'rgba(140,120,255,.5)', marginTop:10, fontFamily:'Noto Sans TC,sans-serif' }}>
+            約需 10–20 秒，請稍候
+          </div>
+        )}
       </div>
     </div>
   )
