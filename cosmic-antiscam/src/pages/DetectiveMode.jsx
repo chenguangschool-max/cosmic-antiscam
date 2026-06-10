@@ -18,7 +18,45 @@ export default function DetectiveMode({ navigate }) {
   const timerRef = useRef(null)
   const trustRef = useRef(0)
 
+  const [speaking, setSpeaking] = useState(false)
   const q = caseData?.questions[qIndex]
+
+  useEffect(() => () => window.speechSynthesis?.cancel(), [])
+
+  useEffect(() => {
+    if (!q) return
+    window.speechSynthesis?.cancel()
+    setSpeaking(false)
+    let text = ''
+    if (phase === 'investigate' || phase === 'answer') {
+      text = q.scene
+      if (q.lineChat) text += '。' + q.lineChat.map(m => m.text).join('。')
+      if (q.message) text += '。' + q.message
+      if (phase === 'answer') text += '。' + q.question
+    } else if (phase === 'feedback') {
+      // 由 handleAnswer 呼叫，不在此重複
+      return
+    }
+    if (!text) return
+    const u = new SpeechSynthesisUtterance(text)
+    u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 0.9
+    u.onstart = () => setSpeaking(true)
+    u.onend = () => setSpeaking(false)
+    u.onerror = () => setSpeaking(false)
+    window.speechSynthesis?.speak(u)
+  }, [phase, qIndex])
+
+  function speakNow(text) {
+    if (!window.speechSynthesis || !text) return
+    if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return }
+    window.speechSynthesis.cancel()
+    const u = new SpeechSynthesisUtterance(text)
+    u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 0.9
+    u.onstart = () => setSpeaking(true)
+    u.onend = () => setSpeaking(false)
+    u.onerror = () => setSpeaking(false)
+    window.speechSynthesis.speak(u)
+  }
 
   useEffect(() => {
     if (phase === 'investigate') {
@@ -89,9 +127,21 @@ export default function DetectiveMode({ navigate }) {
     }])
 
     setPhase('feedback')
+    setTimeout(() => {
+      const feedbackText = (opt.correct ? '判斷正確！' : '判斷錯誤。') + opt.explanation
+      const u = new SpeechSynthesisUtterance(feedbackText)
+      u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 0.9
+      u.onstart = () => setSpeaking(true)
+      u.onend = () => setSpeaking(false)
+      u.onerror = () => setSpeaking(false)
+      window.speechSynthesis?.cancel()
+      window.speechSynthesis?.speak(u)
+    }, 100)
   }
 
   const nextQuestion = () => {
+    window.speechSynthesis?.cancel()
+    setSpeaking(false)
     if (qIndex + 1 >= caseData.questions.length) {
       const totalCoins = Math.min(300, earnedCoins)
       addCoins(totalCoins)
@@ -129,7 +179,10 @@ export default function DetectiveMode({ navigate }) {
 
       {/* Scene */}
       <div style={{ background:'rgba(91,141,238,.08)', border:'1px solid rgba(91,141,238,.2)', borderRadius:12, padding:'12px 14px', marginBottom:12 }}>
-        <div style={{ fontSize:12, color:'rgba(140,180,255,.6)', marginBottom:6 }}>📍 現場情況</div>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
+          <div style={{ fontSize:12, color:'rgba(140,180,255,.6)' }}>📍 現場情況</div>
+          <button onClick={() => { const t = q.scene + (q.lineChat ? '。' + q.lineChat.map(m => m.text).join('。') : '') + (q.message ? '。' + q.message : ''); speakNow(t) }} style={{ background: speaking ? 'rgba(91,141,238,.25)' : 'rgba(255,255,255,.06)', border: `1px solid ${speaking ? 'rgba(91,141,238,.5)' : 'rgba(255,255,255,.12)'}`, borderRadius:14, padding:'2px 9px', cursor:'pointer', color: speaking ? '#7eb8ff' : 'rgba(180,200,255,.5)', fontSize:11 }}>{speaking ? '🔊' : '🔈'}</button>
+        </div>
         <div style={{ fontSize:14, color:'rgba(210,225,255,.9)', lineHeight:1.7 }}>{q.scene}</div>
         {q.lineChat && <LineChat messages={q.lineChat} />}
         {!q.lineChat && q.message && (
@@ -247,7 +300,10 @@ export default function DetectiveMode({ navigate }) {
             <div style={{ fontSize:15, fontWeight:700, color: selected.correct ? '#7ee8c0' : '#ff9e9e', marginBottom:6 }}>
               {selected.correct ? '✅ 判斷正確！' : '❌ 判斷錯誤'}
             </div>
-            <div style={{ fontSize:13, color:'rgba(200,220,255,.85)', lineHeight:1.7 }}>{selected.explanation}</div>
+            <div style={{ display:'flex', alignItems:'flex-start', gap:8 }}>
+              <div style={{ flex:1, fontSize:13, color:'rgba(200,220,255,.85)', lineHeight:1.7 }}>{selected.explanation}</div>
+              <button onClick={() => speakNow((selected.correct ? '判斷正確！' : '判斷錯誤。') + selected.explanation)} style={{ flexShrink:0, background: speaking ? 'rgba(91,141,238,.25)' : 'rgba(255,255,255,.06)', border: `1px solid ${speaking ? 'rgba(91,141,238,.5)' : 'rgba(255,255,255,.12)'}`, borderRadius:14, padding:'2px 9px', cursor:'pointer', color: speaking ? '#7eb8ff' : 'rgba(180,200,255,.5)', fontSize:11 }}>{speaking ? '🔊' : '🔈'}</button>
+            </div>
             {qResults[qResults.length-1] && (
               <div style={{ marginTop:8, fontSize:12, color:'rgba(255,210,50,.8)' }}>
                 🪙 +{qResults[qResults.length-1].coins} 防詐金幣

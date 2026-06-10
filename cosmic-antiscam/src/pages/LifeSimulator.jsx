@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useGame } from '../GameContext'
 import { LIFE_SCENARIOS } from '../data/lifeSimScenarios'
 
@@ -31,8 +31,39 @@ export default function LifeSimulator({ navigate }) {
   const [phase, setPhase] = useState('loading')
   const [picked, setPicked] = useState(null)
   const [history, setHistory] = useState([])
+  const [speaking, setSpeaking] = useState(false)
+  const pickedRef = useRef(null)
 
   useEffect(() => { loadQueue() }, [])
+  useEffect(() => () => window.speechSynthesis?.cancel(), [])
+
+  useEffect(() => {
+    if (phase !== 'story' || !queue[idx]) return
+    speakText(queue[idx].story)
+  }, [idx, phase])
+
+  useEffect(() => {
+    if (phase !== 'consequence' || pickedRef.current === null || !queue[idx]) return
+    const s = queue[idx]
+    const c = s.choices[pickedRef.current]
+    speakText(c.consequence + '。' + s.explanation)
+  }, [phase])
+
+  function speakText(text) {
+    if (!window.speechSynthesis || !text) return
+    window.speechSynthesis.cancel()
+    const u = new SpeechSynthesisUtterance(text)
+    u.lang = 'zh-TW'; u.rate = 0.82; u.pitch = 0.9
+    u.onstart = () => setSpeaking(true)
+    u.onend = () => setSpeaking(false)
+    u.onerror = () => setSpeaking(false)
+    window.speechSynthesis.speak(u)
+  }
+
+  function toggleSpeak(text) {
+    if (speaking) { window.speechSynthesis?.cancel(); setSpeaking(false); return }
+    speakText(text)
+  }
 
   async function loadQueue() {
     let used = getUsed()
@@ -73,6 +104,7 @@ export default function LifeSimulator({ navigate }) {
 
   function choose(ci) {
     if (picked !== null) return
+    pickedRef.current = ci
     setPicked(ci)
     const s = queue[idx]
     const c = s.choices[ci]
@@ -90,6 +122,9 @@ export default function LifeSimulator({ navigate }) {
   }
 
   function goNext() {
+    window.speechSynthesis?.cancel()
+    setSpeaking(false)
+    pickedRef.current = null
     const ni = idx + 1
     if (ni >= TOTAL) {
       const safe = history.filter(h => h.safe).length
@@ -200,6 +235,9 @@ export default function LifeSimulator({ navigate }) {
           <span style={{ fontSize: 17 }}>🎬</span>
           <span style={{ fontSize: 15, fontWeight: 600, color: '#e0eaff' }}>{s.title}</span>
           <span style={{ marginLeft: 'auto', fontSize: 10, padding: '2px 8px', borderRadius: 20, background: 'rgba(255,150,50,.1)', border: '1px solid rgba(255,150,50,.22)', color: 'rgba(255,190,120,.8)', flexShrink: 0 }}>真實情境</span>
+          <button onClick={() => toggleSpeak(s.story)} style={{ background: speaking ? 'rgba(91,141,238,.25)' : 'rgba(255,255,255,.07)', border: `1px solid ${speaking ? 'rgba(91,141,238,.6)' : 'rgba(255,255,255,.15)'}`, borderRadius: 16, padding: '3px 10px', cursor: 'pointer', color: speaking ? '#7eb8ff' : 'rgba(180,200,255,.55)', fontSize: 12, flexShrink: 0 }}>
+            {speaking ? '🔊' : '🔈'}
+          </button>
         </div>
         <div style={{ fontSize: 15, color: 'rgba(200,218,255,.88)', lineHeight: 1.85 }}>{s.story}</div>
       </div>
@@ -241,7 +279,12 @@ export default function LifeSimulator({ navigate }) {
             border: `1px solid ${c[picked].assetChange < 0 ? 'rgba(255,80,80,.25)' : 'rgba(50,200,150,.25)'}`,
             borderRadius: 12, padding: '14px 16px', marginBottom: 10, animation: 'slideUp .2s ease',
           }}>
-            <div style={{ fontSize: 15, color: 'rgba(220,230,255,.88)', lineHeight: 1.85, marginBottom: 12 }}>{c[picked].consequence}</div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 12 }}>
+            <div style={{ flex: 1, fontSize: 15, color: 'rgba(220,230,255,.88)', lineHeight: 1.85 }}>{c[picked].consequence}</div>
+            <button onClick={() => toggleSpeak(c[picked].consequence + '。' + s.explanation)} style={{ flexShrink: 0, background: speaking ? 'rgba(91,141,238,.25)' : 'rgba(255,255,255,.07)', border: `1px solid ${speaking ? 'rgba(91,141,238,.6)' : 'rgba(255,255,255,.15)'}`, borderRadius: 16, padding: '3px 10px', cursor: 'pointer', color: speaking ? '#7eb8ff' : 'rgba(180,200,255,.55)', fontSize: 12 }}>
+              {speaking ? '🔊' : '🔈'}
+            </button>
+          </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 19, fontWeight: 700, color: c[picked].assetChange < 0 ? '#ff9e9e' : '#7ee8c5' }}>
                 {c[picked].assetChange < 0
