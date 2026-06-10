@@ -45,6 +45,8 @@ export default function Quiz({ mode, navigate, onResult }) {
     }
     planRef.current = p
     loadQuestion(0, p)
+    if ((bag['doublecoins'] || 0) > 0) useItem('doublecoins')
+    if ((bag['magnet'] || 0) > 0) useItem('magnet')
     return () => clearInterval(timerRef.current)
   }, [])
 
@@ -97,6 +99,7 @@ export default function Quiz({ mode, navigate, onResult }) {
 
   const handleTimeUp = () => {
     setAnswered(true)
+    setConfirmItem(null)
     const q = questions[currentQ]
     setFeedback({ correct: false, text: `⏰ 時間到！${q?.explanation||''}` })
   }
@@ -105,6 +108,7 @@ export default function Quiz({ mode, navigate, onResult }) {
     if (answered) return
     clearInterval(timerRef.current)
     setAnswered(true)
+    setConfirmItem(null)
     const q = questions[currentQ]
     if (val === q.answer) {
       setSelected('correct')
@@ -119,7 +123,7 @@ export default function Quiz({ mode, navigate, onResult }) {
     } else {
       setSelected('wrong')
       let shielded = false
-      if (shields > 0) { setShields(s=>s-1); shielded = true }
+      if (shields > 0) { setShields(s=>s-1); useItem('shield'); shielded = true }
       setFeedback({ correct: false, text: `❌ 答錯了！${shielded?'（防護盾保護）':''}\n${q.explanation}` })
     }
     if (currentQ + 2 < 10 && !questions[currentQ+2]) loadQuestion(currentQ+2)
