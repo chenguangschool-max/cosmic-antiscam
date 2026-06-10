@@ -359,7 +359,28 @@ function ResultScreen({ c, coins, correct, total, trust, navigate, onBack }) {
 }
 
 function CaseSelectScreen({ cases, onSelect, navigate }) {
-  const categoryColor = { fraud:'#fb923c', invest:'#ec4899', social:'#a78bfa', cyber:'#38bdf8', romance:'#f472b6' }
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
+
+  const generateAiCase = async () => {
+    setAiLoading(true)
+    setAiError('')
+    try {
+      const res = await fetch('https://cosmic-antiscam-production.up.railway.app/api/generate-detective-case', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      })
+      if (!res.ok) throw new Error('failed')
+      const data = await res.json()
+      onSelect(data.case)
+    } catch {
+      setAiError('AI 生成失敗，請再試一次')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
   return (
     <div style={{ padding:'20px 18px', position:'relative', zIndex:2, minHeight:'100vh' }}>
       <button style={{ background:'rgba(255,255,255,.07)', border:'1px solid rgba(255,255,255,.14)', borderRadius:20, padding:'5px 13px', color:'rgba(180,200,255,.7)', fontSize:12, cursor:'pointer', marginBottom:20 }} onClick={() => navigate('menu')}>← 返回</button>
@@ -368,7 +389,7 @@ function CaseSelectScreen({ cases, onSelect, navigate }) {
         <div style={{ fontFamily:'Orbitron,monospace', fontSize:15, fontWeight:900, color:'#fff', letterSpacing:2 }}>偵探模式</div>
         <div style={{ fontSize:12, color:'rgba(140,180,255,.5)', marginTop:4 }}>165 反詐騙特別調查組 — 選擇案件</div>
       </div>
-      {cases.map((c, i) => (
+      {cases.map((c) => (
         <div key={c.id} onClick={() => onSelect(c)} style={{
           background:'rgba(91,141,238,.07)', border:'1px solid rgba(91,141,238,.22)',
           borderRadius:14, padding:'14px 16px', marginBottom:10, cursor:'pointer',
@@ -386,6 +407,33 @@ function CaseSelectScreen({ cases, onSelect, navigate }) {
           </div>
         </div>
       ))}
+
+      <div
+        onClick={aiLoading ? undefined : generateAiCase}
+        style={{
+          background: aiLoading ? 'rgba(167,139,250,.04)' : 'rgba(167,139,250,.1)',
+          border: `2px dashed ${aiError ? 'rgba(255,100,100,.4)' : 'rgba(167,139,250,.4)'}`,
+          borderRadius:14, padding:'18px 16px', marginBottom:10,
+          cursor: aiLoading ? 'default' : 'pointer',
+          textAlign:'center', transition:'background .2s',
+        }}
+      >
+        {aiLoading ? (
+          <>
+            <div style={{ fontSize:24, marginBottom:6 }}>⏳</div>
+            <div style={{ fontSize:14, color:'rgba(180,160,255,.8)', fontWeight:700, fontFamily:'Noto Sans TC,sans-serif' }}>AI 正在生成新案件…</div>
+            <div style={{ fontSize:12, color:'rgba(140,120,255,.5)', marginTop:5 }}>約需 10–20 秒，稍候片刻</div>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize:24, marginBottom:6 }}>✨</div>
+            <div style={{ fontSize:14, color:'#c4b5fd', fontWeight:700, fontFamily:'Noto Sans TC,sans-serif' }}>AI 生成新案件</div>
+            <div style={{ fontSize:12, marginTop:5, color: aiError ? '#ff9e9e' : 'rgba(167,139,250,.6)', fontFamily:'Noto Sans TC,sans-serif' }}>
+              {aiError || '每次不同，隨機詐騙手法'}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }

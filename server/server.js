@@ -165,6 +165,126 @@ app.post('/api/life-scenario', async (req, res) => {
   }
 })
 
+// ── 偵探模式 AI 生成案件 ────────────────────────────────────────────────────────
+
+const AI_DETECTIVE_TYPES = [
+  { method: '假冒電商客服誤設分期', scammer: '電商客服專員' },
+  { method: '假冒銀行解除分期', scammer: '銀行客服' },
+  { method: '求職先繳保證金', scammer: 'HR人資專員' },
+  { method: '假冒健保局退費', scammer: '健保局人員' },
+  { method: '假冒台電欠費停電', scammer: '台電客服' },
+  { method: '網路二手交易詐騙', scammer: '買家' },
+  { method: '假冒郵局補繳費用', scammer: '郵局客服' },
+]
+
+app.post('/api/generate-detective-case', async (req, res) => {
+  const type = AI_DETECTIVE_TYPES[Math.floor(Math.random() * AI_DETECTIVE_TYPES.length)]
+  const uid = Math.random().toString(36).slice(2, 10)
+  const caseNum = '#' + String(Math.floor(Math.random() * 900) + 50).padStart(4, '0')
+
+  const prompt = `你是台灣防詐騙教育遊戲「偵探模式」的關卡設計師。
+請生成一個完整的偵探案件，類型：${type.method}，詐騙方扮演：${type.scammer}。
+
+要求：
+- 繁體中文，台灣真實生活場景
+- 3 道題目，循序漸進揭露詐騙全貌
+- 第1、3題用 lineChat，第2題用 message（字串，不是陣列）
+- 每題 evidence：3-4 個 isSuspicious:true，1-2 個 isSuspicious:false
+- suspiciousIds 必須與 isSuspicious:true 的 id 完全一致
+- options 恰好一個 correct:true，其餘 false
+- 只輸出 JSON，不含其他文字
+
+{
+  "id": "ai_${uid}",
+  "caseNumber": "${caseNum}",
+  "title": "案件標題（12字內）",
+  "victim": "受害者稱呼（如：陳先生）",
+  "loss": "損失金額（如：45 萬元）",
+  "method": "${type.method}",
+  "intro": "案件背景（50-70字，開頭：你是165反詐騙偵探，）",
+  "questions": [
+    {
+      "id": "q1",
+      "scene": "第一場景（30-50字）",
+      "lineChat": [
+        {"sender":"scammer","name":"${type.scammer}名稱（8字內）","text":"第一句話（20-40字）","time":"10:15"},
+        {"sender":"victim","name":"受害者名字","text":"受害者回應（10-25字）","time":"10:17"},
+        {"sender":"scammer","name":"${type.scammer}名稱","text":"繼續誘導（20-40字）","time":"10:18"}
+      ],
+      "question": "偵探，這個場景有哪些可疑訊號？找出來再作答。",
+      "timeLimit": 25,
+      "evidence": [
+        {"id":"e1a","label":"線索名稱（8字內）","icon":"📱","content":"分析（40-70字，換行分點說明）","isSuspicious":true},
+        {"id":"e1b","label":"線索名稱","icon":"🔗","content":"分析內容","isSuspicious":true},
+        {"id":"e1c","label":"線索名稱","icon":"💬","content":"分析內容","isSuspicious":true},
+        {"id":"e1d","label":"正常線索名稱","icon":"📄","content":"說明為何正常（30-50字）","isSuspicious":false},
+        {"id":"e1e","label":"正常線索名稱","icon":"🏷️","content":"說明為何正常","isSuspicious":false}
+      ],
+      "options": [
+        {"text":"正確防詐行動（25字內）","correct":true,"explanation":"解析（30-50字）"},
+        {"text":"錯誤選項A（25字內）","correct":false,"explanation":"解析（20-35字）"},
+        {"text":"錯誤選項B（25字內）","correct":false,"explanation":"解析（20-35字）"}
+      ],
+      "suspiciousIds": ["e1a","e1b","e1c"]
+    },
+    {
+      "id": "q2",
+      "scene": "第二場景（30-50字，詐騙升級）",
+      "message": "詐騙方的關鍵訊息原文（50-80字）",
+      "question": "偵探，以下哪些是危險訊號？",
+      "timeLimit": 20,
+      "evidence": [
+        {"id":"e2a","label":"線索名稱","icon":"⚠️","content":"分析內容","isSuspicious":true},
+        {"id":"e2b","label":"線索名稱","icon":"🏦","content":"分析內容","isSuspicious":true},
+        {"id":"e2c","label":"線索名稱","icon":"📋","content":"分析內容","isSuspicious":true},
+        {"id":"e2d","label":"正常線索","icon":"✅","content":"說明為何正常","isSuspicious":false}
+      ],
+      "options": [
+        {"text":"正確防詐行動（25字內）","correct":true,"explanation":"解析（30-50字）"},
+        {"text":"錯誤選項A（25字內）","correct":false,"explanation":"解析（20-35字）"},
+        {"text":"錯誤選項B（25字內）","correct":false,"explanation":"解析（20-35字）"}
+      ],
+      "suspiciousIds": ["e2a","e2b","e2c"]
+    },
+    {
+      "id": "q3",
+      "scene": "第三場景（30-50字，最後關鍵時刻，要求轉帳或操作ATM）",
+      "lineChat": [
+        {"sender":"scammer","name":"${type.scammer}名稱","text":"要求最終操作（20-40字）","time":"14:30"},
+        {"sender":"victim","name":"受害者名字","text":"受害者猶豫（10-20字）","time":"14:32"},
+        {"sender":"scammer","name":"${type.scammer}名稱","text":"施壓催促（20-35字）","time":"14:33"}
+      ],
+      "question": "偵探，現在最關鍵的判斷：",
+      "timeLimit": 20,
+      "evidence": [
+        {"id":"e3a","label":"線索名稱","icon":"🚨","content":"關鍵紅旗分析（40-60字）","isSuspicious":true},
+        {"id":"e3b","label":"線索名稱","icon":"📞","content":"分析內容","isSuspicious":true},
+        {"id":"e3c","label":"正常線索","icon":"📦","content":"說明為何正常","isSuspicious":false}
+      ],
+      "options": [
+        {"text":"立刻停止並撥165（25字內）","correct":true,"explanation":"解析（30-50字）"},
+        {"text":"錯誤選項A（25字內）","correct":false,"explanation":"解析（20-35字）"},
+        {"text":"錯誤選項B（25字內）","correct":false,"explanation":"解析（20-35字）"}
+      ],
+      "suspiciousIds": ["e3a","e3b"]
+    }
+  ]
+}`
+
+  try {
+    const msg = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 3500,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    const caseData = parseJson(msg.content[0].text)
+    res.json({ case: caseData })
+  } catch (e) {
+    console.error('generate-detective-case failed:', e.message)
+    res.status(500).json({ error: 'generation failed' })
+  }
+})
+
 // ── 題庫主題 ───────────────────────────────────────────────────────────────────
 
 const SCAM_TOPICS = [
