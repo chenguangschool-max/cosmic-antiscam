@@ -444,7 +444,7 @@ async function genQuestion(isScam, topic, difficulty = '') {
       return parseJson(msg.content[0].text)
     } catch (e) {
       if (attempt === 1) throw e
-      await new Promise(r => setTimeout(r, 1500))
+      await new Promise(r => setTimeout(r, 800))
     }
   }
 }
@@ -516,39 +516,33 @@ const QUIZ_MODE_CONFIG = {
 
 async function genRoomQuestions(mode = 'quiz') {
   if (mode === 'detective') {
-    const questions = []
-    for (let i = 0; i < 10; i++) {
-      try { questions.push(await genDetectiveQ()) }
-      catch { questions.push(shuffle(FALLBACK_QUESTIONS)[0]) }
-    }
-    return questions
+    return Promise.all(
+      Array.from({ length: 10 }, () =>
+        genDetectiveQ().catch(() => ({ ...shuffle(FALLBACK_QUESTIONS)[0] }))
+      )
+    )
   }
   if (mode === 'lifesim' || mode === 'scamsim') {
-    const questions = []
-    for (let i = 0; i < 10; i++) {
-      try { questions.push(await genLifeSimQ()) }
-      catch { questions.push(shuffle(FALLBACK_SCAMSIM)[0]) }
-    }
-    return questions
+    return Promise.all(
+      Array.from({ length: 10 }, () =>
+        genLifeSimQ().catch(() => ({ ...shuffle(FALLBACK_SCAMSIM)[0] }))
+      )
+    )
   }
   const cfg = QUIZ_MODE_CONFIG[mode] || QUIZ_MODE_CONFIG.quiz
-  try {
-    const scamTopics = shuffle(SCAM_TOPICS).slice(0, 7)
-    const normalTopics = shuffle(NORMAL_TOPICS).slice(0, 3)
-    const assignments = shuffle([
-      ...scamTopics.map(t => ({ isScam: true, topic: t })),
-      ...normalTopics.map(t => ({ isScam: false, topic: t })),
-    ])
-    const questions = []
-    for (const { isScam, topic } of assignments) {
-      const q = await genQuestion(isScam, topic, cfg.difficulty)
-      questions.push({ ...q, timeLimit: cfg.timeLimit })
-    }
-    return questions
-  } catch (e) {
-    console.error('AI generation failed, using fallback questions:', e.message)
-    return shuffle(FALLBACK_QUESTIONS).map(q => ({ ...q, timeLimit: cfg.timeLimit }))
-  }
+  const scamTopics = shuffle(SCAM_TOPICS).slice(0, 7)
+  const normalTopics = shuffle(NORMAL_TOPICS).slice(0, 3)
+  const assignments = shuffle([
+    ...scamTopics.map(t => ({ isScam: true, topic: t })),
+    ...normalTopics.map(t => ({ isScam: false, topic: t })),
+  ])
+  const questions = await Promise.all(
+    assignments.map(({ isScam, topic }) =>
+      genQuestion(isScam, topic, cfg.difficulty)
+        .catch(() => ({ ...shuffle(FALLBACK_QUESTIONS)[0] }))
+    )
+  )
+  return questions.map(q => ({ ...q, timeLimit: cfg.timeLimit }))
 }
 
 // ── 房間管理 ───────────────────────────────────────────────────────────────────
