@@ -65,9 +65,12 @@ function CodeBoxes({ chars, onChange }) {
 }
 
 const MODE_OPTIONS = [
-  { id: 'quiz',     emoji: '🚀', label: '答題模式',   desc: '判斷詐騙或正常' },
-  { id: 'detective',emoji: '🔍', label: '偵探模式',   desc: '找出情境中的陷阱' },
-  { id: 'lifesim',  emoji: '🎭', label: '人生模擬器', desc: '選擇行動保住資產' },
+  { id: 'beginner',  emoji: '🧑',  label: '新手模式',   desc: '提示多，時間充裕' },
+  { id: 'expert',    emoji: '⭐',  label: '高手模式',   desc: '無提示，時間緊迫' },
+  { id: 'edu',       emoji: '📚',  label: '教育模式',   desc: '每題後詳細說明' },
+  { id: 'holiday',   emoji: '🌴',  label: '假日模式',   desc: '輕鬆休閒玩法' },
+  { id: 'detective', emoji: '🔍',  label: '偵探模式',   desc: '找出情境中的陷阱' },
+  { id: 'scamsim',   emoji: '💸',  label: '詐騙模擬器', desc: '選擇行動保住資產' },
 ]
 
 export default function OnlineLobby({ navigate, onRoomReady }) {
@@ -220,7 +223,7 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
             border: `1px solid ${players.length < 2 ? 'rgba(255,255,255,.1)' : 'rgba(91,141,238,.6)'}`,
             color: players.length < 2 ? 'rgba(180,200,255,.3)' : '#c8dbff',
           }}>
-            {players.length < 2 ? '等待更多玩家加入…' : '🚀 開始對戰！'}
+            {players.length < 2 ? '等待更多玩家加入…' : '🚀 開始遊戲！'}
           </button>
         ) : (
           <div style={{ textAlign: 'center', color: 'rgba(180,200,255,.45)', fontSize: 14 }}>
@@ -237,9 +240,9 @@ export default function OnlineLobby({ navigate, onRoomReady }) {
 
       <div style={{ textAlign: 'center', marginBottom: 26 }}>
         <div style={{ fontSize: 42, marginBottom: 8 }}>🌐</div>
-        <div style={title}>連線對戰</div>
+        <div style={title}>多人模式</div>
         <div style={{ fontSize: 13, color: 'rgba(180,200,255,.45)', marginTop: 5 }}>
-          與朋友即時連線，同步答題比拼防詐能力
+          與朋友即時連線，同步答題比拼防詐能力 — 共 6 種模式
         </div>
       </div>
 

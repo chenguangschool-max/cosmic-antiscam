@@ -109,8 +109,8 @@ export default function LifeSimulator({ navigate }) {
   // ── 載入中 ──
   if (phase === 'loading') return (
     <div style={{ padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', gap: 16 }}>
-      <div style={{ fontSize: 40 }}>🌐</div>
-      <div style={{ fontFamily: 'Orbitron,monospace', fontSize: 14, color: '#c8dbff', letterSpacing: 1 }}>情境載入中</div>
+      <div style={{ fontSize: 40 }}>💸</div>
+      <div style={{ fontFamily: 'Orbitron,monospace', fontSize: 14, color: '#c8dbff', letterSpacing: 1 }}>詐騙模擬器載入中</div>
       <div style={{ width: 200, height: 4, background: 'rgba(255,255,255,.07)', borderRadius: 4, overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${(loaded / TOTAL) * 100}%`, background: 'linear-gradient(90deg,#5b8dee,#a78bfa)', transition: 'width .3s', borderRadius: 4 }} />
       </div>
@@ -129,7 +129,7 @@ export default function LifeSimulator({ navigate }) {
       <div style={{ padding: 18, position: 'relative', zIndex: 2 }}>
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <div style={{ fontSize: 36, marginBottom: 6 }}>🏁</div>
-          <div style={{ fontFamily: 'Orbitron,monospace', fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: 2 }}>模擬人生結束</div>
+          <div style={{ fontFamily: 'Orbitron,monospace', fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: 2 }}>詐騙模擬器結算</div>
         </div>
 
         {/* 財務摘要 */}

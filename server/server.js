@@ -384,8 +384,8 @@ function parseJson(raw) {
   return JSON.parse(text)
 }
 
-async function genQuestion(isScam, topic) {
-  const base = '遊戲世界觀：未來宇宙世界，機構使用「星際」「銀河」「宇宙」前綴，貨幣為「星幣」。只輸出 JSON，不含其他文字。'
+async function genQuestion(isScam, topic, difficulty = '') {
+  const base = `遊戲世界觀：未來宇宙世界，機構使用「星際」「銀河」「宇宙」前綴，貨幣為「星幣」。${difficulty ? difficulty + '。' : ''}只輸出 JSON，不含其他文字。`
   const schema = isScam
     ? `{"signal":"發件人（6-12字）","text":"詐騙訊息（80-130字，製造緊迫感、要求點連結或匯款）","answer":1,"explanation":"這是詐騙，因為…（20-35字）","topic":"${topic}"}`
     : `{"signal":"發件人（6-12字）","text":"正常通知（80-130字，提供官方查詢管道、不要求立即付款）","answer":0,"explanation":"這是正常訊息，因為…（20-35字）","topic":"${topic}"}`
@@ -466,6 +466,14 @@ async function genLifeSimQ() {
   }
 }
 
+const QUIZ_MODE_CONFIG = {
+  beginner: { timeLimit: 30, difficulty: '難度：簡單，詐騙特徵明顯易辨識，訊息較短、破綻清楚，適合新手' },
+  expert:   { timeLimit: 15, difficulty: '難度：困難，詐騙手法隱蔽、措辭專業、細節多，只有高手才能識破' },
+  edu:      { timeLimit: 25, difficulty: '難度：中等，重視教育意義，explanation 要完整說明防詐知識' },
+  holiday:  { timeLimit: 35, difficulty: '難度：輕鬆，情境日常生活化有趣，輕鬆識別即可' },
+  quiz:     { timeLimit: 20, difficulty: '' },
+}
+
 async function genRoomQuestions(mode = 'quiz') {
   if (mode === 'detective') {
     const questions = []
@@ -475,7 +483,7 @@ async function genRoomQuestions(mode = 'quiz') {
     }
     return questions
   }
-  if (mode === 'lifesim') {
+  if (mode === 'lifesim' || mode === 'scamsim') {
     const questions = []
     for (let i = 0; i < 10; i++) {
       try { questions.push(await genLifeSimQ()) }
@@ -483,6 +491,7 @@ async function genRoomQuestions(mode = 'quiz') {
     }
     return questions
   }
+  const cfg = QUIZ_MODE_CONFIG[mode] || QUIZ_MODE_CONFIG.quiz
   try {
     const scamTopics = shuffle(SCAM_TOPICS).slice(0, 7)
     const normalTopics = shuffle(NORMAL_TOPICS).slice(0, 3)
@@ -492,12 +501,13 @@ async function genRoomQuestions(mode = 'quiz') {
     ])
     const questions = []
     for (const { isScam, topic } of assignments) {
-      questions.push(await genQuestion(isScam, topic))
+      const q = await genQuestion(isScam, topic, cfg.difficulty)
+      questions.push({ ...q, timeLimit: cfg.timeLimit })
     }
     return questions
   } catch (e) {
     console.error('AI generation failed, using fallback questions:', e.message)
-    return shuffle(FALLBACK_QUESTIONS)
+    return shuffle(FALLBACK_QUESTIONS).map(q => ({ ...q, timeLimit: cfg.timeLimit }))
   }
 }
 
