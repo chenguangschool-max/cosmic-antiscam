@@ -12,7 +12,7 @@ function cleanForSpeech(text) {
 }
 
 export default function Quiz({ mode, navigate, onResult }) {
-  const { coins, bag, addCoins, spendCoins: _sc, addXp, monsters, unlockMonster } = useGame()
+  const { coins, bag, addCoins, spendCoins: _sc, addXp, monsters, unlockMonster, useItem } = useGame()
   const [questions, setQuestions] = useState([])
   const [currentQ, setCurrentQ] = useState(0)
   const [score, setScore] = useState(0)
@@ -23,7 +23,6 @@ export default function Quiz({ mode, navigate, onResult }) {
   const [timerVal, setTimerVal] = useState(mode?.time || 20)
   const [feedback, setFeedback] = useState(null)
   const [usedItems, setUsedItems] = useState({})
-  const [bagState, setBagState] = useState({ ...bag })
   const [shields, setShields] = useState(bag['shield'] || 0)
   const [coinMult] = useState((bag['doublecoins'] || 0) > 0 ? 2 : 1)
   const [extraCoins] = useState((bag['magnet'] || 0) > 0 ? 5 : 0)
@@ -142,6 +141,7 @@ export default function Quiz({ mode, navigate, onResult }) {
   const handleNext = () => {
     window.speechSynthesis?.cancel()
     setSpeaking(false)
+    setUsedItems({})
     const next = currentQ + 1
     if (next >= 10) {
       const bonusXp = score * 20
@@ -159,8 +159,8 @@ export default function Quiz({ mode, navigate, onResult }) {
   }
 
   const handleUseItem = (item) => {
-    if (usedItems[item.id] || (bagState[item.id]||0) <= 0) return
-    setBagState(prev => ({ ...prev, [item.id]: prev[item.id]-1 }))
+    if (usedItems[item.id] || (bag[item.id] || 0) <= 0) return
+    useItem(item.id)
     setUsedItems(prev => ({ ...prev, [item.id]: true }))
     if (item.id === 'turtle') { setTimerVal(t => t+10) }
     if (item.id === 'clock') { clearInterval(timerRef.current); setTimeout(startTimer, 15000) }
@@ -348,10 +348,10 @@ export default function Quiz({ mode, navigate, onResult }) {
       )}
 
       {/* 右下角道具浮鈕 */}
-      {['turtle','clock','pass'].some(id => (bagState[id]||0) > 0) && (
+      {['turtle','clock','pass'].some(id => (bag[id]||0) > 0) && (
         <div style={{ position:'fixed', bottom:24, right:16, zIndex:60, display:'flex', flexDirection:'column', gap:8, alignItems:'flex-end' }}>
           {['turtle','clock','pass'].map(id => {
-            const qty = bagState[id] || 0; if (!qty) return null
+            const qty = bag[id] || 0; if (!qty) return null
             const item = ITEMS.find(i => i.id === id)
             const used = !!usedItems[id]
             return (
