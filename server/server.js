@@ -302,6 +302,46 @@ const NORMAL_TOPICS = [
   '銀行信用卡消費通知', '健保卡補發正常通知', '銀行定存到期通知', '政府退稅通知',
 ]
 
+// ── 詐騙模擬器備用題庫 ───────────────────────────────────────────────────────
+
+const FALLBACK_SCAMSIM = [
+  {
+    signal: '網路購物退款詐騙',
+    text: '你在蝦皮買了一雙鞋，突然收到自稱客服的LINE訊息：「您的訂單系統異常，需要配合操作ATM解除分期，否則每月自動扣款3000元。」',
+    choices: ['💳 照指示去ATM操作', '📞 打給蝦皮官方客服確認', '🔍 撥165反詐騙查詢', '❌ 不理會繼續等包裹'],
+    answer: 2, explanation: '正規退款絕不需要操作ATM。這是解除分期詐騙，先撥165確認。',
+    assetChanges: [-50000, 0, 200, 0], timeLimit: 25,
+  },
+  {
+    signal: '中獎通知',
+    text: '手機收到簡訊：「恭喜您抽中iPhone 16！領獎需先繳納行政處理費500元，匯款後48小時內寄出。請盡快匯款至：玉山銀行 123-456789」',
+    choices: ['💸 馬上匯款500元', '🤔 打給官方詢問活動', '🚫 直接刪除不理', '📲 分享給朋友一起領獎'],
+    answer: 2, explanation: '沒參加的抽獎卻中獎又要先繳費，100%是詐騙，直接刪除。',
+    assetChanges: [-500, 0, 0, -500], timeLimit: 20,
+  },
+  {
+    signal: '假冒親友借錢',
+    text: '你收到「兒子」的LINE訊息：「媽，我手機壞了換號碼，現在急用2萬，你先轉給我這帳號，晚點還你。」頭貼和名字都跟兒子一樣。',
+    choices: ['💳 立刻轉帳2萬', '📞 用舊號碼打回去確認', '📱 問他「你家地址是哪裡」確認', '💬 先說「好」，但問清楚帳號'],
+    answer: 1, explanation: '換號碼後要錢是詐騙常見手法，用原本的電話號碼打回去確認真人身份。',
+    assetChanges: [-20000, 0, 0, -20000], timeLimit: 25,
+  },
+  {
+    signal: '求職保證金',
+    text: '應徵到一份月薪8萬的在家工作，HR說：「錄取了！但入職前需繳交5000元設備保證金，到職後第一個月還給你。」',
+    choices: ['💰 繳保證金，機會難得', '🔍 查公司統編和地址是否存在', '📞 要求先面試再討論費用', '❌ 直接拒絕並檢舉'],
+    answer: 3, explanation: '正規公司不會要求求職者先繳保證金。這是詐騙，直接拒絕並向1955投訴。',
+    assetChanges: [-5000, 0, 0, 0], timeLimit: 25,
+  },
+  {
+    signal: '假冒台電欠費',
+    text: '接到電話自稱台電客服：「您的電費帳單逾期，今天18:00將強制停電。請立即轉帳3,280元至指定帳戶，轉後30分鐘內恢復供電。」',
+    choices: ['💳 立刻轉帳3280元', '📞 掛斷後查台電官方電話確認', '🏦 叫對方傳帳單來看', '🔌 等到停電再處理'],
+    answer: 1, explanation: '台電不會要求直接轉帳至私人帳戶。掛斷後自己查台電官方電話(1911)確認。',
+    assetChanges: [-3280, 0, 0, 0], timeLimit: 20,
+  },
+]
+
 // ── 備用靜態題庫（API 失敗時使用）────────────────────────────────────────────
 
 const FALLBACK_QUESTIONS = [
@@ -487,7 +527,7 @@ async function genRoomQuestions(mode = 'quiz') {
     const questions = []
     for (let i = 0; i < 10; i++) {
       try { questions.push(await genLifeSimQ()) }
-      catch { questions.push(shuffle(FALLBACK_QUESTIONS)[0]) }
+      catch { questions.push(shuffle(FALLBACK_SCAMSIM)[0]) }
     }
     return questions
   }

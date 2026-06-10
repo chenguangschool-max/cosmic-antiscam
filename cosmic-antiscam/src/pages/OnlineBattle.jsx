@@ -275,7 +275,7 @@ export default function OnlineBattle({ room, navigate }) {
 
       {/* 選項 */}
       {q && phase !== 'result' && (
-        <ChoiceButtons q={q} myAnswer={myAnswer} onAnswer={handleAnswer} />
+        <ChoiceButtons q={q} myAnswer={myAnswer} onAnswer={handleAnswer} mode={roomMode} />
       )}
 
       {/* 等待其他人 */}
@@ -295,7 +295,7 @@ export default function OnlineBattle({ room, navigate }) {
         <>
           {/* 正確答案 highlight */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
-            <ResultChoices q={q} questionResult={questionResult} myAnswer={myAnswer} />
+            <ResultChoices q={q} questionResult={questionResult} myAnswer={myAnswer} mode={roomMode} />
           </div>
 
           {/* 我的結果 */}
@@ -355,7 +355,8 @@ export default function OnlineBattle({ room, navigate }) {
 const LABELS = ['A', 'B', 'C', 'D']
 const DEFAULT_CHOICES = [{ label: '✅ 這是正常事件', val: 0 }, { label: '🚨 這是異常詐騙', val: 1 }]
 
-function ChoiceButtons({ q, myAnswer, onAnswer }) {
+function ChoiceButtons({ q, myAnswer, onAnswer, mode }) {
+  const isSim = mode === 'scamsim' || mode === 'lifesim'
   const choices = q?.choices
     ? q.choices.map((label, i) => ({ label, val: i }))
     : DEFAULT_CHOICES
@@ -368,13 +369,15 @@ function ChoiceButtons({ q, myAnswer, onAnswer }) {
             display: 'flex', alignItems: 'center', gap: 10, width: '100%',
             background: selected ? 'rgba(91,141,238,.2)' : 'rgba(255,255,255,.04)',
             border: `1px solid ${selected ? 'rgba(91,141,238,.7)' : 'rgba(91,141,238,.2)'}`,
-            borderRadius: 11, padding: '12px 15px', color: selected ? '#c8dbff' : 'var(--text)',
-            fontSize: 13, cursor: myAnswer !== null ? 'default' : 'pointer', textAlign: 'left',
+            borderRadius: 11, padding: '13px 15px', color: selected ? '#c8dbff' : 'var(--text)',
+            fontSize: 14, cursor: myAnswer !== null ? 'default' : 'pointer', textAlign: 'left',
             fontFamily: 'Noto Sans TC,sans-serif',
           }}>
-            <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(91,141,238,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
-              {LABELS[i]}
-            </span>
+            {!isSim && (
+              <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(91,141,238,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
+                {LABELS[i]}
+              </span>
+            )}
             {o.label}
           </button>
         )
@@ -383,7 +386,8 @@ function ChoiceButtons({ q, myAnswer, onAnswer }) {
   )
 }
 
-function ResultChoices({ q, questionResult, myAnswer }) {
+function ResultChoices({ q, questionResult, myAnswer, mode }) {
+  const isSim = mode === 'scamsim' || mode === 'lifesim'
   const choices = q?.choices
     ? q.choices.map((label, i) => ({ label, val: i }))
     : DEFAULT_CHOICES
@@ -394,12 +398,19 @@ function ResultChoices({ q, questionResult, myAnswer }) {
     if (isCorrect) { bg = 'rgba(50,200,150,.17)'; bc = 'rgba(50,200,150,.55)'; col = '#8ee8c5' }
     else if (isMine) { bg = 'rgba(255,80,80,.14)'; bc = 'rgba(255,80,80,.45)'; col = '#ffaaaa' }
     return (
-      <div key={o.val} style={{ display: 'flex', alignItems: 'center', gap: 10, background: bg, border: `1px solid ${bc}`, borderRadius: 11, padding: '11px 14px', color: col, fontSize: 13 }}>
-        <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(91,141,238,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
-          {LABELS[i]}
-        </span>
+      <div key={o.val} style={{ display: 'flex', alignItems: 'center', gap: 10, background: bg, border: `1px solid ${bc}`, borderRadius: 11, padding: '11px 14px', color: col, fontSize: 14 }}>
+        {!isSim && (
+          <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(91,141,238,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
+            {LABELS[i]}
+          </span>
+        )}
         {o.label}
         {isCorrect && <span style={{ marginLeft: 'auto', fontSize: 11 }}>✓ 正解</span>}
+        {isSim && q.assetChanges && (
+          <span style={{ marginLeft: 'auto', fontSize: 11, color: q.assetChanges[i] < 0 ? '#ff9e9e' : q.assetChanges[i] > 0 ? '#7ee8c5' : 'rgba(140,180,255,.5)' }}>
+            {q.assetChanges[i] < 0 ? `💸 −${Math.abs(q.assetChanges[i]).toLocaleString()}` : q.assetChanges[i] > 0 ? `✨ +${q.assetChanges[i].toLocaleString()}` : '±0'}
+          </span>
+        )}
       </div>
     )
   })
