@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公路賽車</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+  }
+  #gameWrapper {
+    position: relative;
+    width: 400px;
+  }
+  canvas {
+    display: block;
+    border: 2px solid #333;
+    border-radius: 4px;
+  }
+  #ui {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 16px;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .ui-box {
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+  .ui-box span { color: #FFD700; }
+  #overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.82);
+    border-radius: 4px;
+    z-index: 20;
+    color: #fff;
+    text-align: center;
+  }
+  #overlay h1 { font-size: 36px; color: #FFD700; text-shadow: 0 0 20px #FFD700aa; margin-bottom: 8px; }
+  #overlay .sub { font-size: 16px; color: #aaa; margin-bottom: 24px; }
+  #overlay .score-display { font-size: 22px; margin-bottom: 20px; color: #FFD700; }
+  #overlay button {
+    background: linear-gradient(135deg, #FFD700, #FF8C00);
+    color: #000;
+    border: none;
+    padding: 14px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 4px 20px #FFD70066;
+  }
+  #overlay button:hover { transform: scale(1.05); box-shadow: 0 6px 28px #FFD700aa; }
+  #overlay button:active { transform: scale(0.97); }
+  #controls {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    gap: 6px;
+    z-index: 30;
+    flex-direction: column;
+    align-items: center;
+  }
+  #controls.show { display: flex; }
+  .ctrl-row { display: flex; gap: 6px; }
+  .ctrl-btn {
+    width: 50px; height: 50px;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 22px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.1s;
+  }
+  .ctrl-btn:active { background: rgba(255,215,0,0.35); }
+  #nitro-bar-wrap {
+    position: absolute;
+    bottom: 10px; right: 16px;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #nitro-label { color: #aaa; font-size: 11px; letter-spacing: 1px; margin-bottom: 3px; text-align: center; }
+  #nitro-bar-bg {
+    width: 12px; height: 80px;
+    background: #333;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0 auto;
+  }
+  #nitro-bar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #00eaff, #0077ff);
+    border-radius: 6px;
+    transform-origin: bottom;
+    transition: transform 0.1s;
+  }
+</style>
+</head>
+<body>
+<div id="gameWrapper">
+  <canvas id="c" width="400" height="620"></canvas>
+
+  <div id="ui">
+    <div class="ui-box">分數 <span id="scoreUI">0</span></div>
+    <div class="ui-box">❤️ <span id="livesUI">3</span></div>
+    <div class="ui-box">速度 <span id="speedUI">1</span>x</div>
+  </div>
+
+  <div id="nitro-bar-wrap">
+    <div id="nitro-label">NOS</div>
+    <div id="nitro-bar-bg"><div id="nitro-bar"></div></div>
+  </div>
+
+  <!-- 主選單 overlay -->
+  <div id="overlay">
+    <h1>🏎️ 公路賽車</h1>
+    <div class="sub">躲避來車，越跑越快！</div>
+    <div class="score-display" id="finalScore" style="display:none"></div>
+    <button id="startBtn">開始遊戲</button>
+    <button id="helpBtn" style="margin-top:10px;background:rgba(255,255,255,0.1);color:#aaa;border:1px solid #444;padding:8px 24px;font-size:13px;border-radius:20px;cursor:pointer;">📋 使用說明</button>
+  </div>
+
+  <!-- 使用說明 overlay -->
+  <div id="helpOverlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.92);border-radius:4px;z-index:25;color:#fff;overflow-y:auto;padding:24px 20px;">
+    <h2 style="color:#FFD700;text-align:center;font-size:22px;margin-bottom:16px;">📋 使用說明</h2>
+
+    <div style="margin-bottom:16px;">
+      <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">🎮 操作方式</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="border-bottom:1px solid #333;">
+          <td style="padding:6px 0;color:#aaa;">← →</td>
+          <td style="padding:6px 0;">左右移動換道</td>
+        </tr>
+        <tr style="border-bottom:1px solid #333;">
+          <td style="padding:6px 0;color:#aaa;">↑</td>
+          <td style="padding:6px 0;">往前加速</td>
+        </tr>
+        <tr style="border-bottom:1px solid #333;">
+          <td style="padding:6px 0;color:#aaa;">↓</td>
+          <td style="padding:6px 0;">倒車（往後退）</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 0;color:#aaa;">Shift</td>
+          <td style="padding:6px 0;">💨 氮氣加速（需 NOS 槽）</td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">💥 碰撞規則</div>
+      <div style="font-size:13px;line-height:2;">
+        <div>💨 <span style="color:#00eaff">氮氣中</span>撞車 → 摧毀敵車 <span style="color:#FFD700">+50 分</span></div>
+        <div>⚠️ 普通狀態撞車 → 扣一條命 ❤️</div>
+        <div>💀 生命歸零 → 遊戲結束</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">✨ 道具</div>
+      <div style="font-size:13px;line-height:2;">
+        <div>❤️ 心 → 補充一條生命（最多 5 條）</div>
+        <div>💨 氮氣罐 → 補充 NOS 槽 40%</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">🚗 車輛功能</div>
+      <div style="font-size:13px;line-height:2;">
+        <div>🟠 方向燈：轉彎時自動閃爍</div>
+        <div>⬜ 倒車燈：倒車時亮白燈＋顯示 R</div>
+        <div>🪟 雨刷：擋風玻璃持續擺動</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">📈 得分方式</div>
+      <div style="font-size:13px;line-height:2;color:#aaa;">
+        存活時間越長分數越高，速度也會越來越快。<br>
+        氮氣撞車可大量得分，善用 NOS 槽！
+      </div>
+    </div>
+
+    <button id="helpCloseBtn" style="width:100%;background:linear-gradient(135deg,#FFD700,#FF8C00);color:#000;border:none;padding:12px;font-size:16px;font-weight:bold;border-radius:24px;cursor:pointer;">了解了，開始遊戲 🚀</button>
+  </div>
+
+  <div id="controls">
+    <div class="ctrl-row"><div class="ctrl-btn" id="btn-up">▲</div></div>
+    <div class="ctrl-row">
+      <div class="ctrl-btn" id="btn-left">◀</div>
+      <div class="ctrl-btn" id="btn-nitro">💨</div>
+      <div class="ctrl-btn" id="btn-right">▶</div>
+    </div>
+    <div class="ctrl-row"><div class="ctrl-btn" id="btn-down">▼</div></div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+// ---- State ----
+let state = 'menu'; // menu | play | dead
+let score = 0, lives = 3, frame = 0;
+let baseSpeed = 3, speed = baseSpeed;
+let nitro = 1, nitroActive = false;
+let playerX, playerY;
+const PLAYER_W = 36, PLAYER_H = 60;
+const LANE_COUNT = 3;
+const ROAD_L = 60, ROAD_R = 340;
+const ROAD_W = ROAD_R - ROAD_L;
+const LANE_W = ROAD_W / LANE_COUNT;
+
+let obstacles = [];
+let powerups = [];
+let particles = [];
+let dashLines = [];
+let bgCars = [];
+
+const keys = {};
+const touch = { left: false, right: false, up: false, down: false, nitro: false };
+
+// ---- Road line pool ----
+function initDash() {
+  dashLines = [];
+  for (let i = 0; i < 8; i++) {
+    dashLines.push({ y: i * 80 });
+  }
+}
+
+// ---- Colors ----
+const CAR_COLORS = ['#e74c3c','#3498db','#2ecc71','#9b59b6','#f39c12','#1abc9c','#e67e22'];
+
+function randomCarColor() { return CAR_COLORS[Math.floor(Math.random() * CAR_COLORS.length)]; }
+
+// ---- Obstacle ----
+function spawnObstacle() {
+  const lane = Math.floor(Math.random() * LANE_COUNT);
+  const x = ROAD_L + lane * LANE_W + (LANE_W - PLAYER_W) / 2;
+  obstacles.push({
+    x, y: -PLAYER_H - 10,
+    w: PLAYER_W, h: PLAYER_H,
+    color: randomCarColor(),
+    color2: randomCarColor(),
+    speed: speed * (0.7 + Math.random() * 0.5),
+    id: Math.random()
+  });
+}
+
+function spawnPowerup() {
+  const lane = Math.floor(Math.random() * LANE_COUNT);
+  const x = ROAD_L + lane * LANE_W + LANE_W / 2;
+  powerups.push({ x, y: -20, type: Math.random() < 0.5 ? 'heart' : 'nitro' });
+}
+
+// ---- Particle ----
+function emitParticles(x, y, color, n = 12) {
+  for (let i = 0; i < n; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const v = 2 + Math.random() * 4;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * v,
+      vy: Math.sin(angle) * v,
+      life: 1, decay: 0.04 + Math.random() * 0.04,
+      r: 3 + Math.random() * 4,
+      color
+    });
+  }
+}
+
+// ---- Draw helpers ----
+function drawRoad() {
+  // Sky gradient
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, '#0a0a1a');
+  sky.addColorStop(1, '#111122');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grass
+  ctx.fillStyle = '#1a3d1a';
+  ctx.fillRect(0, 0, ROAD_L, H);
+  ctx.fillRect(ROAD_R, 0, W - ROAD_R, H);
+
+  // Road
+  ctx.fillStyle = '#2a2a2a';
+  ctx.fillRect(ROAD_L, 0, ROAD_W, H);
+
+  // Road edge lines
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(ROAD_L, 0); ctx.lineTo(ROAD_L, H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ROAD_R, 0); ctx.lineTo(ROAD_R, H); ctx.stroke();
+
+  // Lane dashes
+  ctx.strokeStyle = '#ffd700';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([30, 20]);
+  for (let l = 1; l < LANE_COUNT; l++) {
+    const lx = ROAD_L + l * LANE_W;
+    ctx.beginPath(); ctx.moveTo(lx, 0); ctx.lineTo(lx, H); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+}
+
+function drawCar(x, y, w, h, bodyColor, roofColor, dir = 1) {
+  ctx.save();
+  if (dir === -1) { ctx.scale(1, -1); ctx.translate(0, -H); y = H - y - h; }
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(x + w/2, y + h + 4, w * 0.45, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Body
+  ctx.fillStyle = bodyColor;
+  ctx.beginPath();
+  ctx.roundRect(x, y + h * 0.2, w, h * 0.8, 6);
+  ctx.fill();
+
+  // Roof
+  ctx.fillStyle = roofColor;
+  ctx.beginPath();
+  ctx.roundRect(x + w * 0.1, y + h * 0.05, w * 0.8, h * 0.35, 8);
+  ctx.fill();
+
+  // Windows
+  ctx.fillStyle = 'rgba(150,220,255,0.7)';
+  ctx.beginPath();
+  ctx.roundRect(x + w * 0.13, y + h * 0.08, w * 0.74, h * 0.28, 5);
+  ctx.fill();
+
+  // Wheels
+  ctx.fillStyle = '#111';
+  const wr = 5, wpad = 3;
+  [[x + wpad, y + h * 0.35], [x + w - wpad - wr*2, y + h * 0.35],
+   [x + wpad, y + h * 0.78], [x + w - wpad - wr*2, y + h * 0.78]].forEach(([wx, wy]) => {
+    ctx.beginPath();
+    ctx.roundRect(wx, wy, wr * 2, wr * 2.2, 3);
+    ctx.fill();
+    ctx.fillStyle = '#555';
+    ctx.beginPath();
+    ctx.arc(wx + wr, wy + wr, wr * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#111';
+  });
+
+  // Headlights (only for player, dir=1 means facing down screen = enemy, dir=-1 = player)
+  if (dir === -1) {
+    ctx.fillStyle = '#ffffaa';
+    ctx.shadowColor = '#ffff00';
+    ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.ellipse(x + w * 0.2, y + h, 4, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + w * 0.8, y + h, 4, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+  } else {
+    ctx.fillStyle = '#ff4444';
+    ctx.shadowColor = '#ff0000';
+    ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.ellipse(x + w * 0.2, y, 4, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + w * 0.8, y, 4, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  ctx.restore();
+}
+
+function drawPlayerExtras(x, y, w, h) {
+  // In screen coords for player (dir=-1, facing up):
+  // front = y (top), rear = y+h (bottom)
+  // glass area: x+w*0.13 to x+w*0.87, y+h*0.64 to y+h*0.92
+
+  const gy_top = y + h * 0.64;
+  const gy_bot = y + h * 0.91;
+  const wiperLen = (gy_bot - gy_top) * 0.88;
+
+  // ---- Windshield wipers ----
+  ctx.save();
+  ctx.lineCap = 'round';
+
+  const lPivX = x + w * 0.3,  lPivY = gy_bot;
+  const rPivX = x + w * 0.7,  rPivY = gy_bot;
+  const lAngle = -Math.PI / 2 - wiperAngle;
+  const rAngle = -Math.PI / 2 + wiperAngle;
+
+  // arms
+  ctx.strokeStyle = '#ccc';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(lPivX, lPivY); ctx.lineTo(lPivX + Math.cos(lAngle) * wiperLen, lPivY + Math.sin(lAngle) * wiperLen); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(rPivX, rPivY); ctx.lineTo(rPivX + Math.cos(rAngle) * wiperLen, rPivY + Math.sin(rAngle) * wiperLen); ctx.stroke();
+
+  // blade arcs
+  ctx.strokeStyle = '#eee';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(lPivX, lPivY, wiperLen, lAngle - 0.12, lAngle + 0.12); ctx.stroke();
+  ctx.beginPath(); ctx.arc(rPivX, rPivY, wiperLen, rAngle - 0.12, rAngle + 0.12); ctx.stroke();
+  ctx.restore();
+
+  // ---- Turn signals (方向燈) ----
+  const blinkOn = signalBlink < 20;
+  if (goLeftState && blinkOn) {
+    ctx.save();
+    ctx.fillStyle = '#FF8C00';
+    ctx.shadowColor = '#FF8C00'; ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.ellipse(x + 2,     y + 4,     4, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + 2,     y + h - 4, 4, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  if (goRightState && blinkOn) {
+    ctx.save();
+    ctx.fillStyle = '#FF8C00';
+    ctx.shadowColor = '#FF8C00'; ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.ellipse(x + w - 2, y + 4,     4, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + w - 2, y + h - 4, 4, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  // ---- Reverse lights (倒車燈) ----
+  if (isReversing) {
+    ctx.save();
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.ellipse(x + w * 0.25, y + h - 1, 5, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + w * 0.75, y + h - 1, 5, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.font = 'bold 10px Arial';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('R', x + w / 2, y - 3);
+    ctx.restore();
+  }
+}
+
+function drawPowerup(p) {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  const pulse = 0.9 + Math.sin(frame * 0.1) * 0.1;
+  ctx.scale(pulse, pulse);
+  if (p.type === 'heart') {
+    ctx.font = '24px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = '#ff6688';
+    ctx.shadowBlur = 15;
+    ctx.fillText('❤️', 0, 0);
+  } else {
+    ctx.font = '22px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = '#00eaff';
+    ctx.shadowBlur = 15;
+    ctx.fillText('💨', 0, 0);
+  }
+  ctx.restore();
+}
+
+function drawParticles() {
+  particles.forEach(p => {
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+}
+
+function drawHUD() {
+  document.getElementById('scoreUI').textContent = score;
+  document.getElementById('livesUI').textContent = lives;
+  document.getElementById('speedUI').textContent = (speed / baseSpeed).toFixed(1);
+
+  const nitroBar = document.getElementById('nitro-bar');
+  nitroBar.style.transform = `scaleY(${nitro})`;
+  nitroBar.style.background = nitro < 0.3
+    ? 'linear-gradient(180deg,#ff4444,#aa0000)'
+    : 'linear-gradient(180deg,#00eaff,#0077ff)';
+}
+
+// ---- Nitro exhaust ----
+function emitExhaust() {
+  const ex = playerX + PLAYER_W / 2;
+  const ey = playerY + PLAYER_H + 2;
+  const color = nitroActive ? '#00eaff' : '#888';
+  particles.push({
+    x: ex + (Math.random() - 0.5) * 8,
+    y: ey,
+    vx: (Math.random() - 0.5) * 1.5,
+    vy: isReversing ? -(1.5 + Math.random() * 2) : (2 + Math.random() * 3),
+    life: 0.8, decay: 0.07 + Math.random() * 0.05,
+    r: nitroActive ? 5 : 3,
+    color
+  });
+}
+
+// ---- Collision ----
+function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+  return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+}
+
+let invincible = 0;
+let flashTimer = 0;
+let wiperAngle = 0;
+let signalBlink = 0;
+let isReversing = false;
+let goLeftState = false, goRightState = false;
+
+let crashText = null; // { text, x, y, life }
+
+function checkCollisions() {
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    const o = obstacles[i];
+    if (rectsOverlap(playerX, playerY, PLAYER_W, PLAYER_H - 10, o.x, o.y, o.w, o.h - 10)) {
+      if (nitroActive) {
+        // 氮氣撞車：摧毀敵車，得分
+        score += 50;
+        emitParticles(o.x + o.w / 2, o.y + o.h / 2, o.color, 25);
+        emitParticles(o.x + o.w / 2, o.y + o.h / 2, '#FFD700', 10);
+        crashText = { text: '+50 CRUSH!', x: o.x + o.w / 2, y: o.y, life: 1 };
+        obstacles.splice(i, 1);
+      } else if (invincible <= 0) {
+        // 普通撞車：扣血
+        lives--;
+        invincible = 90;
+        flashTimer = 90;
+        emitParticles(playerX + PLAYER_W / 2, playerY + PLAYER_H / 2, '#ff4444', 20);
+        crashText = { text: '-❤️ CRASH!', x: playerX + PLAYER_W / 2, y: playerY, life: 1 };
+        obstacles.splice(i, 1);
+        if (lives <= 0) gameOver();
+      }
+    }
+  }
+
+  for (let i = powerups.length - 1; i >= 0; i--) {
+    const p = powerups[i];
+    if (rectsOverlap(playerX, playerY, PLAYER_W, PLAYER_H, p.x - 14, p.y - 14, 28, 28)) {
+      emitParticles(p.x, p.y, p.type === 'heart' ? '#ff6688' : '#00eaff', 16);
+      if (p.type === 'heart') { lives = Math.min(lives + 1, 5); }
+      else { nitro = Math.min(nitro + 0.4, 1); }
+      powerups.splice(i, 1);
+    }
+  }
+}
+
+// ---- Game logic ----
+function startGame() {
+  score = 0; lives = 3; frame = 0;
+  speed = baseSpeed; nitro = 1; nitroActive = false; invincible = 0;
+  obstacles = []; powerups = []; particles = [];
+  playerX = ROAD_L + ROAD_W / 2 - PLAYER_W / 2;
+  playerY = H - PLAYER_H - 20;
+  initDash();
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('controls').classList.add('show');
+  state = 'play';
+}
+
+function gameOver() {
+  state = 'dead';
+  document.getElementById('controls').classList.remove('show');
+  const ov = document.getElementById('overlay');
+  ov.style.display = 'flex';
+  document.querySelector('#overlay h1').textContent = '💥 遊戲結束';
+  document.querySelector('#overlay .sub').textContent = '你已無法繼續前行...';
+  const fs = document.getElementById('finalScore');
+  fs.style.display = 'block';
+  fs.textContent = `最終分數：${score}`;
+  document.getElementById('startBtn').textContent = '再玩一次';
+}
+
+// ---- Update ----
+function update() {
+  frame++;
+  if (state !== 'play') return;
+
+  // Input
+  const goLeft  = keys['ArrowLeft']  || keys['a'] || keys['A'] || touch.left;
+  const goRight = keys['ArrowRight'] || keys['d'] || keys['D'] || touch.right;
+  const goUp    = keys['ArrowUp']    || keys['w'] || keys['W'] || touch.up;
+  const goDown  = keys['ArrowDown']  || keys['s'] || keys['S'] || touch.down;
+  const doNitro = (keys['Shift'] || touch.nitro) && nitro > 0;
+
+  // Turn signal & reverse state for drawing
+  goLeftState = goLeft;
+  goRightState = goRight;
+  isReversing = goDown && !goUp;
+  signalBlink = (signalBlink + 1) % 40;
+  wiperAngle = Math.sin(frame * 0.07) * 0.5;
+
+  let spd = speed;
+  nitroActive = false;
+  if (doNitro) { spd *= 1.8; nitro = Math.max(0, nitro - 0.008); nitroActive = true; }
+  else { nitro = Math.min(1, nitro + 0.002); }
+
+  const lateralSpd = 4.5;
+  if (goLeft)  playerX = Math.max(ROAD_L, playerX - lateralSpd);
+  if (goRight) playerX = Math.min(ROAD_R - PLAYER_W, playerX + lateralSpd);
+  if (goUp)    playerY = Math.max(H * 0.3, playerY - 2);
+  else if (goDown) playerY = Math.min(H - PLAYER_H - 10, playerY + 3);
+  else         playerY = Math.min(H - PLAYER_H - 10, playerY + 1);
+
+  // Speed ramp
+  speed = baseSpeed + score / 400;
+
+  // Obstacles
+  const spawnRate = Math.max(40, 90 - score / 20);
+  if (frame % Math.floor(spawnRate) === 0) spawnObstacle();
+
+  obstacles.forEach(o => { o.y += (o.speed + spd * 0.3); });
+  obstacles = obstacles.filter(o => o.y < H + 100);
+
+  // Powerups
+  if (frame % 300 === 0) spawnPowerup();
+  powerups.forEach(p => { p.y += spd * 0.5; });
+  powerups = powerups.filter(p => p.y < H + 40);
+
+  // Dash lines (decorative scroll)
+  dashLines.forEach(d => { d.y = (d.y + spd) % 80; });
+
+  // Particles
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    p.vx *= 0.95; p.vy *= 0.95;
+    p.life -= p.decay;
+  });
+  particles = particles.filter(p => p.life > 0);
+
+  // Exhaust
+  if (frame % 3 === 0) emitExhaust();
+
+  // Invincibility
+  if (invincible > 0) invincible--;
+  if (flashTimer > 0) flashTimer--;
+
+  // Score
+  score++;
+
+  // Crash text float up
+  if (crashText) {
+    crashText.y -= 2;
+    crashText.life -= 0.025;
+    if (crashText.life <= 0) crashText = null;
+  }
+
+  checkCollisions();
+}
+
+// ---- Draw ----
+function draw() {
+  drawRoad();
+
+  // Particles under cars
+  drawParticles();
+
+  // Powerups
+  powerups.forEach(p => drawPowerup(p));
+
+  // Obstacles
+  obstacles.forEach(o => drawCar(o.x, o.y, o.w, o.h, o.color, o.color2, 1));
+
+  // Player (flash on hit)
+  const doFlash = flashTimer > 0 && Math.floor(flashTimer / 6) % 2 === 0;
+  if (!doFlash) {
+    ctx.save();
+    if (nitroActive) {
+      ctx.shadowColor = '#00eaff';
+      ctx.shadowBlur = 20;
+    }
+    drawCar(playerX, playerY, PLAYER_W, PLAYER_H, '#FFD700', '#FFA500', -1);
+    ctx.restore();
+    drawPlayerExtras(playerX, playerY, PLAYER_W, PLAYER_H);
+  }
+
+  // Nitro flame
+  if (nitroActive) {
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    const flameH = 10 + Math.random() * 14;
+    const flameGrad = ctx.createLinearGradient(0, playerY + PLAYER_H, 0, playerY + PLAYER_H + flameH);
+    flameGrad.addColorStop(0, '#00eaff');
+    flameGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = flameGrad;
+    ctx.beginPath();
+    ctx.ellipse(playerX + PLAYER_W / 2, playerY + PLAYER_H + flameH / 2, 7, flameH / 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Crash floating text
+  if (crashText) {
+    ctx.save();
+    ctx.globalAlpha = crashText.life;
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const isGood = crashText.text.startsWith('+');
+    ctx.fillStyle = isGood ? '#FFD700' : '#ff4444';
+    ctx.shadowColor = isGood ? '#FFD700' : '#ff0000';
+    ctx.shadowBlur = 12;
+    ctx.fillText(crashText.text, crashText.x, crashText.y);
+    ctx.restore();
+  }
+
+  drawHUD();
+}
+
+// ---- Loop ----
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// ---- Events ----
+document.addEventListener('keydown', e => { keys[e.key] = true; e.preventDefault(); });
+document.addEventListener('keyup',   e => { keys[e.key] = false; });
+
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('helpBtn').addEventListener('click', () => {
+  document.getElementById('helpOverlay').style.display = 'block';
+});
+document.getElementById('helpCloseBtn').addEventListener('click', () => {
+  document.getElementById('helpOverlay').style.display = 'none';
+  startGame();
+});
+
+// Touch controls
+function bindBtn(id, prop) {
+  const el = document.getElementById(id);
+  el.addEventListener('touchstart', e => { touch[prop] = true; e.preventDefault(); }, { passive: false });
+  el.addEventListener('touchend',   e => { touch[prop] = false; e.preventDefault(); }, { passive: false });
+  el.addEventListener('mousedown',  () => { touch[prop] = true; });
+  el.addEventListener('mouseup',    () => { touch[prop] = false; });
+}
+bindBtn('btn-left',  'left');
+bindBtn('btn-right', 'right');
+bindBtn('btn-up',    'up');
+bindBtn('btn-down',  'down');
+bindBtn('btn-nitro', 'nitro');
+
+loop();
+</script>
+</body>
+</html>
