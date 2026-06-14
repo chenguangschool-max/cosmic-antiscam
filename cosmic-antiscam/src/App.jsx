@@ -17,7 +17,6 @@ import OnlineLobby from './pages/OnlineLobby'
 import OnlineBattle from './pages/OnlineBattle'
 import DetectiveMode from './pages/DetectiveMode'
 import LifeSimulator from './pages/LifeSimulator'
-import Lottery from './pages/Lottery'
 
 const SERVER = 'https://cosmic-antiscam-production.up.railway.app'
 
@@ -158,7 +157,6 @@ export default function App() {
             )}
             {page === 'detective' && <DetectiveMode navigate={navigate} />}
             {page === 'lifeSim' && <LifeSimulator navigate={navigate} />}
-            {page === 'lottery' && <Lottery navigate={navigate} />}
           </>
         )}
       </div>

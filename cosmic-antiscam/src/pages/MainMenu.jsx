@@ -162,10 +162,6 @@ export default function MainMenu({ navigate }) {
           <span style={{ fontSize:22 }}>🛒</span>
           <div><div style={{ fontSize:16, fontWeight:500 }}>商店</div><div style={{ fontSize:13, opacity:.6 }}>購買道具</div></div>
         </button>
-        <button style={{ ...menuBtn, background:'rgba(255,170,50,.09)', borderColor:'rgba(255,170,50,.32)', color:'#ffd27a', gridColumn:'1/-1' }} onClick={() => navigate('lottery')}>
-          <span style={{ fontSize:22 }}>🎰</span>
-          <div><div style={{ fontSize:16, fontWeight:500 }}>防詐抽獎機</div><div style={{ fontSize:13, opacity:.6 }}>花 50 🪙 抽獎，機率考驗你</div></div>
-        </button>
         <button style={{ ...menuBtn, background:'rgba(80,200,120,.09)', borderColor:'rgba(80,200,120,.32)', color:'#7ee8a0', gridColumn:'1/-1' }} onClick={() => navigate('onlineLobby')}>
           <span style={{ fontSize:22 }}>🌐</span>
           <div><div style={{ fontSize:16, fontWeight:500 }}>多人模式</div><div style={{ fontSize:13, opacity:.6 }}>6 種模式即時同步</div></div>
