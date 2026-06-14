@@ -153,25 +153,23 @@
     <h2 style="color:#FFD700;text-align:center;font-size:22px;margin-bottom:16px;">📋 使用說明</h2>
 
     <div style="margin-bottom:16px;">
-      <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">🎮 操作方式</div>
+      <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">🎮 行駛操作</div>
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <tr style="border-bottom:1px solid #333;">
-          <td style="padding:6px 0;color:#aaa;">← →</td>
-          <td style="padding:6px 0;">左右移動換道</td>
-        </tr>
-        <tr style="border-bottom:1px solid #333;">
-          <td style="padding:6px 0;color:#aaa;">↑</td>
-          <td style="padding:6px 0;">往前加速</td>
-        </tr>
-        <tr style="border-bottom:1px solid #333;">
-          <td style="padding:6px 0;color:#aaa;">↓</td>
-          <td style="padding:6px 0;">倒車（往後退）</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 0;color:#aaa;">Shift</td>
-          <td style="padding:6px 0;">💨 氮氣加速（需 NOS 槽）</td>
-        </tr>
+        <tr style="border-bottom:1px solid #333;"><td style="padding:6px 0;color:#aaa;width:60px;">← →</td><td style="padding:6px 0;">左右移動換道</td></tr>
+        <tr style="border-bottom:1px solid #333;"><td style="padding:6px 0;color:#aaa;">↑</td><td style="padding:6px 0;">往前加速</td></tr>
+        <tr style="border-bottom:1px solid #333;"><td style="padding:6px 0;color:#aaa;">↓</td><td style="padding:6px 0;">倒車（往後退）</td></tr>
+        <tr><td style="padding:6px 0;color:#aaa;">Shift</td><td style="padding:6px 0;">💨 氮氣加速（需 NOS 槽）</td></tr>
       </table>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">🚗 手動車輛操作</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="border-bottom:1px solid #333;"><td style="padding:6px 0;color:#aaa;width:60px;">Q</td><td style="padding:6px 0;">🔶 左方向燈（開／關切換）</td></tr>
+        <tr style="border-bottom:1px solid #333;"><td style="padding:6px 0;color:#aaa;">E</td><td style="padding:6px 0;">🔷 右方向燈（開／關切換）</td></tr>
+        <tr><td style="padding:6px 0;color:#aaa;">Z</td><td style="padding:6px 0;">🌧 雨刷（開／關切換）</td></tr>
+      </table>
+      <div style="font-size:11px;color:#555;margin-top:6px;">轉彎時會自動關閉對向方向燈，倒車時自動亮白色倒車燈</div>
     </div>
 
     <div style="margin-bottom:16px;">
@@ -191,15 +189,6 @@
       </div>
     </div>
 
-    <div style="margin-bottom:16px;">
-      <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">🚗 車輛功能</div>
-      <div style="font-size:13px;line-height:2;">
-        <div>🟠 方向燈：轉彎時自動閃爍</div>
-        <div>⬜ 倒車燈：倒車時亮白燈＋顯示 R</div>
-        <div>🪟 雨刷：擋風玻璃持續擺動</div>
-      </div>
-    </div>
-
     <div style="margin-bottom:20px;">
       <div style="color:#FFD700;font-size:13px;letter-spacing:2px;margin-bottom:8px;">📈 得分方式</div>
       <div style="font-size:13px;line-height:2;color:#aaa;">
@@ -212,13 +201,21 @@
   </div>
 
   <div id="controls">
-    <div class="ctrl-row"><div class="ctrl-btn" id="btn-up">▲</div></div>
+    <div class="ctrl-row">
+      <div class="ctrl-btn" id="btn-lsig" title="左方向燈 Q">🔶</div>
+      <div class="ctrl-btn" id="btn-up">▲</div>
+      <div class="ctrl-btn" id="btn-rsig" title="右方向燈 E">🔷</div>
+    </div>
     <div class="ctrl-row">
       <div class="ctrl-btn" id="btn-left">◀</div>
       <div class="ctrl-btn" id="btn-nitro">💨</div>
       <div class="ctrl-btn" id="btn-right">▶</div>
     </div>
-    <div class="ctrl-row"><div class="ctrl-btn" id="btn-down">▼</div></div>
+    <div class="ctrl-row">
+      <div class="ctrl-btn" id="btn-wiper" title="雨刷 Z">🌧</div>
+      <div class="ctrl-btn" id="btn-down">▼</div>
+      <div class="ctrl-btn" style="opacity:0;pointer-events:none;"></div>
+    </div>
   </div>
 </div>
 
@@ -428,7 +425,7 @@ function drawPlayerExtras(x, y, w, h) {
 
   // ---- Turn signals (方向燈) ----
   const blinkOn = signalBlink < 20;
-  if (goLeftState && blinkOn) {
+  if (leftSignalOn && blinkOn) {
     ctx.save();
     ctx.fillStyle = '#FF8C00';
     ctx.shadowColor = '#FF8C00'; ctx.shadowBlur = 10;
@@ -436,7 +433,7 @@ function drawPlayerExtras(x, y, w, h) {
     ctx.beginPath(); ctx.ellipse(x + 2,     y + h - 4, 4, 3, 0, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
-  if (goRightState && blinkOn) {
+  if (rightSignalOn && blinkOn) {
     ctx.save();
     ctx.fillStyle = '#FF8C00';
     ctx.shadowColor = '#FF8C00'; ctx.shadowBlur = 10;
@@ -534,7 +531,8 @@ let flashTimer = 0;
 let wiperAngle = 0;
 let signalBlink = 0;
 let isReversing = false;
-let goLeftState = false, goRightState = false;
+let wipersOn = false;
+let leftSignalOn = false, rightSignalOn = false;
 
 let crashText = null; // { text, x, y, life }
 
@@ -577,6 +575,7 @@ function checkCollisions() {
 function startGame() {
   score = 0; lives = 3; frame = 0;
   speed = baseSpeed; nitro = 1; nitroActive = false; invincible = 0;
+  wipersOn = false; leftSignalOn = false; rightSignalOn = false; wiperAngle = 0;
   obstacles = []; powerups = []; particles = [];
   playerX = ROAD_L + ROAD_W / 2 - PLAYER_W / 2;
   playerY = H - PLAYER_H - 20;
@@ -611,12 +610,13 @@ function update() {
   const goDown  = keys['ArrowDown']  || keys['s'] || keys['S'] || touch.down;
   const doNitro = (keys['Shift'] || touch.nitro) && nitro > 0;
 
-  // Turn signal & reverse state for drawing
-  goLeftState = goLeft;
-  goRightState = goRight;
+  // Reverse & wiper state
   isReversing = goDown && !goUp;
   signalBlink = (signalBlink + 1) % 40;
-  wiperAngle = Math.sin(frame * 0.07) * 0.5;
+  if (wipersOn) wiperAngle = Math.sin(frame * 0.07) * 0.5;
+  // Auto-cancel opposite signal when steering
+  if (goLeft && rightSignalOn) rightSignalOn = false;
+  if (goRight && leftSignalOn) leftSignalOn = false;
 
   let spd = speed;
   nitroActive = false;
@@ -743,8 +743,15 @@ function loop() {
 }
 
 // ---- Events ----
-document.addEventListener('keydown', e => { keys[e.key] = true; e.preventDefault(); });
-document.addEventListener('keyup',   e => { keys[e.key] = false; });
+document.addEventListener('keydown', e => {
+  if (state === 'play') {
+    if (e.key === 'q' || e.key === 'Q') { leftSignalOn = !leftSignalOn; if (leftSignalOn) rightSignalOn = false; e.preventDefault(); return; }
+    if (e.key === 'e' || e.key === 'E') { rightSignalOn = !rightSignalOn; if (rightSignalOn) leftSignalOn = false; e.preventDefault(); return; }
+    if (e.key === 'z' || e.key === 'Z') { wipersOn = !wipersOn; if (!wipersOn) wiperAngle = 0; e.preventDefault(); return; }
+  }
+  keys[e.key] = true; e.preventDefault();
+});
+document.addEventListener('keyup', e => { keys[e.key] = false; });
 
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('helpBtn').addEventListener('click', () => {
@@ -768,6 +775,16 @@ bindBtn('btn-right', 'right');
 bindBtn('btn-up',    'up');
 bindBtn('btn-down',  'down');
 bindBtn('btn-nitro', 'nitro');
+
+function bindToggleBtn(id, fn) {
+  const el = document.getElementById(id);
+  const fire = () => { if (state === 'play') fn(); };
+  el.addEventListener('touchstart', e => { fire(); e.preventDefault(); }, { passive: false });
+  el.addEventListener('mousedown', fire);
+}
+bindToggleBtn('btn-lsig',  () => { leftSignalOn = !leftSignalOn; if (leftSignalOn) rightSignalOn = false; });
+bindToggleBtn('btn-rsig',  () => { rightSignalOn = !rightSignalOn; if (rightSignalOn) leftSignalOn = false; });
+bindToggleBtn('btn-wiper', () => { wipersOn = !wipersOn; if (!wipersOn) wiperAngle = 0; });
 
 loop();
 </script>
