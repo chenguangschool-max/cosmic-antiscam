@@ -167,7 +167,7 @@
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <tr style="border-bottom:1px solid #333;"><td style="padding:6px 0;color:#aaa;width:60px;">Q</td><td style="padding:6px 0;">🔶 左方向燈（開／關切換）</td></tr>
         <tr style="border-bottom:1px solid #333;"><td style="padding:6px 0;color:#aaa;">E</td><td style="padding:6px 0;">🔷 右方向燈（開／關切換）</td></tr>
-        <tr><td style="padding:6px 0;color:#aaa;">Z</td><td style="padding:6px 0;">🌧 雨刷（開／關切換）</td></tr>
+        <tr><td style="padding:6px 0;color:#aaa;">Z</td><td style="padding:6px 0;">🌧 雨刷速度（關 → 慢 → 快 → 關）</td></tr>
       </table>
       <div style="font-size:11px;color:#555;margin-top:6px;">轉彎時會自動關閉對向方向燈，倒車時自動亮白色倒車燈</div>
     </div>
@@ -531,8 +531,23 @@ let flashTimer = 0;
 let wiperAngle = 0;
 let signalBlink = 0;
 let isReversing = false;
-let wipersOn = false;
+let wiperSpeed = 0; // 0=off, 1=slow, 2=fast
 let leftSignalOn = false, rightSignalOn = false;
+let lastBlinkState = false; // for tick sound trigger
+
+// ---- Audio (turn signal tick) ----
+let audioCtx = null;
+function ensureAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+function playTick() {
+  ensureAudio();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.frequency.value = 750;
+  gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.06);
+}
 
 let crashText = null; // { text, x, y, life }
 
@@ -575,7 +590,7 @@ function checkCollisions() {
 function startGame() {
   score = 0; lives = 3; frame = 0;
   speed = baseSpeed; nitro = 1; nitroActive = false; invincible = 0;
-  wipersOn = false; leftSignalOn = false; rightSignalOn = false; wiperAngle = 0;
+  wiperSpeed = 0; leftSignalOn = false; rightSignalOn = false; wiperAngle = 0; lastBlinkState = false;
   obstacles = []; powerups = []; particles = [];
   playerX = ROAD_L + ROAD_W / 2 - PLAYER_W / 2;
   playerY = H - PLAYER_H - 20;
@@ -613,7 +628,12 @@ function update() {
   // Reverse & wiper state
   isReversing = goDown && !goUp;
   signalBlink = (signalBlink + 1) % 40;
-  if (wipersOn) wiperAngle = Math.sin(frame * 0.07) * 0.5;
+  const wiperSpd = wiperSpeed === 1 ? 0.045 : wiperSpeed === 2 ? 0.12 : 0;
+  if (wiperSpeed > 0) wiperAngle = Math.sin(frame * wiperSpd) * 0.5;
+  // Turn signal tick sound on rising edge of each blink
+  const blinkNow = signalBlink < 20;
+  if ((leftSignalOn || rightSignalOn) && blinkNow && !lastBlinkState) playTick();
+  lastBlinkState = blinkNow;
   // Auto-cancel opposite signal when steering
   if (goLeft && rightSignalOn) rightSignalOn = false;
   if (goRight && leftSignalOn) leftSignalOn = false;
@@ -732,6 +752,33 @@ function draw() {
     ctx.restore();
   }
 
+  // ---- Dashboard indicators ----
+  const blinkOnDash = signalBlink < 20;
+  ctx.save();
+  ctx.font = 'bold 15px Arial';
+  ctx.textBaseline = 'top';
+  // Left signal indicator
+  if (leftSignalOn && blinkOnDash) {
+    ctx.fillStyle = '#00dd00'; ctx.shadowColor = '#00ff00'; ctx.shadowBlur = 8;
+    ctx.textAlign = 'left';
+    ctx.fillText('◄◄', ROAD_L + 8, 44);
+  }
+  // Right signal indicator
+  if (rightSignalOn && blinkOnDash) {
+    ctx.fillStyle = '#00dd00'; ctx.shadowColor = '#00ff00'; ctx.shadowBlur = 8;
+    ctx.textAlign = 'right';
+    ctx.fillText('►►', ROAD_R - 8, 44);
+  }
+  // Wiper speed indicator
+  if (wiperSpeed > 0) {
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#6699ff';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(wiperSpeed === 1 ? '🌧 慢' : '🌧 快', W / 2, 46);
+  }
+  ctx.restore();
+
   drawHUD();
 }
 
@@ -747,7 +794,7 @@ document.addEventListener('keydown', e => {
   if (state === 'play') {
     if (e.key === 'q' || e.key === 'Q') { leftSignalOn = !leftSignalOn; if (leftSignalOn) rightSignalOn = false; e.preventDefault(); return; }
     if (e.key === 'e' || e.key === 'E') { rightSignalOn = !rightSignalOn; if (rightSignalOn) leftSignalOn = false; e.preventDefault(); return; }
-    if (e.key === 'z' || e.key === 'Z') { wipersOn = !wipersOn; if (!wipersOn) wiperAngle = 0; e.preventDefault(); return; }
+    if (e.key === 'z' || e.key === 'Z') { wiperSpeed = (wiperSpeed + 1) % 3; if (wiperSpeed === 0) wiperAngle = 0; e.preventDefault(); return; }
   }
   keys[e.key] = true; e.preventDefault();
 });
@@ -784,7 +831,7 @@ function bindToggleBtn(id, fn) {
 }
 bindToggleBtn('btn-lsig',  () => { leftSignalOn = !leftSignalOn; if (leftSignalOn) rightSignalOn = false; });
 bindToggleBtn('btn-rsig',  () => { rightSignalOn = !rightSignalOn; if (rightSignalOn) leftSignalOn = false; });
-bindToggleBtn('btn-wiper', () => { wipersOn = !wipersOn; if (!wipersOn) wiperAngle = 0; });
+bindToggleBtn('btn-wiper', () => { wiperSpeed = (wiperSpeed + 1) % 3; if (wiperSpeed === 0) wiperAngle = 0; });
 
 loop();
 </script>
