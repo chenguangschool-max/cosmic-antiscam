@@ -71,6 +71,10 @@ export function GameProvider({ children }) {
     setJustUnlocked(prev => [...prev, id])
   }
 
+  const addItem = (id) => {
+    setBag(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
+  }
+
   const buyItem = (item) => {
     if (coins < item.price) return false
     spendCoins(item.price)
@@ -107,7 +111,7 @@ export function GameProvider({ children }) {
   return (
     <GameCtx.Provider value={{
       coins, xp, level, bag, monsters, justUnlocked,
-      addCoins, spendCoins, addXp, unlockMonster, buyItem, useItem,
+      addCoins, spendCoins, addXp, unlockMonster, addItem, buyItem, useItem,
       clearJustUnlocked, getXpProgress, setMonsters, xpForLv, resetGame,
     }}>
       {children}
