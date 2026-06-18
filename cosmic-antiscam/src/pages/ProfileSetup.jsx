@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+
+const PRESET_AVATARS = ['🧑‍🚀', '👴', '🧓', '🕵️', '🤖', '👨‍💻']
 
 export default function ProfileSetup({ onDone }) {
   const saved = JSON.parse(localStorage.getItem('playerProfile') || '{}')
@@ -6,7 +8,17 @@ export default function ProfileSetup({ onDone }) {
   const [realName, setRealName] = useState(saved.realName || '')
   const [age, setAge] = useState(saved.age ? String(saved.age) : '')
   const [gender, setGender] = useState(saved.gender || '')
+  const [avatar, setAvatar] = useState(saved.avatar || '🧑‍🚀')
   const [err, setErr] = useState('')
+  const fileRef = useRef()
+
+  const handlePhoto = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => setAvatar(ev.target.result)
+    reader.readAsDataURL(file)
+  }
 
   const handleSubmit = () => {
     if (!nickname.trim()) return setErr('請輸入暱稱')
@@ -20,6 +32,7 @@ export default function ProfileSetup({ onDone }) {
       realName: realName.trim(),
       age: Number(age),
       gender,
+      avatar,
     }))
     onDone(nickname.trim())
   }
@@ -39,11 +52,16 @@ export default function ProfileSetup({ onDone }) {
     outline: 'none', boxSizing: 'border-box',
   })
 
+  const isPhoto = avatar.startsWith('data:')
+
   return (
     <div style={{ padding: '28px 20px', position: 'relative', zIndex: 2, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
       <div style={{ textAlign: 'center', marginBottom: 28 }}>
-        <div style={{ fontSize: 48, marginBottom: 10 }}>🧑‍🚀</div>
+        {isPhoto
+          ? <img src={avatar} alt="avatar" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', marginBottom: 10, border: '2px solid rgba(91,141,238,.6)' }} />
+          : <div style={{ fontSize: 56, marginBottom: 10, lineHeight: 1 }}>{avatar}</div>
+        }
         <div style={{ fontFamily: 'Orbitron,monospace', fontSize: 19, fontWeight: 900, color: '#fff', letterSpacing: 2 }}>
           設定
         </div>
@@ -59,6 +77,48 @@ export default function ProfileSetup({ onDone }) {
           border: '1px solid rgba(91,141,238,.2)',
           marginBottom: 20,
         }}>
+
+          {field('🖼 頭像',
+            <div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginBottom: 10 }}>
+                {PRESET_AVATARS.map(em => (
+                  <button
+                    key={em}
+                    onClick={() => setAvatar(em)}
+                    style={{
+                      fontSize: 28, padding: '8px 0', borderRadius: 10, lineHeight: 1,
+                      background: avatar === em ? 'rgba(91,141,238,.3)' : 'rgba(255,255,255,.05)',
+                      border: `2px solid ${avatar === em ? 'rgba(91,141,238,.8)' : 'rgba(91,141,238,.15)'}`,
+                      cursor: 'pointer', transition: 'all .15s',
+                    }}
+                  >
+                    {em}
+                  </button>
+                ))}
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handlePhoto}
+                style={{ display: 'none' }}
+              />
+              <button
+                onClick={() => fileRef.current.click()}
+                style={{
+                  width: '100%', padding: '10px 0', borderRadius: 10,
+                  background: isPhoto ? 'rgba(91,141,238,.25)' : 'rgba(255,255,255,.05)',
+                  border: `1px dashed ${isPhoto ? 'rgba(91,141,238,.8)' : 'rgba(91,141,238,.3)'}`,
+                  color: isPhoto ? '#c8dbff' : 'rgba(140,180,255,.6)',
+                  fontSize: 14, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif',
+                  transition: 'all .15s',
+                }}
+              >
+                {isPhoto ? '✅ 已使用自訂照片　點此更換' : '📷 拍照 / 從相簿上傳'}
+              </button>
+            </div>
+          )}
 
           {field('👤 暱稱（最多 10 字）',
             <input
