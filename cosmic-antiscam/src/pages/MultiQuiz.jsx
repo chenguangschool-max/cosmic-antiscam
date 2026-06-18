@@ -18,7 +18,7 @@ function AvatarBubble({ avatar, color, index, size = 32 }) {
 
 export default function MultiQuiz({ players, navigate, onDone }) {
   const { addCoins, addXp } = useGame()
-  const p1Avatar = JSON.parse(localStorage.getItem('playerProfile') || '{}').avatar || ''
+  const p1Avatar = JSON.parse(localStorage.getItem('playerProfile') || '{}').avatar || '🧑‍🚀'
   const getAvatar = (i) => i === 0 ? p1Avatar : DEFAULT_AVATARS[i]
   const [playerIdx, setPlayerIdx] = useState(0)
   const [results, setResults] = useState([])

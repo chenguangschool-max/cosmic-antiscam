@@ -16,7 +16,7 @@ function AvatarBubble({ avatar, color, index, size = 32 }) {
 export default function MultiSetup({ navigate, onStart }) {
   const [count, setCount] = useState(2)
   const savedName = localStorage.getItem('playerName') || '玩家1'
-  const p1Avatar = JSON.parse(localStorage.getItem('playerProfile') || '{}').avatar || ''
+  const p1Avatar = JSON.parse(localStorage.getItem('playerProfile') || '{}').avatar || '🧑‍🚀'
 
   const getAvatar = (i) => i === 0 ? p1Avatar : DEFAULT_AVATARS[i]
 
