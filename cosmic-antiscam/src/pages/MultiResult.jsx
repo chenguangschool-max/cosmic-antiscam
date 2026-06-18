@@ -2,6 +2,14 @@ const MEDALS = ['🥇', '🥈', '🥉']
 const COLORS = ['rgba(255,210,50,.15)', 'rgba(200,200,220,.08)', 'rgba(200,140,80,.08)', 'rgba(255,255,255,.04)']
 const BORDERS = ['rgba(255,210,50,.4)', 'rgba(200,200,220,.2)', 'rgba(200,140,80,.25)', 'rgba(91,141,238,.15)']
 
+function AvatarThumb({ avatar }) {
+  if (!avatar) return null
+  if (avatar.startsWith('data:')) {
+    return <img src={avatar} alt="av" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+  }
+  return <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(91,141,238,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{avatar}</div>
+}
+
 export default function MultiResult({ results, navigate, onPlayAgain }) {
   const sorted = [...results].sort((a, b) => b.score - a.score || b.coins - a.coins)
   const topScore = sorted[0]?.score ?? 0
@@ -26,9 +34,10 @@ export default function MultiResult({ results, navigate, onPlayAgain }) {
               transform: isFirst ? 'scale(1.02)' : 'none',
               transition: 'transform .2s',
             }}>
-              <div style={{ fontSize: 24, width: 32, textAlign: 'center' }}>
+              <div style={{ fontSize: 24, width: 32, textAlign: 'center', flexShrink: 0 }}>
                 {MEDALS[i] || `${i + 1}`}
               </div>
+              {p.avatar && <AvatarThumb avatar={p.avatar} />}
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 600, color: isFirst ? 'var(--gold)' : '#e0eaff' }}>{p.name}</div>
                 <div style={{ fontSize: 11, color: 'rgba(180,200,255,.45)', marginTop: 2 }}>

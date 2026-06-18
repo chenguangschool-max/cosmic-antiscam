@@ -3,10 +3,23 @@ import { useGame } from '../GameContext'
 import { generateQuestion } from '../data'
 
 const COLORS = ['#5b8dee', '#a78bfa', '#34d399', '#fb923c']
+const DEFAULT_AVATARS = ['', '👾', '🌟', '🎮']
 const MODE_TIME = 20
+
+function AvatarBubble({ avatar, color, index, size = 32 }) {
+  if (avatar && avatar.startsWith('data:')) {
+    return <img src={avatar} alt="av" style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: `2px solid ${color}99` }} />
+  }
+  if (avatar && !avatar.startsWith('data:')) {
+    return <div style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, background: `${color}33`, border: `2px solid ${color}77`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.5 }}>{avatar}</div>
+  }
+  return <div style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.42, fontWeight: 800, color: '#fff' }}>{index + 1}</div>
+}
 
 export default function MultiQuiz({ players, navigate, onDone }) {
   const { addCoins, addXp } = useGame()
+  const p1Avatar = JSON.parse(localStorage.getItem('playerProfile') || '{}').avatar || ''
+  const getAvatar = (i) => i === 0 ? p1Avatar : DEFAULT_AVATARS[i]
   const [playerIdx, setPlayerIdx] = useState(0)
   const [results, setResults] = useState([])
   const [phase, setPhase] = useState('handoff') // 'handoff' | 'playing'
@@ -137,6 +150,7 @@ export default function MultiQuiz({ players, navigate, onDone }) {
         score,
         coins: quizCoins + score * 5,
         xp: quizXp + bonusXp,
+        avatar: getAvatar(playerIdx),
       }
       const newResults = [...results, playerResult]
       if (playerIdx + 1 >= players.length) {
@@ -166,12 +180,9 @@ export default function MultiQuiz({ players, navigate, onDone }) {
         <button onClick={() => navigate('menu')} style={backBtn}>← 返回主選單</button>
 
         <div style={{ textAlign: 'center' }}>
-          <div style={{
-            width: 80, height: 80, borderRadius: '50%', background: color,
-            margin: '0 auto 16px', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', fontSize: 30, fontWeight: 800, color: '#fff',
-            boxShadow: `0 0 32px ${color}55`,
-          }}>{playerIdx + 1}</div>
+          <div style={{ margin: '0 auto 16px', width: 80, display: 'flex', justifyContent: 'center', filter: `drop-shadow(0 0 16px ${color}55)` }}>
+            <AvatarBubble avatar={getAvatar(playerIdx)} color={color} index={playerIdx} size={80} />
+          </div>
 
           <div style={{ fontSize: 12, color: 'rgba(180,200,255,.5)', marginBottom: 5 }}>輪到</div>
           <div style={{ fontFamily: 'Orbitron,monospace', fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 5 }}>
@@ -215,11 +226,7 @@ export default function MultiQuiz({ players, navigate, onDone }) {
     <div style={{ padding: 18, position: 'relative', zIndex: 2 }}>
       {/* player + timer bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <div style={{
-          width: 30, height: 30, borderRadius: '50%', background: color, flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 13, fontWeight: 700, color: '#fff',
-        }}>{playerIdx + 1}</div>
+        <AvatarBubble avatar={getAvatar(playerIdx)} color={color} index={playerIdx} size={30} />
         <div style={{ fontSize: 13, fontWeight: 600, color: '#e0eaff', flex: 1 }}>{players[playerIdx]}</div>
         <div style={{ fontFamily: 'Orbitron,monospace', fontSize: 17, fontWeight: 700, color: warn ? '#ff6b6b' : '#fff', animation: warn ? 'pulse .5s infinite' : '' }}>
           {timerVal}

@@ -1,10 +1,24 @@
 import { useState } from 'react'
 
 const COLORS = ['#5b8dee', '#a78bfa', '#34d399', '#fb923c']
+const DEFAULT_AVATARS = ['', '👾', '🌟', '🎮']
+
+function AvatarBubble({ avatar, color, index, size = 32 }) {
+  if (avatar && avatar.startsWith('data:')) {
+    return <img src={avatar} alt="av" style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: `2px solid ${color}99` }} />
+  }
+  if (avatar && !avatar.startsWith('data:')) {
+    return <div style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, background: `${color}33`, border: `2px solid ${color}77`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.5 }}>{avatar}</div>
+  }
+  return <div style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.42, fontWeight: 800, color: '#fff' }}>{index + 1}</div>
+}
 
 export default function MultiSetup({ navigate, onStart }) {
   const [count, setCount] = useState(2)
   const savedName = localStorage.getItem('playerName') || '玩家1'
+  const p1Avatar = JSON.parse(localStorage.getItem('playerProfile') || '{}').avatar || ''
+
+  const getAvatar = (i) => i === 0 ? p1Avatar : DEFAULT_AVATARS[i]
 
   const handleStart = () => {
     const players = Array.from({ length: count }, (_, i) =>
@@ -52,11 +66,7 @@ export default function MultiSetup({ navigate, onStart }) {
             background: 'rgba(255,255,255,.04)',
             border: `1px solid ${COLORS[i]}33`,
           }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-              background: COLORS[i], display: 'flex', alignItems: 'center',
-              justifyContent: 'center', fontSize: 14, fontWeight: 800, color: '#fff',
-            }}>{i + 1}</div>
+            <AvatarBubble avatar={getAvatar(i)} color={COLORS[i]} index={i} size={32} />
             <span style={{ color: '#e0eaff', fontSize: 16, fontWeight: 500 }}>{name}</span>
           </div>
         ))}
