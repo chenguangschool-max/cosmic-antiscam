@@ -10,7 +10,9 @@ export default function ProfileSetup({ onDone }) {
   const [gender, setGender] = useState(saved.gender || '')
   const [avatar, setAvatar] = useState(saved.avatar || '🧑‍🚀')
   const [err, setErr] = useState('')
-  const fileRef = useRef()
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false)
+  const cameraRef = useRef()
+  const galleryRef = useRef()
 
   const handlePhoto = (e) => {
     const file = e.target.files?.[0]
@@ -18,6 +20,7 @@ export default function ProfileSetup({ onDone }) {
     const reader = new FileReader()
     reader.onload = ev => setAvatar(ev.target.result)
     reader.readAsDataURL(file)
+    e.target.value = ''
   }
 
   const handleSubmit = () => {
@@ -96,16 +99,10 @@ export default function ProfileSetup({ onDone }) {
                   </button>
                 ))}
               </div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handlePhoto}
-                style={{ display: 'none' }}
-              />
+              <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
+              <input ref={galleryRef} type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
               <button
-                onClick={() => fileRef.current.click()}
+                onClick={() => setShowPhotoMenu(true)}
                 style={{
                   width: '100%', padding: '10px 0', borderRadius: 10,
                   background: isPhoto ? 'rgba(91,141,238,.25)' : 'rgba(255,255,255,.05)',
@@ -115,8 +112,40 @@ export default function ProfileSetup({ onDone }) {
                   transition: 'all .15s',
                 }}
               >
-                {isPhoto ? '✅ 已使用自訂照片　點此更換' : '📷 拍照 / 從相簿上傳'}
+                {isPhoto ? '✅ 已使用自訂照片　點此更換' : '📷 上傳照片'}
               </button>
+
+              {showPhotoMenu && (
+                <div
+                  onClick={() => setShowPhotoMenu(false)}
+                  style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.65)', zIndex: 200, display: 'flex', alignItems: 'flex-end' }}
+                >
+                  <div
+                    onClick={e => e.stopPropagation()}
+                    style={{ width: '100%', background: '#131c38', borderRadius: '18px 18px 0 0', padding: '20px 16px 36px' }}
+                  >
+                    <div style={{ fontSize: 13, color: 'rgba(140,180,255,.55)', textAlign: 'center', marginBottom: 16, fontFamily: 'Noto Sans TC,sans-serif' }}>選擇圖片來源</div>
+                    <button
+                      onClick={() => { cameraRef.current.click(); setShowPhotoMenu(false) }}
+                      style={{ width: '100%', padding: '14px 0', borderRadius: 12, marginBottom: 10, background: 'rgba(91,141,238,.18)', border: '1px solid rgba(91,141,238,.4)', color: '#c8dbff', fontSize: 15, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }}
+                    >
+                      📷 拍照
+                    </button>
+                    <button
+                      onClick={() => { galleryRef.current.click(); setShowPhotoMenu(false) }}
+                      style={{ width: '100%', padding: '14px 0', borderRadius: 12, marginBottom: 10, background: 'rgba(91,141,238,.18)', border: '1px solid rgba(91,141,238,.4)', color: '#c8dbff', fontSize: 15, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }}
+                    >
+                      🖼 從圖庫選擇
+                    </button>
+                    <button
+                      onClick={() => setShowPhotoMenu(false)}
+                      style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', color: 'rgba(180,200,255,.5)', fontSize: 14, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }}
+                    >
+                      取消
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

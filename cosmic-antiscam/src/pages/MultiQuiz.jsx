@@ -20,9 +20,10 @@ export default function MultiQuiz({ players, navigate, onDone }) {
   const { addCoins, addXp } = useGame()
   const p1Avatar = JSON.parse(localStorage.getItem('playerProfile') || '{}').avatar || '🧑‍🚀'
   const getAvatar = (i) => i === 0 ? p1Avatar : DEFAULT_AVATARS[i]
+
   const [playerIdx, setPlayerIdx] = useState(0)
   const [results, setResults] = useState([])
-  const [phase, setPhase] = useState('handoff') // 'handoff' | 'playing'
+  const [phase, setPhase] = useState('handoff')
 
   const [questions, setQuestions] = useState([])
   const [currentQ, setCurrentQ] = useState(0)
@@ -224,7 +225,6 @@ export default function MultiQuiz({ players, navigate, onDone }) {
 
   return (
     <div style={{ padding: 18, position: 'relative', zIndex: 2 }}>
-      {/* player + timer bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <AvatarBubble avatar={getAvatar(playerIdx)} color={color} index={playerIdx} size={30} />
         <div style={{ fontSize: 13, fontWeight: 600, color: '#e0eaff', flex: 1 }}>{players[playerIdx]}</div>
@@ -233,7 +233,6 @@ export default function MultiQuiz({ players, navigate, onDone }) {
         </div>
       </div>
 
-      {/* progress */}
       <div style={{ marginBottom: 12 }}>
         <div style={{ fontSize: 10, color: 'rgba(180,200,255,.5)', marginBottom: 3 }}>
           第 {currentQ + 1} 題 / 共 10 題　得分 {score}
@@ -243,7 +242,6 @@ export default function MultiQuiz({ players, navigate, onDone }) {
         </div>
       </div>
 
-      {/* question card */}
       <div style={{ background: 'rgba(255,255,255,.04)', border: `1px solid ${color}33`, borderRadius: 12, padding: 16, marginBottom: 12, minHeight: 95 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
           <div style={{ fontSize: 10, color: 'rgba(140,180,255,.6)', letterSpacing: 1 }}>
@@ -272,7 +270,6 @@ export default function MultiQuiz({ players, navigate, onDone }) {
         )}
       </div>
 
-      {/* choices */}
       {q && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[{ label: '✅ 這是正常事件', val: 0 }, { label: '🚨 這是異常詐騙', val: 1 }].map((o, i) => {
@@ -298,7 +295,6 @@ export default function MultiQuiz({ players, navigate, onDone }) {
         </div>
       )}
 
-      {/* feedback */}
       {feedback && (
         <div style={{
           marginTop: 11, padding: '10px 14px', borderRadius: 9, fontSize: 12, lineHeight: 1.6,
@@ -311,7 +307,6 @@ export default function MultiQuiz({ players, navigate, onDone }) {
         </div>
       )}
 
-      {/* next */}
       {feedback && (
         <button onClick={handleNext} style={{
           width: '100%', marginTop: 11, padding: 11,

@@ -438,4 +438,376 @@ export const DETECTIVE_CASES = [
       },
     ],
   },
+
+  // ─────────────── 案件 #0050 ───────────────
+  {
+    id: 'bank-otp-2024',
+    caseNumber: '#0050',
+    title: '假冒銀行 OTP 竊取詐騙案',
+    victim: '王先生',
+    loss: '45 萬元',
+    method: '假冒銀行客服 + 竊取一次性驗證碼',
+    intro: '台北業務員王明宏接到「台新銀行防詐中心」電話，說他的信用卡被盜刷 12,000 元，需要立即處理。你是 165 反詐騙偵探，找出這場詐騙的每個關鍵轉折。',
+    questions: [
+      {
+        id: 'q1',
+        scene: '王先生接到電話，對方自稱台新銀行信用卡防詐中心：',
+        message: '「王先生您好，我是台新銀行防詐中心，您的信用卡末碼 8821 今天下午 14:37 在蝦皮購物有一筆 12,000 元消費，請問是您本人操作嗎？」',
+        question: '偵探，這通電話最應該注意什麼？',
+        timeLimit: 25,
+        evidence: [
+          {
+            id: 'e1a', label: '來電顯示號碼', icon: '📞',
+            content: '電話號碼分析：\n• 來電顯示：0800-588-885（確實是台新客服號碼）\n• ⚠️ 來電顯示可以偽造（電話號碼詐騙技術）\n• 顯示真實號碼 ≠ 真的台新銀行\n\n→ 任何銀行來電都應該掛斷，自行登入 App 確認',
+            isSuspicious: true,
+          },
+          {
+            id: 'e1b', label: '「您的卡末碼 8821」', icon: '💳',
+            content: '個資取得方式：\n• 卡號末碼可從資料外洩購得\n• 說出正確資訊讓你覺得「他真的知道我的卡」\n• 這是增加可信度的話術，不代表是真實銀行\n\n→ 說出你的部分資料 ≠ 是真正的銀行',
+            isSuspicious: true,
+          },
+          {
+            id: 'e1c', label: '「防詐中心」這個名稱', icon: '🏦',
+            content: '組織名稱分析：\n• 銀行客服部門叫「客戶服務中心」\n• 「防詐中心」是詐騙集團的自創名稱\n• 真正的銀行發現異常交易，第一步是直接鎖卡\n  不會打電話要你「配合操作」\n\n→ 「防詐中心」這個名稱本身就是紅旗',
+            isSuspicious: true,
+          },
+          {
+            id: 'e1d', label: '「蝦皮 12,000 元消費」', icon: '🛒',
+            content: '消費查詢方式：\n• 你可以自行登入銀行 App 查消費明細\n• 不需要依賴來電者告知\n• 若真的有異常，銀行 App 會有推播通知\n\n→ 自行登入 App 查詢是唯一正確做法',
+            isSuspicious: false,
+          },
+        ],
+        options: [
+          { text: '來電顯示可以偽造，先掛斷，自行登入台新 App 查帳', correct: true, explanation: '正確！來電顯示完全可以偽造，說出卡末碼也可以靠外洩資料取得。任何聲稱銀行的來電，都應該掛斷後自行登入 App 確認。' },
+          { text: '他說出我的卡末碼，代表他真的是銀行，繼續聽', correct: false, explanation: '危險！卡號末碼可以從資料外洩購得，說出部分資料是增加可信度的話術，不代表是真實銀行客服。' },
+          { text: '要求對方提供完整的報案流程', correct: false, explanation: '繼續和對方通話只會讓詐騙集團引導你做危險操作。正確做法是掛斷後自行登入銀行 App。' },
+        ],
+        suspiciousIds: ['e1a', 'e1b', 'e1c'],
+      },
+      {
+        id: 'q2',
+        scene: '王先生沒有掛斷，「客服」說需要操作取消授權，傳來一個連結：',
+        lineChat: [
+          { sender: 'scammer', name: '台新防詐客服', text: '為了幫您取消這筆盜刷並鎖定異常，請點以下連結進入安全驗證頁面，輸入網銀帳密和一次性驗證碼完成確認：https://taishin-secure-verify.com/auth', time: '14:52' },
+          { sender: 'victim', name: '王先生', text: '這個網址看起來怪怪的…', time: '14:54' },
+          { sender: 'scammer', name: '台新防詐客服', text: '不用擔心，這是台新的安全驗證平台，動作快一點，盜刷金額每分鐘都在擴大喔！', time: '14:54' },
+        ],
+        question: '偵探，這個連結和操作步驟有什麼危險？',
+        timeLimit: 25,
+        evidence: [
+          {
+            id: 'e2a', label: '網址分析', icon: '🔗',
+            content: '網域對比：\n• 傳來的網址：taishin-secure-verify.com\n• 台新官方網址：taishinbank.com.tw\n\n⚠️ 台灣銀行官網結尾一定是 .com.tw\n→ .com 結尾的「銀行網站」都是假的',
+            isSuspicious: true,
+          },
+          {
+            id: 'e2b', label: '「輸入網銀帳密」的要求', icon: '🔑',
+            content: '安全常識：\n• 銀行絕不要求你在「第三方頁面」輸入帳密\n• 網銀帳密只能在官方 App 或 .com.tw 官網使用\n• 在其他地方輸入 = 直接交出帳戶控制權\n\n→ 輸入了就等於讓對方登入你的帳戶',
+            isSuspicious: true,
+          },
+          {
+            id: 'e2c', label: '「盜刷每分鐘擴大」的催促', icon: '⏰',
+            content: '心理分析：\n• 製造緊迫感是詐騙的核心手法\n• 讓你沒時間思考和查證\n• 真正的銀行察覺異常，第一步是鎖卡\n  不是要你去點連結\n\n→ 催促你「快點操作」是危險信號',
+            isSuspicious: true,
+          },
+          {
+            id: 'e2d', label: '一次性驗證碼（OTP）的用途', icon: '🔢',
+            content: 'OTP 的作用：\n• OTP 是銀行確認「是本人操作」的關鍵\n• 告訴別人你的 OTP = 讓別人用你的身份做交易\n• 銀行客服永遠不需要你說出 OTP\n\n→ 任何人要你報 OTP，都是詐騙',
+            isSuspicious: true,
+          },
+        ],
+        options: [
+          { text: '網址是假的，銀行絕不要 OTP，立刻掛斷，改用台新官方 App 查詢', correct: true, explanation: '完全正確！台灣的銀行官網一定是 .com.tw，任何人要你說出 OTP 都是詐騙。立刻掛斷，登入官方 App。' },
+          { text: '先進網站看看，不輸入資料就沒事', correct: false, explanation: '進入釣魚網站就有風險，有些釣魚網站光是開啟就能竊取 Cookie 或裝置資訊。不應該點進去。' },
+          { text: '把 OTP 前三碼告訴對方，看他猜不猜得出來', correct: false, explanation: '任何部分的 OTP 都不應該透露。對方可能使用暴力嘗試，不要給他任何數字。' },
+        ],
+        suspiciousIds: ['e2a', 'e2b', 'e2c', 'e2d'],
+      },
+      {
+        id: 'q3',
+        scene: '王先生在釣魚網站輸入帳密後，手機收到 OTP 簡訊，「客服」要他朗讀驗證碼：',
+        lineChat: [
+          { sender: 'scammer', name: '台新防詐客服', text: '好，您的手機應該剛收到一個驗證簡訊，請把那 6 位數字告訴我，我來完成「取消授權」。', time: '15:01' },
+          { sender: 'victim', name: '王先生', text: '收到了，是 489…', time: '15:01' },
+          { sender: 'scammer', name: '台新防詐客服', text: '好，請繼續說完 6 位數', time: '15:01' },
+        ],
+        question: '偵探，王先生已經輸入帳密，現在說出 OTP 會發生什麼事？',
+        timeLimit: 20,
+        evidence: [
+          {
+            id: 'e3a', label: '詐騙集團的完整流程', icon: '🔄',
+            content: '還原詐騙流程：\n① 你輸入帳密 → 他們登入你的網銀\n② 系統發 OTP 到你手機（這是銀行確認「是你」）\n③ 你說出 OTP → 他們通過驗證\n④ 立刻把帳戶的錢全部轉走\n\n→ OTP = 你帳戶的最後一道防線',
+            isSuspicious: true,
+          },
+          {
+            id: 'e3b', label: '「取消授權需要 OTP」的說法', icon: '❌',
+            content: '操作邏輯分析：\n• 真正的取消授權由銀行後台直接執行\n• 不需要客戶說出 OTP\n• 「取消授權需要 OTP」在真實銀行流程中不存在\n\n→ 「取消授權」只是讓你說 OTP 的藉口',
+            isSuspicious: true,
+          },
+          {
+            id: 'e3c', label: '帳戶目前餘額', icon: '💰',
+            content: '帳戶狀態：\n• 帳戶餘額：450,000 元\n• 對方已取得帳密，只差 OTP\n• OTP 有效時間：3 分鐘\n\n→ 只要不說出 OTP，帳戶還有機會保住',
+            isSuspicious: false,
+          },
+        ],
+        options: [
+          { text: '立刻停止！掛斷、馬上改網銀密碼、致電台新凍結帳戶', correct: true, explanation: '正確！雖然已輸入帳密，只要 OTP 沒有說出去，帳戶還有機會保住。立刻改密碼並致電銀行凍結，速度決定能保住多少。' },
+          { text: '已說了前三碼，繼續說完看看', correct: false, explanation: '說完 OTP 就等於交出帳戶控制權。對方會在 3 分鐘內把 45 萬全部轉走，無法追回。' },
+          { text: '問對方可以用什麼方式退還被盜刷的 12,000 元', correct: false, explanation: '根本沒有盜刷，也沒有退款，整個情境都是假的。現在最重要的是保護帳戶，立刻掛斷、凍結。' },
+        ],
+        suspiciousIds: ['e3a', 'e3b'],
+      },
+    ],
+  },
+
+  // ─────────────── 案件 #0051 ───────────────
+  {
+    id: 'job-mule-2024',
+    caseNumber: '#0051',
+    title: '高薪轉帳工作洗錢詐騙案',
+    victim: '阿傑',
+    loss: '法律責任 + 500 萬追償',
+    method: '假求職廣告 + 人頭帳戶洗錢',
+    intro: '20 歲剛入社會的阿傑在 Facebook 看到「居家轉帳員」廣告，不用出門、每筆抽 2%、手機就能操作。你是 165 反詐騙偵探，找出這份「輕鬆工作」背後藏著什麼陷阱。',
+    questions: [
+      {
+        id: 'q1',
+        scene: '阿傑看到廣告後傳訊詢問，對方迅速回應：',
+        lineChat: [
+          { sender: 'scammer', name: '財務主管 Karen', text: '您好！我們公司是合法的跨境資金清算公司，工作是接受款項匯入您帳戶，再依指示轉出，每筆抽 2%，一天平均 2–3 筆，月入輕鬆 30,000 以上！', time: '10:20' },
+          { sender: 'victim', name: '阿傑', text: '這個工作合法嗎？', time: '10:23' },
+          { sender: 'scammer', name: '財務主管 Karen', text: '完全合法！我們有執照，只是台灣金融法規限制，需要借用個人帳戶操作，你的資料我們絕對保密 😊', time: '10:24' },
+        ],
+        question: '偵探，這份工作廣告有什麼根本問題？',
+        timeLimit: 25,
+        evidence: [
+          {
+            id: 'e1a', label: '「借用個人帳戶」這句話', icon: '🏦',
+            content: '金融常識：\n• 合法公司有自己的法人帳戶\n• 「需要借用個人帳戶」= 不想留下公司痕跡\n• 個人帳戶若用於轉移詐騙款項\n  帳戶持有人就是洗錢共犯\n\n→ 這就是「人頭帳戶」的取得方式',
+            isSuspicious: true,
+          },
+          {
+            id: 'e1b', label: '「跨境資金清算」業務', icon: '📋',
+            content: '業務合法性：\n• 跨境匯款需要金管會核准的執照\n• 合法業者有自己的企業帳戶，不用個人帳戶\n• 無法提供公司名稱和統一編號查驗\n\n→ 「我們有執照」說得出口但提不出來',
+            isSuspicious: true,
+          },
+          {
+            id: 'e1c', label: '每筆 2% 的薪資結構', icon: '💸',
+            content: '正常工作分析：\n• 真實財務工作不會「抽成轉帳」\n• 2% 抽成來自哪裡？你沒有創造任何價值\n• 讓你「碰到」這筆錢讓你承擔法律責任\n\n→ 這個結構只對詐騙集團有利',
+            isSuspicious: true,
+          },
+          {
+            id: 'e1d', label: '居家遠端操作', icon: '🏠',
+            content: '工作型態：\n• 沒有實體辦公室 = 無法查證公司真實性\n• 遠端操作 = 你看不到錢的來源和流向\n\n→ 缺乏任何可驗證的實體存在',
+            isSuspicious: false,
+          },
+        ],
+        options: [
+          { text: '「借用個人帳戶」就是洗錢特徵，你的帳戶會成為犯罪工具，立刻封鎖對方', correct: true, explanation: '正確！任何要求「用你的帳戶幫別人轉帳」的工作都是洗錢。若你的帳戶轉移了詐騙款項，你就是洗錢共犯，最高刑責 7 年。' },
+          { text: '試試看，如果有問題再退出', correct: false, explanation: '一旦帳戶被使用，錢就過手了，你的帳戶已與犯罪連結。「我不知道」無法作為有效辯護。' },
+          { text: '要求對方提供公司執照再決定', correct: false, explanation: '執照可以偽造。「借用個人帳戶」本身就已是洗錢的標誌，看到這句話就應該結束對話。' },
+        ],
+        suspiciousIds: ['e1a', 'e1b', 'e1c'],
+      },
+      {
+        id: 'q2',
+        scene: '阿傑沒有停止，開始操作，第一筆款項匯入帳戶：',
+        lineChat: [
+          { sender: 'scammer', name: '財務主管 Karen', text: '阿傑，現在有 150,000 元匯入你帳戶了，請立刻轉到以下帳號，轉完截圖給我，你的抽成 3,000 元明天單獨匯給你。帳號：玉山銀行 808-XXXXXX', time: '14:30' },
+          { sender: 'victim', name: '阿傑', text: '好，我看看…真的有 15 萬進來！', time: '14:32' },
+        ],
+        question: '偵探，這 15 萬元的真實來源是什麼？',
+        timeLimit: 25,
+        evidence: [
+          {
+            id: 'e2a', label: '這 15 萬元的來源', icon: '💰',
+            content: '資金調查：\n• 這 15 萬元來自詐騙受害者 A 的帳戶\n• 受害者 A 被「假客服詐騙」騙去轉帳\n• 阿傑的帳戶是「第二層人頭帳戶」\n• 轉走這筆 = 參與洗錢\n\n→ 這不是公司資金，是別人被騙的錢',
+            isSuspicious: true,
+          },
+          {
+            id: 'e2b', label: '指定轉出帳號的性質', icon: '📲',
+            content: '轉出目標分析：\n• 指定帳號是第三層人頭帳戶\n• 資金會被迅速分散到多個帳號\n• 讓警察難以追查原始詐騙者\n\n→ 阿傑成為「漂白犯罪金錢」的環節',
+            isSuspicious: true,
+          },
+          {
+            id: 'e2c', label: '「抽成明天匯」的邏輯', icon: '📅',
+            content: '詐騙設計：\n• 一旦你轉走資金，你已是共犯\n• 對方可能根本不會匯抽成來\n• 就算匯來，那 3,000 元也是犯罪所得\n\n→ 3,000 元的小利換來洗錢刑責',
+            isSuspicious: true,
+          },
+          {
+            id: 'e2d', label: '洗錢防制法條文', icon: '⚖️',
+            content: '法律說明：\n• 洗錢防制法 第 14 條\n• 幫助洗錢：3 年以下有期徒刑\n  或 500 萬以下罰金\n• 「不知情」但收取利益仍可能入罪\n\n→ 每多轉一筆，法律責任越重',
+            isSuspicious: false,
+          },
+        ],
+        options: [
+          { text: '立刻停止！這是詐騙受害者的錢，通知銀行凍結帳戶並主動報警', correct: true, explanation: '正確！雖然已經是被利用的一環，但若主動停止並向警方坦承，可以爭取以「被害者」身份處理，繼續轉款法律責任會更重。' },
+          { text: '轉完這筆，拿到 3,000 就不繼續了', correct: false, explanation: '每多轉一筆，洗錢紀錄就多一筆，法律責任越重。「只做一次」無法作為辯護。' },
+          { text: '先把抽成 3,000 要到手再說', correct: false, explanation: '即使拿到 3,000 元，那是犯罪所得。更重要的是你已承擔了洗錢刑責，應立刻停止並報警。' },
+        ],
+        suspiciousIds: ['e2a', 'e2b', 'e2c'],
+      },
+      {
+        id: 'q3',
+        scene: '阿傑轉了兩筆後，警察打電話來了：',
+        message: '「先生，您的帳戶被標記為詐騙洗錢相關帳戶，共有三名受害者的資金通過您的帳戶，我們需要您配合說明，請問您目前方便接受約談嗎？」',
+        question: '偵探，阿傑現在最正確的做法是？',
+        timeLimit: 20,
+        evidence: [
+          {
+            id: 'e3a', label: '阿傑的法律處境', icon: '⚖️',
+            content: '現況分析：\n• 三筆轉帳記錄都在帳戶內\n• 他有收取抽成（可能構成犯罪所得）\n• 是否被認定為「不知情受害者」\n  取決於配合程度和提供的線索\n\n→ 主動配合比躲避有利得多',
+            isSuspicious: false,
+          },
+          {
+            id: 'e3b', label: '手上掌握的證據', icon: '💬',
+            content: '可提供的線索：\n• Karen 的 LINE 對話完整截圖\n• Facebook 原始廣告截圖\n• 所有指示的轉帳紀錄\n\n→ 這些是追查詐騙集團的有效線索\n→ 提供出來對阿傑有利',
+            isSuspicious: false,
+          },
+          {
+            id: 'e3c', label: '類似案件的法院判例', icon: '📚',
+            content: '判例分析：\n• 主動配合、提供完整線索：多以緩刑或輕判處理\n• 逃避警方約談：刑責大幅加重\n• 繼續轉帳：被視為「知情共犯」\n\n→ 第一時間主動配合是最好的選擇',
+            isSuspicious: false,
+          },
+        ],
+        options: [
+          { text: '立刻配合警方約談，保留所有 LINE 對話和截圖，委託律師說明情況', correct: true, explanation: '正確！若能證明是受騙、主動配合、提供完整線索，有機會以被害者身份處理而非共犯。逃避或刪除記錄只會讓情況惡化。' },
+          { text: '刪掉所有聊天記錄，說完全不知情', correct: false, explanation: '刪除記錄是「妨礙司法」，會讓罪責更重。銀行保有完整轉帳記錄，帳戶行為無法抹去。' },
+          { text: '要求 Karen 出面替你承擔責任', correct: false, explanation: 'Karen 是詐騙集團成員，對你沒有任何義務，且可能根本無法聯繫到真人。你必須為帳戶行為承擔責任。' },
+        ],
+        suspiciousIds: [],
+      },
+    ],
+  },
+
+  // ─────────────── 案件 #0052 ───────────────
+  {
+    id: 'romance-crypto-2024',
+    caseNumber: '#0052',
+    title: '網路戀愛加密貨幣詐騙案',
+    victim: '美玲',
+    loss: '230 萬元',
+    method: '網路感情 + 假加密貨幣平台',
+    intro: '50 歲離婚的美玲在 Facebook 認識了「旅居海外的台商」David，三個月的深厚感情後，David 開始推薦加密貨幣投資。你是 165 反詐騙偵探，找出這段戀情背後的每個陷阱。',
+    questions: [
+      {
+        id: 'q1',
+        scene: '美玲在 Facebook 收到陌生人 David 的加友請求，開始聊天：',
+        lineChat: [
+          { sender: 'scammer', name: 'David Chen 🇨🇳台灣人旅居上海', text: '美玲小姐妳好，看到妳分享的風景照片，感覺我們有緣，我也很喜歡旅遊，可以交個朋友嗎？', time: '19:30' },
+          { sender: 'victim', name: '美玲', text: '你好，你是哪裡人呢？', time: '19:45' },
+          { sender: 'scammer', name: 'David Chen 🇨🇳台灣人旅居上海', text: '台灣台中人，在上海做貿易生意，妳的笑容很溫暖，讓我一眼就注意到妳 🌹', time: '19:47' },
+        ],
+        question: '偵探，這段交友初期有什麼需要注意的訊號？',
+        timeLimit: 25,
+        evidence: [
+          {
+            id: 'e1a', label: 'David 的大頭貼', icon: '📸',
+            image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=280&q=75&auto=format',
+            content: '圖片反向搜尋結果：\n• 這張照片出現在多個外國網站\n• 原始上傳者是一位歐洲男性\n• David 的帳號建立才 8 週\n• 朋友清單多為陌生人，台灣朋友極少\n\n→ 使用他人照片是詐騙的高度警示',
+            isSuspicious: true,
+          },
+          {
+            id: 'e1b', label: '一開始就的「緣分」說法', icon: '💬',
+            content: '陌生交友分析：\n• 主動加友且立即表達好感\n• 「看照片感覺有緣」是常見話術\n• 正常認識不會第一句話就說「注意到妳」\n\n→ 立即建立親密感是感情詐騙的開場',
+            isSuspicious: true,
+          },
+          {
+            id: 'e1c', label: '「旅居海外的台灣人」身份', icon: '✈️',
+            content: '身份核查：\n• 說在上海做貿易，細問公司名稱時模糊帶過\n• 三個月內從未視訊，理由總是工作忙\n• 無法提供任何可以驗證的資訊\n\n→ 無法確認身份的網路對象需謹慎',
+            isSuspicious: true,
+          },
+          {
+            id: 'e1d', label: '每天的噓寒問暖', icon: '💕',
+            content: '互動模式：\n• 每天早晚問候，節日也不缺席\n• 記住美玲說過的每一件小事\n• 卻始終沒有實際見面的計畫\n\n→ 密集情感投入卻從不見面\n  這是「養豬」的標準模式',
+            isSuspicious: false,
+          },
+        ],
+        options: [
+          { text: '照片是盜用的，從未視訊，立刻要求視訊通話確認是真人', correct: true, explanation: '正確！反向圖片搜尋是識破詐騙的利器。要求立即視訊——若對方一直找藉口拒絕，就是感情詐騙。' },
+          { text: '他很體貼，可能只是海外工作比較忙', correct: false, explanation: '三個月的密集噓寒問暖是「養豬」的劇本，不是真實感情。「他很關心我」正是詐騙集團要你這樣感覺的。' },
+          { text: '等相處更久再確認', correct: false, explanation: '等越久感情投入越深，越難理性判斷。殺豬盤讓你在有感情時才開口要錢，讓你難以拒絕。' },
+        ],
+        suspiciousIds: ['e1a', 'e1b', 'e1c'],
+      },
+      {
+        id: 'q2',
+        scene: '兩個月後，David 提到他靠加密貨幣賺了不少，想帶美玲一起：',
+        lineChat: [
+          { sender: 'scammer', name: 'David Chen', text: '美玲，我有個消息想跟妳分享，最近用了一個平台，上個月賺了快 40 萬，我的舅舅在裡面有內部名額，妳要不要一起試試？', time: '21:00' },
+          { sender: 'victim', name: '美玲', text: '我對投資不太懂…', time: '21:05' },
+          { sender: 'scammer', name: 'David Chen', text: '沒關係，我全程帶著妳，就當我送妳的禮物，我喜歡妳，希望妳也能一起有好的生活 😊', time: '21:06' },
+        ],
+        question: '偵探，「投資邀請」出現了，有什麼破綻？',
+        timeLimit: 25,
+        evidence: [
+          {
+            id: 'e2a', label: '「幣達財富通」平台', icon: '📱',
+            content: '平台調查：\n• App Store / Google Play：搜尋不到\n• 安裝方式：只能用 David 給的 QR Code 安裝\n• 公司登記查詢：零結果\n• 金管會官網：無任何相關登記\n\n→ 合法投資平台一定在 fsc.gov.tw 可查到',
+            isSuspicious: true,
+          },
+          {
+            id: 'e2b', label: '「舅舅的內部名額」', icon: '🤫',
+            content: '話術分析：\n• 「內部名額」製造稀缺感和特殊感\n• 讓你覺得是「他特別給你的機會」\n• 降低你用正常標準查證的動力\n\n→ 利用感情關係降低警戒',
+            isSuspicious: true,
+          },
+          {
+            id: 'e2c', label: '「上月賺了 40 萬」截圖', icon: '📊',
+            content: '截圖鑑識：\n• 帳戶名稱區域刻意模糊化\n• 字體間距與真實交易所略有不同\n• 加密貨幣截圖非常容易偽造\n\n→ 截圖可以製造，不能證明平台真實',
+            isSuspicious: true,
+          },
+          {
+            id: 'e2d', label: '「當作送妳的禮物」', icon: '🎁',
+            content: '心理分析：\n• 把投資包裝成「禮物」讓你沒有虧損的心理負擔\n• 降低你做盡職查核的動力\n\n→ 這是殺豬盤標準的「殺豬」起手式',
+            isSuspicious: false,
+          },
+        ],
+        options: [
+          { text: 'App 查不到、無法從官方商店下載、金管會無登記——這是假平台，停止', correct: true, explanation: '正確！合法投資平台一定在金管會 fsc.gov.tw 有登記，只能用 QR Code 安裝是最大紅旗。無論感情多深，查證不能省。' },
+          { text: '試投少一點，先看看', correct: false, explanation: '「先投少一點」正是詐騙設計的引導！初期小額一定顯示獲利，目的是讓你加碼大額資金。' },
+          { text: '他送我的禮物，拒絕不太好', correct: false, explanation: '感情不能代替查證。真正關心你的人不會帶你進入無法查證的平台。' },
+        ],
+        suspiciousIds: ['e2a', 'e2b', 'e2c'],
+      },
+      {
+        id: 'q3',
+        scene: '美玲投入 10 萬後帳面顯示大幅獲利，David 說現在有特別行情：',
+        lineChat: [
+          { sender: 'scammer', name: 'David Chen', text: '妳的帳面已經 145,000 了！這次特別行情是季度清算，VIP 要 200 萬以上才能進場，妳如果再追加，我們一起賺，之後我可以來台灣看妳 💕', time: '14:00' },
+          { sender: 'victim', name: '美玲', text: '200 萬…我要把定存解掉…', time: '14:10' },
+          { sender: 'scammer', name: 'David Chen', text: '值得的，我在旁邊陪著妳，這次機會不多，今晚截止名額 ⏰', time: '14:11' },
+        ],
+        question: '偵探，美玲準備解定存追加 200 萬，你的判斷是？',
+        timeLimit: 20,
+        evidence: [
+          {
+            id: 'e3a', label: '「放水」讓帳面大漲', icon: '🎣',
+            content: '平台運作邏輯：\n• 後台數字由詐騙集團完全控制\n• 帳面 145,000 是他們輸入的數字\n• 允許小額提款叫「放水」\n• 大額追加後，帳戶就會「凍結」\n\n→ 那 45,000 元的「獲利」是誘餌',
+            isSuspicious: true,
+          },
+          {
+            id: 'e3b', label: '「今晚截止 VIP 名額」', icon: '⏰',
+            content: '緊迫感製造：\n• 截止時間讓你沒有時間查證\n• 「VIP 才能進場」製造稀缺感\n• 「我來台灣看妳」是感情誘餌\n\n→ 催促 + 感情是讓你快速決定的操控工具',
+            isSuspicious: true,
+          },
+          {
+            id: 'e3c', label: '解定存提款的影響', icon: '🏦',
+            content: '財務影響：\n• 定存提前解約：損失利息\n• 200 萬是重大資產決策\n• 任何重大投資決策需要冷靜期和第三方意見\n\n→ 被催著「今晚截止」解定存是最高風險訊號',
+            isSuspicious: true,
+          },
+          {
+            id: 'e3d', label: '帳面獲利提款測試', icon: '💰',
+            content: '提款紀錄：\n• 申請提款 5,000 元：成功到帳\n• 這個「成功」讓美玲更相信平台\n\n→ 小額提款是「放水」，不代表大額安全\n→ 平台後台可以選擇讓誰能出金',
+            isSuspicious: false,
+          },
+        ],
+        options: [
+          { text: '帳面數字是假的，今晚截止是催促手段，立刻把目前的錢全部提出、停止追加', correct: true, explanation: '正確！「今晚截止 VIP」是讓你快速決定、無法查證的操控手法。立刻提出所有資金、停止追加，不要因為感情讓自己承受財務損失。' },
+          { text: '他說會來台灣看我，應該是真心的，先追加看看', correct: false, explanation: '「來台灣看妳」是最後的感情砝碼。230 萬就是這樣在「加一點就好」中消失的。' },
+          { text: '先提出小額測試平台是否能出金', correct: false, explanation: '小額出金是「放水」策略。他們特意讓你能提小錢，目的是讓你放心追加大額。' },
+        ],
+        suspiciousIds: ['e3a', 'e3b', 'e3c'],
+      },
+    ],
+  },
 ]
