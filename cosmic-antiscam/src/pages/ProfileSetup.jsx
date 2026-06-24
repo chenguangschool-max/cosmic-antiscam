@@ -99,8 +99,8 @@ export default function ProfileSetup({ onDone }) {
                   </button>
                 ))}
               </div>
-              <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
-              <input ref={galleryRef} type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
+              <input ref={cameraRef} type="file" accept="image/*" capture="user" onChange={handlePhoto} style={{ position: 'fixed', left: '-9999px', top: 0, opacity: 0 }} />
+              <input ref={galleryRef} type="file" accept="image/*" onChange={handlePhoto} style={{ position: 'fixed', left: '-9999px', top: 0, opacity: 0 }} />
               <button
                 onClick={() => setShowPhotoMenu(true)}
                 style={{
@@ -126,13 +126,13 @@ export default function ProfileSetup({ onDone }) {
                   >
                     <div style={{ fontSize: 13, color: 'rgba(140,180,255,.55)', textAlign: 'center', marginBottom: 16, fontFamily: 'Noto Sans TC,sans-serif' }}>選擇圖片來源</div>
                     <button
-                      onClick={() => { cameraRef.current.click(); setShowPhotoMenu(false) }}
+                      onClick={() => { setShowPhotoMenu(false); setTimeout(() => cameraRef.current?.click(), 80) }}
                       style={{ width: '100%', padding: '14px 0', borderRadius: 12, marginBottom: 10, background: 'rgba(91,141,238,.18)', border: '1px solid rgba(91,141,238,.4)', color: '#c8dbff', fontSize: 15, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }}
                     >
                       📷 拍照
                     </button>
                     <button
-                      onClick={() => { galleryRef.current.click(); setShowPhotoMenu(false) }}
+                      onClick={() => { setShowPhotoMenu(false); setTimeout(() => galleryRef.current?.click(), 80) }}
                       style={{ width: '100%', padding: '14px 0', borderRadius: 12, marginBottom: 10, background: 'rgba(91,141,238,.18)', border: '1px solid rgba(91,141,238,.4)', color: '#c8dbff', fontSize: 15, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }}
                     >
                       🖼 從圖庫選擇
