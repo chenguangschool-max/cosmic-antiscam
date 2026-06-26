@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 
 const PRESET_AVATARS = ['🧑‍🚀', '👴', '🧓', '🕵️', '🤖', '👨‍💻']
 
@@ -11,8 +11,6 @@ export default function ProfileSetup({ onDone }) {
   const [avatar, setAvatar] = useState(saved.avatar || '🧑‍🚀')
   const [err, setErr] = useState('')
   const [showPhotoMenu, setShowPhotoMenu] = useState(false)
-  const cameraRef = useRef()
-  const galleryRef = useRef()
 
   const handlePhoto = (e) => {
     const file = e.target.files?.[0]
@@ -99,8 +97,10 @@ export default function ProfileSetup({ onDone }) {
                   </button>
                 ))}
               </div>
-              <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
-              <input ref={galleryRef} type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
+              {/* 用 label+htmlFor 讓瀏覽器原生觸發 input，capture 才能正確開相機 */}
+              <input id="ps-camera" type="file" accept="image/*" capture="user" onChange={handlePhoto} style={{ display: 'none' }} />
+              <input id="ps-gallery" type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
+
               <button
                 onClick={() => setShowPhotoMenu(true)}
                 style={{
@@ -125,18 +125,20 @@ export default function ProfileSetup({ onDone }) {
                     style={{ width: '100%', background: '#131c38', borderRadius: '18px 18px 0 0', padding: '20px 16px 36px' }}
                   >
                     <div style={{ fontSize: 13, color: 'rgba(140,180,255,.55)', textAlign: 'center', marginBottom: 16, fontFamily: 'Noto Sans TC,sans-serif' }}>選擇圖片來源</div>
-                    <button
-                      onClick={() => { cameraRef.current?.click(); setShowPhotoMenu(false) }}
-                      style={{ width: '100%', padding: '14px 0', borderRadius: 12, marginBottom: 10, background: 'rgba(91,141,238,.18)', border: '1px solid rgba(91,141,238,.4)', color: '#c8dbff', fontSize: 15, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }}
+                    <label
+                      htmlFor="ps-camera"
+                      onClick={() => setShowPhotoMenu(false)}
+                      style={{ display: 'block', width: '100%', padding: '14px 0', borderRadius: 12, marginBottom: 10, background: 'rgba(91,141,238,.18)', border: '1px solid rgba(91,141,238,.4)', color: '#c8dbff', fontSize: 15, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif', textAlign: 'center', boxSizing: 'border-box' }}
                     >
                       📷 拍照
-                    </button>
-                    <button
-                      onClick={() => { galleryRef.current?.click(); setShowPhotoMenu(false) }}
-                      style={{ width: '100%', padding: '14px 0', borderRadius: 12, marginBottom: 10, background: 'rgba(91,141,238,.18)', border: '1px solid rgba(91,141,238,.4)', color: '#c8dbff', fontSize: 15, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }}
+                    </label>
+                    <label
+                      htmlFor="ps-gallery"
+                      onClick={() => setShowPhotoMenu(false)}
+                      style={{ display: 'block', width: '100%', padding: '14px 0', borderRadius: 12, marginBottom: 10, background: 'rgba(91,141,238,.18)', border: '1px solid rgba(91,141,238,.4)', color: '#c8dbff', fontSize: 15, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif', textAlign: 'center', boxSizing: 'border-box' }}
                     >
                       🖼 從圖庫選擇
-                    </button>
+                    </label>
                     <button
                       onClick={() => setShowPhotoMenu(false)}
                       style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', color: 'rgba(180,200,255,.5)', fontSize: 14, cursor: 'pointer', fontFamily: 'Noto Sans TC,sans-serif' }}
